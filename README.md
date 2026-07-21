@@ -28,7 +28,7 @@ KBO 경기 및 선수 데이터를 수집·정제하여 선수의 경기력 변�
 ## 프로젝트 구조
 
 ```text
-han/
+baseball/
 ├── doc/                  # 프로젝트 관련 문서
 ├── README.md             # 프로젝트 소개
 └── BASEBALL_DATA_ENGINEERING_PLAN.md
