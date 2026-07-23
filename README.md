@@ -59,13 +59,7 @@ baseball/
 - [프로젝트 계획서](BASEBALL_DATA_ENGINEERING_PLAN.md)
 - [야구 기본 지식](doc/baseball_basics.md)
 
-## 로드맵
 
-> 추후 작성합니다.
-
-## 기여 방법
-
-> 추후 작성합니다.
 
 ## 라이선스
 
