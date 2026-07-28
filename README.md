@@ -283,7 +283,30 @@ python -m baseball_platform.pipeline
 
 - `synthetic_train.csv`: 2019~2024 합성 학습 데이터
 - `synthetic_test.csv`: Target이 없는 2025 합성 평가 데이터
+- `fold_results.csv`: 모델·검증 시즌별 상세 성능
+- `leaderboard.csv`: Fold 평균 기준 모델 순위
+- `model_comparison.png`: 모델 평균·시즌별 성능 비교 대시보드
 - `synthetic_submission.csv`: 투구별 제구 성공 확률
+
+현재 비교 모델은 전체 평균 확률과 Logistic Regression입니다. 두 모델을 동일한 2023·2024 시간 Fold에서 Log Loss, Brier Score, ROC-AUC로 평가하고, 평균 Log Loss가 가장 낮은 모델을 2019~2024 전체 데이터로 다시 학습해 제출 파일을 생성합니다. 공식 평가 지표가 공개되면 리더보드 정렬 기준을 해당 지표로 교체합니다.
+
+## Notebook 대시보드
+
+[모델 대시보드 Notebook](notebooks/model_dashboard.ipynb)을 열고 위에서부터 셀을 실행하면 다음 결과를 한 화면에서 확인할 수 있습니다.
+
+- 전체 학습·검증·예측 파이프라인 실행 결과
+- 모델 리더보드
+- 시즌 Fold별 상세 성능
+- 모델 성능 비교 차트
+- 2025 예측 결과 요약
+- 예측 확률 분포
+
+Notebook 환경 설치 및 실행:
+
+```powershell
+python -m pip install -r requirements-notebook.txt
+jupyter lab
+```
 
 ### 테스트
 
