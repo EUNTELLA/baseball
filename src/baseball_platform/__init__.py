@@ -1,1 +1,1 @@
-"""Baseball data platform package."""
+"""목표 좌표 기반 투수 제구력 평가 패키지."""
