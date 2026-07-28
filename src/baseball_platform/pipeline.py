@@ -9,7 +9,11 @@ from pathlib import Path
 
 from baseball_platform.collectors.synthetic_data import generate_synthetic_datasets
 from baseball_platform.contracts import load_contract
-from baseball_platform.models.baseline import LogisticBaseline, log_loss
+from baseball_platform.evaluation import compare_models, write_comparison_results
+from baseball_platform.models.baseline import (
+    LogisticBaseline,
+    MeanProbabilityModel,
+)
 from baseball_platform.quality.dataset_validator import (
     read_csv_rows,
     validate_dataset,
@@ -17,6 +21,7 @@ from baseball_platform.quality.dataset_validator import (
 )
 from baseball_platform.transforms.temporal_features import add_leakage_safe_history
 from baseball_platform.validation.temporal_split import expanding_season_folds
+from baseball_platform.visualization import create_model_comparison_dashboard
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -45,20 +50,28 @@ def run(output_directory: Path) -> dict[str, object]:
     ]
     categorical = list(contract.categorical_features)
 
-    validation_scores: dict[str, float] = {}
-    for fold in expanding_season_folds(train_rows):
-        model = LogisticBaseline(numeric, categorical)
-        model.fit(fold.train_rows, contract.target_column)
-        probabilities = model.predict_proba(fold.validation_rows)
-        targets = [
-            int(row[contract.target_column])
-            for row in fold.validation_rows
-        ]
-        validation_scores[str(fold.validation_season)] = round(
-            log_loss(targets, probabilities), 6
-        )
+    folds = expanding_season_folds(train_rows)
+    model_factories = {
+        "mean_probability": MeanProbabilityModel,
+        "logistic_regression": lambda: LogisticBaseline(
+            numeric, categorical
+        ),
+    }
+    fold_results, leaderboard = compare_models(
+        model_factories,
+        folds,
+        target_column=contract.target_column,
+    )
+    fold_results_path, leaderboard_path = write_comparison_results(
+        output_directory, fold_results, leaderboard
+    )
+    dashboard_path = create_model_comparison_dashboard(
+        output_directory / "model_comparison.png",
+        fold_results,
+        leaderboard,
+    )
 
-    final_model = LogisticBaseline(numeric, categorical)
+    final_model = model_factories[leaderboard[0].model]()
     final_model.fit(train_rows, contract.target_column)
     probabilities = final_model.predict_proba(test_rows)
     submission_path = output_directory / "synthetic_submission.csv"
@@ -81,7 +94,11 @@ def run(output_directory: Path) -> dict[str, object]:
     )
     return {
         "schema_version": contract.schema_version,
-        "validation_log_loss": validation_scores,
+        "best_model": leaderboard[0].model,
+        "best_mean_log_loss": leaderboard[0].mean_log_loss,
+        "fold_results": str(fold_results_path),
+        "leaderboard": str(leaderboard_path),
+        "dashboard": str(dashboard_path),
         "train_rows": len(train_rows),
         "test_rows": len(test_rows),
         "submission": str(submission_path),
