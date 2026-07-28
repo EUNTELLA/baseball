@@ -66,8 +66,12 @@ class EndToEndPipelineTest(unittest.TestCase):
             self.assertEqual(result["train_rows"], 1440)
             self.assertEqual(result["test_rows"], 240)
             self.assertTrue(Path(str(result["submission"])).exists())
-            self.assertEqual(
-                set(result["validation_log_loss"]), {"2023", "2024"}
+            self.assertTrue(Path(str(result["fold_results"])).exists())
+            self.assertTrue(Path(str(result["leaderboard"])).exists())
+            self.assertTrue(Path(str(result["dashboard"])).exists())
+            self.assertIn(
+                result["best_model"],
+                {"mean_probability", "logistic_regression"},
             )
 
 
