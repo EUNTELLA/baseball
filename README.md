@@ -254,16 +254,47 @@ baseball/
 - [x] 대회 문제 정의
 - [x] 데이터 구조 분류
 - [x] 시간 순서 기반 검증 전략 수립
+- [x] 공식 데이터 매핑 전 임시 데이터 계약
+- [x] 2019~2025 합성 데이터 생성기
+- [x] 누수 방지 과거 성공률 특징
+- [x] 2023·2024 Expanding Window 검증
+- [x] Logistic Regression 기준 모델
+- [x] 확률 제출 파일 생성 및 검증
 - [ ] 공식 데이터 스키마 확인
 - [ ] 탐색적 데이터 분석
-- [ ] 기준 모델 구축
-- [ ] 시점 기준 파생변수 생성
 - [ ] 2025 시즌 확률 예측 및 제출 파일 생성
 
-현재 저장소의 기존 거리 기반 제구력 계산 코드는 초기 프로토타입입니다. 다음 구현 단계에서 공식 학습·평가 데이터의 컬럼 구조와 제출 형식에 맞춰 예측 파이프라인으로 교체합니다.
+현재 구현은 공식 데이터가 아닌 합성 데이터와 임시 컬럼 계약을 사용합니다. 공식 데이터가 제공되면 실제 컬럼, Target, 평가 지표 및 제출 형식을 매핑해야 합니다.
+
+## 임시 파이프라인 실행
+
+### 요구 사항
+
+- Python 3.10 이상
+- scikit-learn 1.6.1
+
+```powershell
+python -m pip install -r requirements.txt
+$env:PYTHONPATH="src"
+python -m baseball_platform.pipeline
+```
+
+실행하면 `data/generated/` 아래에 다음 파일을 생성합니다.
+
+- `synthetic_train.csv`: 2019~2024 합성 학습 데이터
+- `synthetic_test.csv`: Target이 없는 2025 합성 평가 데이터
+- `synthetic_submission.csv`: 투구별 제구 성공 확률
+
+### 테스트
+
+```powershell
+$env:PYTHONPATH="src"
+python -m unittest discover -s tests -v
+```
 
 ## 문서
 
+- [프로젝트 기본 지식](doc/README.md)
 - [기존 데이터 엔지니어링 계획서](BASEBALL_DATA_ENGINEERING_PLAN.md)
 - [야구 기본 지식](doc/baseball_basics.md)
 
