@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+import math
 import statistics
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -19,8 +20,10 @@ class FoldResult:
     validation_season: int
     train_rows: int
     validation_rows: int
+    validation_success_rate: float
     log_loss: float
     brier_score: float
+    brier_skill_score: float
     roc_auc: float
 
 
@@ -31,11 +34,38 @@ class LeaderboardRow:
     mean_log_loss: float
     std_log_loss: float
     mean_brier_score: float
+    oof_brier_score: float
+    oof_brier_skill_score: float
     mean_roc_auc: float
     fold_count: int
 
 
 ModelFactory = Callable[[], object]
+
+
+def brier_skill_score(
+    targets: list[int], probabilities: list[float]
+) -> float:
+    """대회 공식 Brier Skill Score를 계산한다."""
+    if not targets or len(targets) != len(probabilities):
+        raise ValueError("정답과 예측은 길이가 같은 비어 있지 않은 값이어야 합니다.")
+    if any(target not in (0, 1) for target in targets):
+        raise ValueError("정답은 0 또는 1이어야 합니다.")
+    if any(
+        not math.isfinite(probability) or not 0 <= probability <= 1
+        for probability in probabilities
+    ):
+        raise ValueError("예측 확률은 유한한 0~1 값이어야 합니다.")
+
+    brier = statistics.fmean(
+        (probability - target) ** 2
+        for target, probability in zip(targets, probabilities, strict=True)
+    )
+    success_rate = statistics.fmean(targets)
+    reference_brier = success_rate * (1 - success_rate)
+    if reference_brier == 0:
+        return 0.0
+    return max(0.0, 100000 * (1 - brier / reference_brier))
 
 
 def compare_models(
@@ -59,11 +89,13 @@ def compare_models(
                     validation_season=fold.validation_season,
                     train_rows=len(fold.train_rows),
                     validation_rows=len(fold.validation_rows),
-                    log_loss=round(log_loss(targets, probabilities), 6),
-                    brier_score=round(
-                        brier_score_loss(targets, probabilities), 6
+                    validation_success_rate=statistics.fmean(targets),
+                    log_loss=log_loss(targets, probabilities),
+                    brier_score=brier_score_loss(targets, probabilities),
+                    brier_skill_score=brier_skill_score(
+                        targets, probabilities
                     ),
-                    roc_auc=round(roc_auc_score(targets, probabilities), 6),
+                    roc_auc=roc_auc_score(targets, probabilities),
                 )
             )
 
@@ -101,13 +133,23 @@ def _summarize(results: list[FoldResult]) -> list[LeaderboardRow]:
                 "mean_brier_score": statistics.fmean(
                     result.brier_score for result in model_results
                 ),
+                "oof_brier_score": _weighted_mean(
+                    model_results, "brier_score"
+                ),
+                "oof_brier_skill_score": _oof_brier_skill_score(
+                    model_results
+                ),
                 "mean_roc_auc": statistics.fmean(
                     result.roc_auc for result in model_results
                 ),
                 "fold_count": len(model_results),
             }
         )
-    summaries.sort(key=lambda item: item["mean_log_loss"])
+    summaries.sort(
+        key=lambda item: (
+            -item["oof_brier_skill_score"], item["oof_brier_score"]
+        )
+    )
     return [
         LeaderboardRow(
             rank=rank,
@@ -115,11 +157,32 @@ def _summarize(results: list[FoldResult]) -> list[LeaderboardRow]:
             mean_log_loss=round(float(item["mean_log_loss"]), 6),
             std_log_loss=round(float(item["std_log_loss"]), 6),
             mean_brier_score=round(float(item["mean_brier_score"]), 6),
+            oof_brier_score=round(float(item["oof_brier_score"]), 6),
+            oof_brier_skill_score=round(
+                float(item["oof_brier_skill_score"]), 6
+            ),
             mean_roc_auc=round(float(item["mean_roc_auc"]), 6),
             fold_count=int(item["fold_count"]),
         )
         for rank, item in enumerate(summaries, start=1)
     ]
+
+
+def _weighted_mean(results: list[FoldResult], field: str) -> float:
+    total_rows = sum(result.validation_rows for result in results)
+    return sum(
+        float(getattr(result, field)) * result.validation_rows
+        for result in results
+    ) / total_rows
+
+
+def _oof_brier_skill_score(results: list[FoldResult]) -> float:
+    brier = _weighted_mean(results, "brier_score")
+    success_rate = _weighted_mean(results, "validation_success_rate")
+    reference_brier = success_rate * (1 - success_rate)
+    if reference_brier == 0:
+        return 0.0
+    return max(0.0, 100000 * (1 - brier / reference_brier))
 
 
 def _write_dataclasses(path: Path, rows: list[object]) -> None:
