@@ -15,10 +15,10 @@ from baseball_platform.validation.temporal_split import expanding_season_folds
 
 
 class TemporalFeatureTest(unittest.TestCase):
-    def test_current_target_is_not_used_in_current_feature(self) -> None:
+    def test_current_label_is_not_used_in_current_feature(self) -> None:
         rows = [
-            {"pitcher_id": "P1", "target": "1"},
-            {"pitcher_id": "P1", "target": "0"},
+            {"pitcher_id": "P1", "control_success": "1"},
+            {"pitcher_id": "P1", "control_success": "0"},
         ]
 
         result = add_leakage_safe_history(rows)
@@ -30,7 +30,7 @@ class TemporalFeatureTest(unittest.TestCase):
 
     def test_temporal_fold_has_only_past_seasons(self) -> None:
         rows = [
-            {"season": year, "target": 1}
+            {"season": year, "control_success": 1}
             for year in range(2019, 2025)
         ]
 
@@ -57,9 +57,9 @@ class SubmissionValidationTest(unittest.TestCase):
 class EndToEndPipelineTest(unittest.TestCase):
     def test_pipeline_generates_valid_submission(self) -> None:
         contract = load_contract(
-            PROJECT_ROOT / "configs" / "provisional_schema.json"
+            PROJECT_ROOT / "configs" / "schema.json"
         )
-        self.assertEqual(contract.schema_version, "provisional-v1")
+        self.assertEqual(contract.schema_version, "competition-v1")
         with tempfile.TemporaryDirectory() as directory:
             result = run(Path(directory))
 

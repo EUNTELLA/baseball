@@ -28,16 +28,16 @@ class EvaluationTest(unittest.TestCase):
     def test_higher_oof_brier_skill_score_ranks_first(self) -> None:
         fold = TemporalFold(
             train_rows=[
-                {"target": 0},
-                {"target": 1},
-                {"target": 1},
-                {"target": 1},
+                {"control_success": 0},
+                {"control_success": 1},
+                {"control_success": 1},
+                {"control_success": 1},
             ],
             validation_rows=[
-                {"target": 1, "strong": 0.9, "weak": 0.5},
-                {"target": 1, "strong": 0.8, "weak": 0.5},
-                {"target": 0, "strong": 0.1, "weak": 0.5},
-                {"target": 1, "strong": 0.9, "weak": 0.5},
+                {"control_success": 1, "strong": 0.9, "weak": 0.5},
+                {"control_success": 1, "strong": 0.8, "weak": 0.5},
+                {"control_success": 0, "strong": 0.1, "weak": 0.5},
+                {"control_success": 1, "strong": 0.9, "weak": 0.5},
             ],
             validation_season=2024,
         )
@@ -48,7 +48,7 @@ class EvaluationTest(unittest.TestCase):
                 "strong": lambda: RowProbabilityModel("strong"),
             },
             [fold],
-            target_column="target",
+            target_column="control_success",
         )
 
         self.assertEqual(len(results), 2)
