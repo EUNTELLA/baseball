@@ -358,6 +358,7 @@ Score = max(0, 100000 × (1 - Brier Score / 평균 제구율 Brier Score))
 
 ```text
 baseball/
+├── script.py                        # 평가 서버에서 자동 실행되는 추론 진입점
 ├── configs/                         # 모델 및 검증 설정
 ├── data/                            # 학습·평가·샘플 제출 데이터
 ├── doc/                             # 데이터 및 실험 문서
@@ -365,6 +366,7 @@ baseball/
 │   ├── quality/                     # 스키마와 데이터 품질 검증
 │   ├── transforms/                  # 전처리 및 특징 생성
 │   ├── loaders/                     # 데이터 로딩
+│   ├── competition_data.py          # 실제 train/test/샘플 제출 자동 식별
 │   ├── marts/                       # 시점 기준 학습 데이터셋 구성
 │   └── models/                      # 학습, 검증 및 예측
 └── tests/                           # 데이터·특징·모델 테스트
@@ -409,7 +411,7 @@ python -m baseball_platform.pipeline
 - `model_comparison.png`: 모델 평균·시즌별 성능 비교 대시보드
 - `synthetic_submission.csv`: 투구별 제구 성공 확률
 
-현재 비교 모델은 전체 평균 확률과 Logistic Regression입니다. 두 모델을 동일한 2023·2024 시간 Fold에서 Log Loss, Brier Score, ROC-AUC로 평가하며, 현재 파이프라인은 평균 Log Loss가 가장 낮은 모델을 선택합니다. 대회 제출용 파이프라인에서는 공식 산식인 Brier Skill Score를 구현하고 모델 선택 기준도 해당 점수로 교체해야 합니다.
+현재 비교 모델은 전체 평균 확률과 Logistic Regression입니다. 두 모델을 동일한 2023·2024 시간 Fold에서 Brier Skill Score, Brier Score, Log Loss, ROC-AUC로 평가하며, 전체 OOF Brier Skill Score가 가장 높은 모델을 선택합니다. 선택한 모델은 제출 스크립트가 읽을 수 있는 `model/model.joblib` 아티팩트로 저장됩니다.
 
 ## Notebook 대시보드
 
