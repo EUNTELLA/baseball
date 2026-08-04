@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import math
 from dataclasses import dataclass
 
 from sklearn.compose import ColumnTransformer
@@ -83,18 +82,6 @@ class LogisticBaseline:
     def predict_proba(self, rows: list[dict[str, object]]) -> list[float]:
         x = _as_matrix(rows, self.features)
         return self.pipeline.predict_proba(x)[:, 1].tolist()
-
-
-def log_loss(targets: list[int], probabilities: list[float]) -> float:
-    epsilon = 1e-15
-    losses = []
-    for target, probability in zip(targets, probabilities, strict=True):
-        clipped = min(1 - epsilon, max(epsilon, probability))
-        losses.append(
-            -(target * math.log(clipped) + (1 - target) * math.log(1 - clipped))
-        )
-    return sum(losses) / len(losses)
-
 
 def _as_matrix(
     rows: list[dict[str, object]], features: list[str]

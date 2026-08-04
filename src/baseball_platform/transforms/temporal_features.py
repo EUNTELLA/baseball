@@ -1,4 +1,4 @@
-"""현재 행의 target을 사용하지 않는 과거 시점 특징을 생성한다."""
+"""현재 투구의 정답을 사용하지 않는 과거 시점 특징을 생성한다."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ from collections import defaultdict, deque
 def add_leakage_safe_history(
     rows: list[dict[str, str]],
     *,
-    target_column: str = "target",
+    target_column: str = "control_success",
     window: int = 20,
 ) -> list[dict[str, object]]:
     histories: dict[str, deque[int]] = defaultdict(lambda: deque(maxlen=window))

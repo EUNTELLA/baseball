@@ -39,7 +39,9 @@ def validate_dataset(
             f"필수 컬럼이 없습니다: {', '.join(sorted(missing))}"
         )
     if not is_train and contract.target_column in columns:
-        raise DatasetValidationError("평가 데이터에는 target이 없어야 합니다.")
+        raise DatasetValidationError(
+            f"평가 데이터에는 {contract.target_column}가 없어야 합니다."
+        )
 
     expected_seasons = (
         set(contract.train_seasons) if is_train else {contract.test_season}
@@ -92,11 +94,11 @@ def validate_dataset(
                 target = int(row[contract.target_column])
             except ValueError as exc:
                 raise DatasetValidationError(
-                    f"{number}행: target이 정수가 아닙니다."
+                    f"{number}행: {contract.target_column}가 정수가 아닙니다."
                 ) from exc
             if target not in (0, 1):
                 raise DatasetValidationError(
-                    f"{number}행: 임시 target은 0 또는 1이어야 합니다."
+                    f"{number}행: {contract.target_column}는 0 또는 1이어야 합니다."
                 )
 
 

@@ -1,4 +1,4 @@
-"""합성 데이터로 학습부터 제출 파일 생성까지 실행하는 임시 파이프라인."""
+"""개발용 합성 데이터로 학습부터 모델 저장까지 검증하는 파이프라인."""
 
 from __future__ import annotations
 
@@ -30,7 +30,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 
 def run(output_directory: Path) -> dict[str, object]:
-    contract = load_contract(PROJECT_ROOT / "configs" / "provisional_schema.json")
+    contract = load_contract(PROJECT_ROOT / "configs" / "schema.json")
     train_path, test_path = generate_synthetic_datasets(
         output_directory, contract
     )
@@ -127,7 +127,7 @@ def run(output_directory: Path) -> dict[str, object]:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="임시 제구 확률 예측 파이프라인")
+    parser = argparse.ArgumentParser(description="개발용 제구 확률 예측 파이프라인")
     parser.add_argument(
         "--output",
         type=Path,

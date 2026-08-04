@@ -40,13 +40,11 @@ def create_model_comparison_dashboard(
 
     axes[0].bar(
         labels,
-        [row.mean_log_loss for row in leaderboard],
+        [row.oof_brier_skill_score for row in leaderboard],
         color=colors,
-        yerr=[row.std_log_loss for row in leaderboard],
-        capsize=5,
     )
-    axes[0].set_title("Mean Log Loss (lower is better)")
-    axes[0].set_ylabel("Log Loss")
+    axes[0].set_title("OOF Brier Skill Score (higher is better)")
+    axes[0].set_ylabel("Brier Skill Score")
     axes[0].grid(axis="y", alpha=0.25)
     _annotate_bars(axes[0])
 
@@ -61,15 +59,15 @@ def create_model_comparison_dashboard(
         )
         axes[1].plot(
             [result.validation_season for result in model_results],
-            [result.log_loss for result in model_results],
+            [result.brier_skill_score for result in model_results],
             marker="o",
             linewidth=2,
             label=_display_name(model),
             color=COLORS.get(model, "#0F766E"),
         )
-    axes[1].set_title("Log Loss by Validation Season")
+    axes[1].set_title("Brier Skill Score by Validation Season")
     axes[1].set_xlabel("Validation season")
-    axes[1].set_ylabel("Log Loss")
+    axes[1].set_ylabel("Brier Skill Score")
     axes[1].set_xticks(
         sorted({result.validation_season for result in fold_results})
     )
@@ -101,7 +99,7 @@ def create_model_comparison_dashboard(
     figure.text(
         0.5,
         0.01,
-        "Synthetic data / provisional schema. Official metric is not yet confirmed.",
+        "Development validation on synthetic data / Official metric: Brier Skill Score",
         ha="center",
         fontsize=9,
         color="#64748B",
