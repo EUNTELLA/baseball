@@ -1,6 +1,6 @@
 {
-  "schema_version": "provisional-v1",
-  "notice": "공식 데이터 명세가 아닌 파이프라인 개발용 임시 계약입니다.",
+  "schema_version": "competition-v1",
+  "notice": "control_success는 공식 Target이며 입력 컬럼은 데이터 공개 후 확정합니다.",
   "id_columns": ["pitch_id", "game_id", "pitcher_id", "batter_id", "team_id"],
   "time_columns": ["season", "game_date", "pitch_sequence"],
   "numeric_features": [
@@ -13,7 +13,7 @@
     "asof_release_height", "asof_release_side", "asof_extension"
   ],
   "categorical_features": ["pitch_type_history"],
-  "target_column": "target",
+  "target_column": "control_success",
   "train_seasons": [2019, 2020, 2021, 2022, 2023, 2024],
   "test_season": 2025
 }
