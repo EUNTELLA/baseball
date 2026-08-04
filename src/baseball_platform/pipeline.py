@@ -7,6 +7,8 @@ import csv
 import json
 from pathlib import Path
 
+import joblib
+
 from baseball_platform.collectors.synthetic_data import generate_synthetic_datasets
 from baseball_platform.contracts import load_contract
 from baseball_platform.evaluation import compare_models, write_comparison_results
@@ -73,6 +75,24 @@ def run(output_directory: Path) -> dict[str, object]:
 
     final_model = model_factories[leaderboard[0].model]()
     final_model.fit(train_rows, contract.target_column)
+    model_directory = output_directory / "model"
+    model_directory.mkdir(parents=True, exist_ok=True)
+    model_path = model_directory / "model.joblib"
+    if isinstance(final_model, LogisticBaseline):
+        artifact = {
+            "model": final_model.pipeline,
+            "feature_columns": final_model.features,
+            "input_format": "matrix",
+            "prediction_column": "control_success",
+        }
+    else:
+        artifact = {
+            "constant_probability": final_model.probability,
+            "feature_columns": [],
+            "input_format": "constant",
+            "prediction_column": "control_success",
+        }
+    joblib.dump(artifact, model_path)
     probabilities = final_model.predict_proba(test_rows)
     submission_path = output_directory / "synthetic_submission.csv"
     submission_rows = [
@@ -95,12 +115,13 @@ def run(output_directory: Path) -> dict[str, object]:
     return {
         "schema_version": contract.schema_version,
         "best_model": leaderboard[0].model,
-        "best_mean_log_loss": leaderboard[0].mean_log_loss,
+        "best_oof_brier_skill_score": leaderboard[0].oof_brier_skill_score,
         "fold_results": str(fold_results_path),
         "leaderboard": str(leaderboard_path),
         "dashboard": str(dashboard_path),
         "train_rows": len(train_rows),
         "test_rows": len(test_rows),
+        "model": str(model_path),
         "submission": str(submission_path),
     }
 
