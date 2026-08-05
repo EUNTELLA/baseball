@@ -1,6 +1,28 @@
+# Competition datasets and archives (keep local only)
+/open.zip
+/open/data/train.csv
+/open/data/trackman_history.csv
+
+# Competition reference material
+/*.pdf
+
+# Generated submissions and model artifacts
+/submit.zip
+/model/
+/output/
+
+# Python and notebook caches
 __pycache__/
 *.py[cod]
+.ipynb_checkpoints/
+
+# Local environments and editor settings
 .venv/
-.pytest_cache/
-data/generated/
-*.pdf
+venv/
+.env
+.idea/
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
