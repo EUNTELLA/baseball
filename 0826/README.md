@@ -32,8 +32,11 @@ drive.mount("/content/drive")
 2. `02_catboost_time_cv.ipynb`: 선수·팀 ID를 범주형으로 처리하는 CatBoost
 3. `03_probability_calibration.ipynb`: 이전 연도 OOF만 사용하는 walk-forward 확률 보정
 4. `04_feature_engineering_catboost.ipynb`: 카운트, 좌우 조합, 득점권, 경기 국면, 최근 추세 등의 파생 피처
+5. `05_final_train_submission.ipynb`: 전체 데이터 RandomForest 재학습, 확률 보정, 제출 ZIP 생성 및 샘플 검증
 
 실행 결과는 `0826/results/`에 저장됩니다. 모델 성능 비교 시 리더보드가 아닌 동일 Fold의 Brier Score와 Competition Score를 우선 확인합니다.
+
+05는 앞선 검증에서 선택한 RandomForest를 2019~2024년 전체 데이터로 재학습합니다. 비교를 위해 원본 제출본과 `-0.01056616` 확률 보정 제출본을 모두 생성합니다.
 
 ## 의존성
 
