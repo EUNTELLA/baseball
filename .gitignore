@@ -28,6 +28,5 @@ venv/
 .DS_Store
 Thumbs.db
 
-*/results
-*/open
-*/baseline
+open/
+baseline/
