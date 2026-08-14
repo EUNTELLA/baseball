@@ -22,7 +22,15 @@ RandomForest의 Public Score가 raw `549.6413938266`에서 상수 오프셋 보�
 python 0811/02_recent_window_rf_submission.py
 ```
 
-생성 파일은 `0811/results/submit_rf_recent_calibrated.zip`입니다. 로컬 검증 개선은 확인했지만 Public 1000점을 보장하는 결과는 아니므로 기존 675.55 제출을 유지한 채 새 슬롯에 비교 제출합니다.
+생성 파일은 `0811/results/submit_rf_recent_calibrated.zip`입니다.
+
+### 제출 결과
+
+| 제출명 | 제출일 | Public Score | 추론 시간 | 이전 최고 대비 |
+| --- | --- | ---: | ---: | ---: |
+| `recent_window_randomforest_rf_submission` | 2026-08-14 18:45:02 | **704.320910303** | 3초 | **+28.7710324431** |
+
+최근-window RF가 전체 기간 보정 RF의 `675.5498778599`를 넘어 현재 최고 제출본이 됐습니다. 오래된 2019~2022년 데이터를 제외하는 방향이 2025 평가 데이터의 시간 분포에 더 적합하다는 가설을 지지합니다.
 
 첫 노트북은 아래 위치에서 `01_rf_oof.npz`를 자동으로 찾습니다.
 
