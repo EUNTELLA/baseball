@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import json
 import shutil
 import subprocess
@@ -28,8 +29,8 @@ TEST_PATH = DATA_DIR / "test.csv"
 SAMPLE_PATH = DATA_DIR / "sample_submission.csv"
 TARGET_COL = "control_success"
 ID_COL = "row_id"
-OUTPUT_STEM = "submit_rf_recent_weighted_15"
-YEAR_WEIGHTS = {2023: 1.0, 2024: 1.5}
+DEFAULT_OUTPUT_STEM = "submit_rf_recent_weighted_15"
+DEFAULT_RECENT_WEIGHT = 1.5
 CALIBRATION_OFFSET = -0.009683759059887942
 CAT_COLS = ["top_bottom", "game_type", "base_state"]
 
@@ -103,12 +104,13 @@ if __name__ == "__main__":
 '''
 
 
-def main() -> None:
+def main(recent_weight: float, output_stem: str) -> None:
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     train = pd.read_csv(TRAIN_PATH, encoding="utf-8-sig")
-    recent = train[train["season"].isin(YEAR_WEIGHTS)].copy()
+    year_weights = {2023: 1.0, 2024: recent_weight}
+    recent = train[train["season"].isin(year_weights)].copy()
     features = [col for col in train.columns if col not in (ID_COL, TARGET_COL)]
-    sample_weight = recent["season"].map(YEAR_WEIGHTS).to_numpy(dtype=float)
+    sample_weight = recent["season"].map(year_weights).to_numpy(dtype=float)
 
     model = build_model(features)
     started = time.perf_counter()
@@ -119,7 +121,7 @@ def main() -> None:
     )
     train_seconds = time.perf_counter() - started
 
-    package_dir = BUILD_DIR / OUTPUT_STEM
+    package_dir = BUILD_DIR / output_stem
     if package_dir.exists():
         shutil.rmtree(package_dir)
     (package_dir / "model").mkdir(parents=True)
@@ -133,7 +135,7 @@ def main() -> None:
         encoding="utf-8",
     )
 
-    zip_path = RESULTS_DIR / f"{OUTPUT_STEM}.zip"
+    zip_path = RESULTS_DIR / f"{output_stem}.zip"
     if zip_path.exists():
         zip_path.unlink()
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as archive:
@@ -141,7 +143,7 @@ def main() -> None:
             if path.is_file():
                 archive.write(path, path.relative_to(package_dir))
 
-    validation_dir = RESULTS_DIR / f"validation_{OUTPUT_STEM}"
+    validation_dir = RESULTS_DIR / f"validation_{output_stem}"
     if validation_dir.exists():
         shutil.rmtree(validation_dir)
     validation_dir.mkdir(parents=True)
@@ -185,7 +187,7 @@ def main() -> None:
 
     report = {
         "model": "weighted recent-window RandomForest",
-        "year_weights": YEAR_WEIGHTS,
+        "year_weights": year_weights,
         "calibration_offset": CALIBRATION_OFFSET,
         "train_rows": int(len(recent)),
         "effective_weight_sum": float(sample_weight.sum()),
@@ -196,11 +198,15 @@ def main() -> None:
         "row_independence_max_difference": independence_max_difference,
         "sample_stdout": completed.stdout.strip(),
     }
-    (RESULTS_DIR / "01_weighted_recent_rf_report.json").write_text(
+    (RESULTS_DIR / f"{output_stem}_report.json").write_text(
         json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8"
     )
     print(json.dumps(report, ensure_ascii=False, indent=2))
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--recent-weight", type=float, default=DEFAULT_RECENT_WEIGHT)
+    parser.add_argument("--output-stem", default=DEFAULT_OUTPUT_STEM)
+    args = parser.parse_args()
+    main(args.recent_weight, args.output_stem)
