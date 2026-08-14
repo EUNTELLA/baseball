@@ -29,6 +29,7 @@ python 0811/02_recent_window_rf_submission.py
 | 제출명 | 제출일 | Public Score | 추론 시간 | 이전 최고 대비 |
 | --- | --- | ---: | ---: | ---: |
 | `recent_window_randomforest_rf_submission` | 2026-08-14 18:45:02 | **704.320910303** | 3초 | **+28.7710324431** |
+| `submit_rf_2024_only_calibrated_report` | 2026-08-14 19:05:04 | 699.3861996099 | 3초 | -4.9347106931 |
 
 최근-window RF가 전체 기간 보정 RF의 `675.5498778599`를 넘어 현재 최고 제출본이 됐습니다. 오래된 2019~2022년 데이터를 제외하는 방향이 2025 평가 데이터의 시간 분포에 더 적합하다는 가설을 지지합니다.
 
@@ -46,6 +47,8 @@ python 0811/02_recent_window_rf_submission.py
 ```powershell
 python 0811/02_recent_window_rf_submission.py --train-years 2024 --output-stem submit_rf_2024_only_calibrated
 ```
+
+2024년 단독 학습본의 Public Score는 `699.3861996099`로, 2023~2024년 학습본보다 `4.9347106931` 낮았습니다. 따라서 2023년 데이터를 완전히 제거하지 않고 최근 시즌에 가중치를 높이는 방향이 다음 후보입니다.
 
 첫 노트북은 아래 위치에서 `01_rf_oof.npz`를 자동으로 찾습니다.
 
