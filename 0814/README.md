@@ -119,3 +119,35 @@ Seed 앙상블과 RF 구조 후보는 로컬 검증에서 탈락했으므로 만
 ### 선형 보정 제출 결과
 
 Public Score는 `761.7509255482`로 고정 오프셋 모델 `727.5961617195`보다 `34.1547638287`점 높았습니다. 로컬 Brier 개선과 Public 결과가 같은 방향으로 확인되어 현재 최고 제출 및 최종 후보로 유지합니다.
+
+## 06. 확률 보정 방식 교차검증
+
+2024 OOF를 5개 연속 구간으로 나눠 affine, quadratic ridge, Platt, isotonic 보정을 비교합니다.
+
+```powershell
+python 0814/05_calibration_methods_cv.py
+```
+
+각 보정기는 검증 구간을 제외한 나머지 구간에서만 학습하며, 교차검증 Brier가 affine보다 낮은 방식이 있을 때만 다음 후보로 진행합니다.
+
+교차검증 결과 quadratic ridge `594.17`, Platt `592.89`, affine `592.54`, isotonic `583.79`로 quadratic ridge가 소폭 우세했습니다.
+
+## 07. 행 단위 메타 보정
+
+quadratic 보정에 공식 `asof_*` 비율 또는 전체 수치형 피처를 추가한 Ridge 메타 모델을 5개 연속 구간으로 교차검증합니다.
+
+```powershell
+python 0814/06_meta_calibration_cv.py
+```
+
+각 행의 입력 피처만 사용하며 평가 데이터 내부 집계는 사용하지 않습니다. quadratic 단독보다 명확히 개선될 때만 제출 후보로 진행합니다.
+
+교차검증 결과 전체 허용 수치형 피처를 사용한 Ridge가 `610.94`로 affine `592.54`보다 약 `18.40`점 개선됐습니다.
+
+## 08. Ridge 메타 보정 제출 후보
+
+```powershell
+python 0814/07_meta_calibrated_submission.py
+```
+
+기존 가중치 `2.0` RF의 행별 확률과 해당 행의 허용 수치형 피처만 Ridge 메타 보정기에 입력합니다. 생성 파일은 `0814/results/submit_rf_recent_weighted_20_meta_ridge.zip`입니다.
