@@ -10,7 +10,7 @@
 /submit.zip
 /model/
 /output/
-/0826/results/
+/results/
 
 # Python and notebook caches
 __pycache__/
