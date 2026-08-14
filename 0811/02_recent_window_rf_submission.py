@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import json
 import shutil
 import subprocess
@@ -28,7 +29,8 @@ TEST_PATH = DATA_DIR / "test.csv"
 SAMPLE_PATH = DATA_DIR / "sample_submission.csv"
 TARGET_COL = "control_success"
 ID_COL = "row_id"
-TRAIN_YEARS = (2023, 2024)
+DEFAULT_TRAIN_YEARS = (2023, 2024)
+DEFAULT_OUTPUT_STEM = "submit_rf_recent_calibrated"
 
 # 2023 학습 -> 2024 검증에서 측정한 평균 잔차 E[y - p].
 CALIBRATION_OFFSET = -0.009683759059887942
@@ -102,17 +104,17 @@ if __name__ == "__main__":
 '''
 
 
-def main() -> None:
+def main(train_years: tuple[int, ...], output_stem: str) -> None:
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     train = pd.read_csv(TRAIN_PATH, encoding="utf-8-sig")
-    recent = train[train["season"].isin(TRAIN_YEARS)].copy()
+    recent = train[train["season"].isin(train_years)].copy()
     features = [col for col in train.columns if col not in (ID_COL, TARGET_COL)]
     model = build_model(features)
     started = time.perf_counter()
     model.fit(recent[features], recent[TARGET_COL])
     train_seconds = time.perf_counter() - started
 
-    package_dir = BUILD_DIR / "submit_rf_recent_calibrated"
+    package_dir = BUILD_DIR / output_stem
     if package_dir.exists():
         shutil.rmtree(package_dir)
     (package_dir / "model").mkdir(parents=True)
@@ -126,7 +128,7 @@ def main() -> None:
         encoding="utf-8",
     )
 
-    zip_path = RESULTS_DIR / "submit_rf_recent_calibrated.zip"
+    zip_path = RESULTS_DIR / f"{output_stem}.zip"
     if zip_path.exists():
         zip_path.unlink()
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as archive:
@@ -134,7 +136,7 @@ def main() -> None:
             if path.is_file():
                 archive.write(path, path.relative_to(package_dir))
 
-    validation_dir = RESULTS_DIR / "validation_recent_rf"
+    validation_dir = RESULTS_DIR / f"validation_{output_stem}"
     if validation_dir.exists():
         shutil.rmtree(validation_dir)
     validation_dir.mkdir(parents=True)
@@ -160,9 +162,9 @@ def main() -> None:
 
     report = {
         "model": "recent-window RandomForest",
-        "train_years": list(TRAIN_YEARS),
+        "train_years": list(train_years),
         "calibration_offset": CALIBRATION_OFFSET,
-        "validation_2024": {
+        "calibration_source_2023_to_2024": {
             "raw_score": 560.1049224554399,
             "oracle_centered_score": 597.6439894250562,
         },
@@ -173,11 +175,21 @@ def main() -> None:
         "members": members,
         "sample_stdout": completed.stdout.strip(),
     }
-    (RESULTS_DIR / "02_recent_window_rf_report.json").write_text(
+    (RESULTS_DIR / f"{output_stem}_report.json").write_text(
         json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8"
     )
     print(json.dumps(report, ensure_ascii=False, indent=2))
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--train-years",
+        nargs="+",
+        type=int,
+        default=list(DEFAULT_TRAIN_YEARS),
+        help="최종 모델 학습에 사용할 시즌 목록",
+    )
+    parser.add_argument("--output-stem", default=DEFAULT_OUTPUT_STEM)
+    args = parser.parse_args()
+    main(tuple(args.train_years), args.output_stem)
