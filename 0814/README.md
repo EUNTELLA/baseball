@@ -151,3 +151,25 @@ python 0814/07_meta_calibrated_submission.py
 ```
 
 기존 가중치 `2.0` RF의 행별 확률과 해당 행의 허용 수치형 피처만 Ridge 메타 보정기에 입력합니다. 생성 파일은 `0814/results/submit_rf_recent_weighted_20_meta_ridge.zip`입니다.
+
+## 09. 엄격 Walk-forward 메타 검증
+
+리더보드 제출 없이 최종 후보를 선택하기 위한 고정 평가입니다.
+
+```powershell
+python 0814/08_strict_walk_forward_meta.py
+```
+
+검증 절차는 `2021~2022 RF 학습 → 2023 OOF 생성 → 2023에서 보정기 학습 → 2024 OOF 최종 평가`입니다. Ridge 규제값도 2023 내부 검증으로만 선택하며, 2024 정답은 최종 비교에 한 번만 사용합니다.
+
+### 엄격 검증 결과
+
+| 2023에서 학습한 보정 방식 | 2024 Score | 판단 |
+| --- | ---: | --- |
+| **Offset** | **573.25** | 가장 안정적 |
+| Rates Ridge | 461.73 | 탈락 |
+| Quadratic Ridge | 461.45 | 탈락 |
+| All-numeric Ridge | 452.01 | 탈락 |
+| Affine | 171.71 | 연도 이동에 불안정 |
+
+2024 내부 교차검증에서 높았던 Ridge 메타 보정은 2023에서 학습해 2024로 이동하자 성능이 하락했습니다. 따라서 `submit_rf_recent_weighted_20_meta_ridge.zip`은 최종 후보에서 제외합니다. 복잡한 보정기의 동일 연도 점수보다 다음 연도 Walk-forward 성능을 우선합니다.
