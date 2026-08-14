@@ -32,6 +32,8 @@ ID_COL = "row_id"
 DEFAULT_OUTPUT_STEM = "submit_rf_recent_weighted_15"
 DEFAULT_RECENT_WEIGHT = 1.5
 CALIBRATION_OFFSET = -0.009683759059887942
+DEFAULT_CALIBRATION_SLOPE = 1.0
+DEFAULT_CALIBRATION_INTERCEPT = CALIBRATION_OFFSET
 CAT_COLS = ["top_bottom", "game_type", "base_state"]
 
 
@@ -65,7 +67,7 @@ def build_model(features: list[str]) -> Pipeline:
     )
 
 
-def make_inference_script() -> str:
+def make_inference_script(calibration_slope: float, calibration_intercept: float) -> str:
     return f'''from pathlib import Path
 
 import joblib
@@ -74,7 +76,8 @@ import pandas as pd
 
 ID_COL = {ID_COL!r}
 TARGET_COL = {TARGET_COL!r}
-CALIBRATION_OFFSET = {CALIBRATION_OFFSET!r}
+CALIBRATION_SLOPE = {calibration_slope!r}
+CALIBRATION_INTERCEPT = {calibration_intercept!r}
 
 
 def main():
@@ -83,8 +86,9 @@ def main():
     sample = pd.read_csv(root / "data" / "sample_submission.csv", encoding="utf-8-sig")
     model = joblib.load(root / "model" / "weighted_recent_rf.pkl")
     prediction = np.clip(
-        model.predict_proba(test.drop(columns=[ID_COL]))[:, 1]
-        + CALIBRATION_OFFSET,
+        CALIBRATION_INTERCEPT
+        + CALIBRATION_SLOPE
+        * model.predict_proba(test.drop(columns=[ID_COL]))[:, 1],
         0.0,
         1.0,
     )
@@ -104,7 +108,12 @@ if __name__ == "__main__":
 '''
 
 
-def main(recent_weight: float, output_stem: str) -> None:
+def main(
+    recent_weight: float,
+    output_stem: str,
+    calibration_slope: float,
+    calibration_intercept: float,
+) -> None:
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     train = pd.read_csv(TRAIN_PATH, encoding="utf-8-sig")
     year_weights = {2023: 1.0, 2024: recent_weight}
@@ -126,7 +135,10 @@ def main(recent_weight: float, output_stem: str) -> None:
         shutil.rmtree(package_dir)
     (package_dir / "model").mkdir(parents=True)
     joblib.dump(model, package_dir / "model" / "weighted_recent_rf.pkl", compress=3)
-    (package_dir / "script.py").write_text(make_inference_script(), encoding="utf-8")
+    (package_dir / "script.py").write_text(
+        make_inference_script(calibration_slope, calibration_intercept),
+        encoding="utf-8",
+    )
     (package_dir / "requirements.txt").write_text(
         f"numpy=={np.__version__}\n"
         f"pandas=={pd.__version__}\n"
@@ -188,7 +200,11 @@ def main(recent_weight: float, output_stem: str) -> None:
     report = {
         "model": "weighted recent-window RandomForest",
         "year_weights": year_weights,
-        "calibration_offset": CALIBRATION_OFFSET,
+        "calibration": {
+            "formula": "intercept + slope * probability",
+            "slope": calibration_slope,
+            "intercept": calibration_intercept,
+        },
         "train_rows": int(len(recent)),
         "effective_weight_sum": float(sample_weight.sum()),
         "train_seconds": train_seconds,
@@ -208,5 +224,16 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--recent-weight", type=float, default=DEFAULT_RECENT_WEIGHT)
     parser.add_argument("--output-stem", default=DEFAULT_OUTPUT_STEM)
+    parser.add_argument(
+        "--calibration-slope", type=float, default=DEFAULT_CALIBRATION_SLOPE
+    )
+    parser.add_argument(
+        "--calibration-intercept", type=float, default=DEFAULT_CALIBRATION_INTERCEPT
+    )
     args = parser.parse_args()
-    main(args.recent_weight, args.output_stem)
+    main(
+        args.recent_weight,
+        args.output_stem,
+        args.calibration_slope,
+        args.calibration_intercept,
+    )

@@ -73,3 +73,44 @@ python 0814/01_weighted_recent_rf_submission.py --recent-weight 2.0 --output-ste
 생성 파일은 `0814/results/submit_rf_recent_weighted_20.zip`입니다. 이 파일 하나만 다음 리더보드 비교 후보로 사용합니다.
 
 Public Score는 `727.5961617195`로 기존 가중치 `1.5` 모델보다 `12.7385261158`점 높았습니다. 현재 최고 제출 및 최종 후보로 유지합니다.
+
+## 03. Seed 앙상블 로컬 검증
+
+가중치 `2.0`과 모델 파라미터를 고정하고 Seed `42`, `2026`, `814`의 예측 평균을 검증합니다.
+
+```powershell
+python 0814/03_seed_ensemble_cv.py
+```
+
+각 단일 Seed 및 누적 앙상블을 2024년 동일 검증셋에서 비교합니다. 3개 Seed 평균이 Seed 42 기준 `587.3791`보다 개선될 때만 최종 제출 패키지를 생성합니다.
+
+검증 결과 Seed 42 단일 `587.3791`, 2개 평균 `587.3025`, 3개 평균 `585.8157`로 앙상블이 개선되지 않아 패키징하지 않았습니다.
+
+## 04. RandomForest 구조 비교
+
+가중치 `2.0`과 Seed `42`를 유지하고 깊이, leaf 크기, 분할 피처 수를 비교합니다.
+
+```powershell
+python 0814/04_rf_structure_cv.py
+```
+
+단일 Seed 기준보다 개선되는 구조가 있을 때만 최종 제출 후보로 선택합니다.
+
+검증 결과 최고 구조도 `562.50`으로 현재 구조의 `587.38`보다 낮아 패키징하지 않았습니다.
+
+## 05. 선형 확률 보정
+
+가중치 `2.0`, Seed `42`, 기존 RF 구조의 2024 OOF에 Brier 최적 선형 보정을 적용했습니다.
+
+| 보정 방식 | 로컬 Score |
+| --- | ---: |
+| 고정 오프셋 | 587.38 |
+| 선형 보정 | **598.21** |
+
+선형 보정 공식은 `p' = -0.0707759724 + 1.1157668298 × p`이며, 공식 학습 데이터의 2024 시간 검증 결과로만 계산했습니다.
+
+```powershell
+python 0814/01_weighted_recent_rf_submission.py --recent-weight 2.0 --output-stem submit_rf_recent_weighted_20_affine --calibration-slope 1.1157668298344108 --calibration-intercept -0.0707759724069274
+```
+
+Seed 앙상블과 RF 구조 후보는 로컬 검증에서 탈락했으므로 만들지 않습니다. 선형 보정 후보 하나만 최종 ZIP으로 생성합니다.
