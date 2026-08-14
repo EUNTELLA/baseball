@@ -5,7 +5,24 @@ RandomForest의 Public Score가 raw `549.6413938266`에서 상수 오프셋 보�
 ## 실행 순서
 
 1. `01_offset_stability.ipynb`: 기존 RandomForest OOF 예측으로 2022~2024년 오프셋 안정성 비교
-2. 이후 실험 후보: calibration 방식 비교, RandomForest seed 앙상블, RandomForest-CatBoost 혼합
+2. `02_recent_window_rf_submission.py`: 2023~2024 최근 데이터만 학습한 RandomForest 제출 ZIP 생성
+
+## 최근-window RF
+
+2023년만 학습하고 2024년을 검증한 결과, 기존 전체 기간 RF보다 시간 이동에 대한 성능이 개선됐습니다.
+
+| 모델 | 2024 Raw Score | 평균 보정 후 Score |
+| --- | ---: | ---: |
+| 전체 기간 기존 RF | 415.57 | 약 507 |
+| 2023 학습 recent RF | 560.10 | 597.64 |
+
+최종 후보는 2023~2024년으로 학습하고 2023→2024 검증에서 측정한 평균 잔차 `-0.0096837591`을 적용합니다.
+
+```powershell
+python 0811/02_recent_window_rf_submission.py
+```
+
+생성 파일은 `0811/results/submit_rf_recent_calibrated.zip`입니다. 로컬 검증 개선은 확인했지만 Public 1000점을 보장하는 결과는 아니므로 기존 675.55 제출을 유지한 채 새 슬롯에 비교 제출합니다.
 
 첫 노트북은 아래 위치에서 `01_rf_oof.npz`를 자동으로 찾습니다.
 
