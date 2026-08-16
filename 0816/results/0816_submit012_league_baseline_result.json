@@ -1,5 +1,5 @@
 {
-  "experiment": "submit012 league-rate baseline screening",
+  "experiment": "CatBoost d6 FE10 7-seed structure vs league-rate baseline screening",
   "season_rates": {
     "2019": 0.5646700054335694,
     "2020": 0.5327116970588356,
@@ -29,7 +29,7 @@
     57.353824051999936,
     56.09584887799997
   ],
-  "submit012_success_model_reference": {
+  "catboost_d6_fe10_success_model_reference": {
     "brier": 0.24788590135125568,
     "score": 769.0040586434965,
     "prediction_mean": 0.49490372640162716

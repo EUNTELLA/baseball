@@ -40,7 +40,7 @@ CAT_COLS = BASE_CAT_COLS + ["count_state"]
 
 
 def engineer(frame: pd.DataFrame, global_mean: float, smoothing: int = 30):
-    """submit012의 FE 10개와 동일한 행 단위 피처 생성."""
+    """CatBoost d6·FE10 기준 모델과 동일한 행 단위 피처 생성."""
     result = frame.copy()
     for who in ("pitcher", "batter"):
         count = result[f"asof_{who}_n"].fillna(0)
@@ -153,14 +153,14 @@ def main(train_path: Path, output: Path) -> None:
     candidate_metrics = bss(league_baseline, target[valid_mask])
     score_delta = candidate_metrics["score"] - standard_metrics["score"]
     payload = {
-        "experiment": "submit012 league-rate baseline screening",
+        "experiment": "CatBoost d6 FE10 structure vs league-rate baseline screening",
         "season_rates": {str(key): float(value) for key, value in rates.items()},
         "forecast_2024_rate": forecast_2024,
         "actual_2024_rate_for_reporting_only": float(target[valid_mask].mean()),
         "seeds": SEEDS,
         "best_iterations": iterations,
         "seconds": seconds,
-        "submit012_success_model_reference": standard_metrics,
+        "catboost_d6_fe10_success_model_reference": standard_metrics,
         "league_baseline_candidate": candidate_metrics,
         "score_delta": float(score_delta),
         "decision": "continue_to_7_seed_build" if score_delta > 3.0 else "reject",

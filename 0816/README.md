@@ -82,13 +82,13 @@ python 0816/05_rf_lightgbm_blend_submission.py
 
 최종 후보는 `0816/results/submit_rf85_lgb15_affine.zip` 하나입니다. 실제 검증 전 기준점은 기존 RF affine의 Public Score `761.7509255482`입니다.
 
-## 06. submit012 League-rate baseline 선별 검증
+## 06. CatBoost d6·FE10·7시드·실패모드 offset·고정 shift 기준 League-rate 선별 검증
 
-Public Score `998.0030076995`의 `submit012`를 새 기준점으로 변경했습니다. 동일한 `open.zip`, T4 GPU, CatBoost 3시드 조건에서 기존 방식과 league-rate baseline을 다시 학습해 비교했습니다.
+Public Score `998.0030076995`의 `CatBoost depth 6 + FE 10개 + 7시드 평균 + MR/wayoff offset + 고정 logit shift` 모델을 새 기준점으로 변경했습니다(run ID `012_shift_full`). 동일한 `open.zip`, T4 GPU, CatBoost 3시드 조건에서 기존 성공모델 구조와 league-rate baseline을 다시 학습해 비교했습니다.
 
 | 모델 | 2024 Score | 예측 평균 |
 | --- | ---: | ---: |
-| submit012 성공모델 구조 | 769.00 | 0.49490 |
+| CatBoost d6 + FE10 성공모델 구조 | 769.00 | 0.49490 |
 | **League-rate baseline** | **809.11** | **0.48283** |
 
 - **Score 개선:** `+40.1010`
@@ -97,7 +97,7 @@ Public Score `998.0030076995`의 `submit012`를 새 기준점으로 변경했습
 - **판정:** `continue_to_7_seed_build`
 - **결과 파일:** `0816/results/0816_submit012_league_baseline_result.json`
 
-평균 편향 감소가 개선의 일부이므로 기존 submit012의 전역 shift와 중복 적용하지 않습니다. 다음 단계는 league-rate 7시드 전체 학습, 새 성공모델 OOF에 맞춘 offset 재산출, 2025 baseline 고정 저장 및 제출 ZIP 검증입니다.
+평균 편향 감소가 개선의 일부이므로 기준 모델의 전역 logit shift `-0.04163865`와 중복 적용하지 않습니다. 다음 단계는 league-rate 7시드 전체 학습, 2025 baseline 고정 저장 및 제출 ZIP 검증입니다.
 
 ## 07. League-rate 7시드 제출 후보 빌드
 
@@ -105,4 +105,4 @@ Public Score `998.0030076995`의 `submit012`를 새 기준점으로 변경했습
 0816/07_submit012_league_baseline_build_colab.py
 ```
 
-submit012 패키지의 보조 실패모드 모델과 고정 offset을 유지하고 성공모델만 league-rate 7시드로 교체합니다. 2025 baseline은 학습·검증 결과로 확정한 `0.4819150787`을 meta에 저장하며, 기존 전역 logit shift는 제거합니다. Colab 실행 방법은 `0816/COLAB_07.md`에 기록합니다.
+기준 모델의 MR/wayoff 보조모델과 고정 offset을 유지하고 CatBoost d6·FE10 성공모델만 league-rate 7시드로 교체합니다. 2025 baseline은 학습·검증 결과로 확정한 `0.4819150787`을 meta에 저장하며, 기존 전역 logit shift `-0.04163865`는 제거합니다. Colab 실행 방법은 `0816/COLAB_07.md`에 기록합니다.

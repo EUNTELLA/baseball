@@ -1,4 +1,4 @@
-"""submit012 대비 league-rate CatBoost baseline 선별 검증.
+"""CatBoost d6·FE10 성공모델 대비 league-rate baseline 선별 검증.
 
 Colab 사용 예:
   !python baseball/0816/06_submit012_league_baseline_colab.py \
@@ -40,7 +40,7 @@ CAT_COLS = BASE_CAT_COLS + ["count_state"]
 
 
 def engineer(frame: pd.DataFrame, global_mean: float, smoothing: int = 30):
-    """submit012의 FE 10개와 동일한 행 단위 피처 생성."""
+    """CatBoost d6·FE10 기준 모델과 동일한 행 단위 피처 생성."""
     result = frame.copy()
     for who in ("pitcher", "batter"):
         count = result[f"asof_{who}_n"].fillna(0)
@@ -145,7 +145,7 @@ def main(train_path: Path, output: Path) -> None:
         )
 
     # 비교군도 현재 train.csv와 같은 행, 같은 CatBoost 환경에서 재학습한다.
-    # 저장된 submit012 OOF와 open.zip의 데이터 버전이 다를 수 있기 때문이다.
+    # 저장된 기준 모델 OOF와 open.zip의 데이터 버전이 다를 수 있기 때문이다.
     standard_train_pool = Pool(
         x.loc[train_mask], target[train_mask], cat_features=cat_indices
     )
@@ -154,7 +154,7 @@ def main(train_path: Path, output: Path) -> None:
     )
     standard_predictions = []
     standard_iterations = []
-    print("--- 동일 데이터·환경 submit012 비교군 재학습 ---", flush=True)
+    print("--- 동일 데이터·환경 CatBoost d6·FE10 비교군 재학습 ---", flush=True)
     for seed in SEEDS:
         model = CatBoostClassifier(**PARAMS, random_seed=seed)
         model.fit(
@@ -175,7 +175,7 @@ def main(train_path: Path, output: Path) -> None:
     candidate_metrics = bss(league_baseline, target[valid_mask])
     score_delta = candidate_metrics["score"] - standard_metrics["score"]
     payload = {
-        "experiment": "submit012 league-rate baseline screening",
+        "experiment": "CatBoost d6 FE10 structure vs league-rate baseline screening",
         "season_rates": {str(key): float(value) for key, value in rates.items()},
         "forecast_2024_rate": forecast_2024,
         "actual_2024_rate_for_reporting_only": float(target[valid_mask].mean()),
@@ -183,7 +183,7 @@ def main(train_path: Path, output: Path) -> None:
         "best_iterations": iterations,
         "standard_best_iterations": standard_iterations,
         "seconds": seconds,
-        "submit012_success_model_reference": standard_metrics,
+        "catboost_d6_fe10_success_model_reference": standard_metrics,
         "league_baseline_candidate": candidate_metrics,
         "score_delta": float(score_delta),
         "decision": "continue_to_7_seed_build" if score_delta > 3.0 else "reject",

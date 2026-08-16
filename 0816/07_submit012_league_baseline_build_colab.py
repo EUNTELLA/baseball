@@ -1,4 +1,4 @@
-"""League-rate CatBoost 7시드 학습 및 submit012 기반 제출 ZIP 생성."""
+"""League-rate CatBoost d6·FE10 7시드와 고정 실패모드 offset 제출 ZIP 생성."""
 from __future__ import annotations
 
 import argparse
@@ -72,7 +72,7 @@ def patch_inference_script(path: Path) -> None:
     new_success = 'p = np.clip(avg_proba("model_", meta["seeds"], success_pool), 1e-6, 1 - 1e-6)'
     for old in (old_pool, old_function, old_predict, old_success):
         if old not in code:
-            raise RuntimeError(f"submit012 script 패턴을 찾지 못했습니다: {old}")
+            raise RuntimeError(f"기준 패키지 script 패턴을 찾지 못했습니다: {old}")
     code = code.replace(old_pool, new_pool)
     code = code.replace(old_function, new_function)
     code = code.replace(old_predict, new_predict)
@@ -188,8 +188,8 @@ def main(train_path: Path, output_zip: Path, work_dir: Path, task_type: str) -> 
         raise RuntimeError(f"ZIP 손상: {bad_member}")
 
     report = {
-        "base": "submit012 / LB 998.0030076995",
-        "candidate": "7-seed league-rate baseline + submit012 fixed auxiliary offset",
+        "base": "CatBoost d6 FE10 7-seed + MR/wayoff offset + fixed logit shift / LB 998.0030076995",
+        "candidate": "CatBoost d6 FE10 7-seed league-rate baseline + fixed MR/wayoff auxiliary offset",
         "task_type": task_type,
         "best_iterations": best_iterations,
         "validation": validation_metrics,
