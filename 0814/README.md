@@ -152,6 +152,8 @@ python 0814/07_meta_calibrated_submission.py
 
 기존 가중치 `2.0` RF의 행별 확률과 해당 행의 허용 수치형 피처만 Ridge 메타 보정기에 입력합니다. 생성 파일은 `0814/results/submit_rf_recent_weighted_20_meta_ridge.zip`입니다.
 
+실제 Public Score는 `743.6924889713`으로 affine 모델 `761.7509255482`보다 `18.0584365769`점 낮았습니다. 엄격 Walk-forward에서 메타 보정의 연도 이동 성능이 낮았던 결과와 같은 방향이므로 최종 후보에서 제외합니다.
+
 ## 09. 엄격 Walk-forward 메타 검증
 
 리더보드 제출 없이 최종 후보를 선택하기 위한 고정 평가입니다.
