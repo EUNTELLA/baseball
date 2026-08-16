@@ -32,8 +32,6 @@ PARAMS = dict(
 )
 ID_COL = "row_id"
 TARGET_COL = "control_success"
-SCRIPT_DIR = Path(__file__).resolve().parent
-ASSET_DIR = SCRIPT_DIR / "assets"
 BASE_CAT_COLS = [
     "top_bottom", "game_type", "base_state", "pitcher_hand",
     "batter_hand", "pitcher_team_id", "batter_team_id",
@@ -146,10 +144,32 @@ def main(train_path: Path, output: Path) -> None:
             flush=True,
         )
 
-    standard = np.mean(
-        [np.load(ASSET_DIR / f"success_2024_{seed}.npy") for seed in SEEDS],
-        axis=0,
+    # 비교군도 현재 train.csv와 같은 행, 같은 CatBoost 환경에서 재학습한다.
+    # 저장된 submit012 OOF와 open.zip의 데이터 버전이 다를 수 있기 때문이다.
+    standard_train_pool = Pool(
+        x.loc[train_mask], target[train_mask], cat_features=cat_indices
     )
+    standard_valid_pool = Pool(
+        x.loc[valid_mask], target[valid_mask], cat_features=cat_indices
+    )
+    standard_predictions = []
+    standard_iterations = []
+    print("--- 동일 데이터·환경 submit012 비교군 재학습 ---", flush=True)
+    for seed in SEEDS:
+        model = CatBoostClassifier(**PARAMS, random_seed=seed)
+        model.fit(
+            standard_train_pool,
+            eval_set=standard_valid_pool,
+            use_best_model=True,
+        )
+        standard_predictions.append(model.predict_proba(standard_valid_pool)[:, 1])
+        standard_iterations.append(int(model.get_best_iteration()))
+        print(
+            f"standard seed={seed} iter={standard_iterations[-1]} "
+            f"score={bss(standard_predictions[-1], target[valid_mask])['score']:.2f}",
+            flush=True,
+        )
+    standard = np.mean(standard_predictions, axis=0)
     league_baseline = np.mean(predictions, axis=0)
     standard_metrics = bss(standard, target[valid_mask])
     candidate_metrics = bss(league_baseline, target[valid_mask])
@@ -161,6 +181,7 @@ def main(train_path: Path, output: Path) -> None:
         "actual_2024_rate_for_reporting_only": float(target[valid_mask].mean()),
         "seeds": SEEDS,
         "best_iterations": iterations,
+        "standard_best_iterations": standard_iterations,
         "seconds": seconds,
         "submit012_success_model_reference": standard_metrics,
         "league_baseline_candidate": candidate_metrics,

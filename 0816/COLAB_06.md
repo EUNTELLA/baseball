@@ -24,7 +24,7 @@ drive.mount('/content/drive')
   --output /content/drive/MyDrive/LG_Aimers/0816_submit012_league_baseline_result.json
 ```
 
-피처 정의와 submit012 비교용 OOF 파일이 `0816`에 포함되어 있어 다른 저장소를 클론하거나 파일을 따로 업로드할 필요가 없습니다.
+피처 정의가 `0816`에 포함되어 있어 다른 저장소를 클론하거나 파일을 따로 업로드할 필요가 없습니다. 비교군도 같은 `open.zip`과 같은 CPU/GPU 환경에서 3시드로 다시 학습하므로 데이터 버전 차이 없이 비교됩니다.
 
 ## 판정 기준
 
