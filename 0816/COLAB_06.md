@@ -15,17 +15,16 @@ drive.mount('/content/drive')
 
 ```python
 !pip -q install catboost==1.2.8
-!git clone --depth 1 https://github.com/danny010712/LG-Aimers-9th-Hackathon.git /content/LG-Aimers-9th-Hackathon
+!git clone https://github.com/EUNTELLA/baseball.git /content/baseball
 ```
 
-현재 프로젝트의 `0816/06_submit012_league_baseline_colab.py`를 Colab `/content/`에 업로드한 다음 실행합니다.
-
 ```python
-!python /content/06_submit012_league_baseline_colab.py \
-  --repo /content/LG-Aimers-9th-Hackathon \
+!python /content/baseball/0816/06_submit012_league_baseline_colab.py \
   --train /content/drive/MyDrive/LG_Aimers/train.csv \
   --output /content/drive/MyDrive/LG_Aimers/0816_submit012_league_baseline_result.json
 ```
+
+피처 정의와 submit012 비교용 OOF 파일이 `0816`에 포함되어 있어 다른 저장소를 클론하거나 파일을 따로 업로드할 필요가 없습니다.
 
 ## 판정 기준
 

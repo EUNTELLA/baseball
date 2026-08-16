@@ -1,8 +1,7 @@
 """submit012 대비 league-rate CatBoost baseline 선별 검증.
 
 Colab 사용 예:
-  !python 06_submit012_league_baseline_colab.py \
-      --repo /content/LG-Aimers-9th-Hackathon \
+  !python baseball/0816/06_submit012_league_baseline_colab.py \
       --train /content/drive/MyDrive/LG_Aimers/train.csv
 
 2024 정답 평균은 모델 baseline 산출에 사용하지 않는다. 2019~2023으로 학습하고,
@@ -11,9 +10,7 @@ Colab 사용 예:
 from __future__ import annotations
 
 import argparse
-import importlib.util
 import json
-import sys
 import time
 from pathlib import Path
 
@@ -35,16 +32,46 @@ PARAMS = dict(
 )
 ID_COL = "row_id"
 TARGET_COL = "control_success"
+SCRIPT_DIR = Path(__file__).resolve().parent
+ASSET_DIR = SCRIPT_DIR / "assets"
+BASE_CAT_COLS = [
+    "top_bottom", "game_type", "base_state", "pitcher_hand",
+    "batter_hand", "pitcher_team_id", "batter_team_id",
+]
+CAT_COLS = BASE_CAT_COLS + ["count_state"]
 
 
-def load_features(repo: Path):
-    path = repo / "test" / "common" / "features.py"
-    spec = importlib.util.spec_from_file_location("submit012_features", path)
-    if spec is None or spec.loader is None:
-        raise FileNotFoundError(f"features.py를 불러올 수 없습니다: {path}")
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
+def engineer(frame: pd.DataFrame, global_mean: float, smoothing: int = 30):
+    """submit012의 FE 10개와 동일한 행 단위 피처 생성."""
+    result = frame.copy()
+    for who in ("pitcher", "batter"):
+        count = result[f"asof_{who}_n"].fillna(0)
+        rate = result[f"asof_{who}_success_rate"].fillna(global_mean)
+        result[f"smoothed_{who}_success_rate"] = (
+            count * rate + smoothing * global_mean
+        ) / (count + smoothing)
+    result["platoon_advantage"] = (
+        result["pitcher_hand"] == result["batter_hand"]
+    ).astype(int)
+    result["count_advantage"] = result["strikes_before"] - result["balls_before"]
+    result["count_state"] = (
+        result["balls_before"].astype(str) + "-" + result["strikes_before"].astype(str)
+    )
+    result["recent_control_momentum"] = (
+        result["asof_pitcher_prev1_game_success_rate"]
+        - result["asof_pitcher_success_rate"]
+    )
+    result["form_trend_5_1"] = (
+        result["asof_pitcher_prev1_game_success_rate"]
+        - result["asof_pitcher_prev5_game_success_rate"]
+    )
+    result["is_home"] = (result["top_bottom"] == "T").astype(int)
+    result["pitcher_win_expectancy"] = np.where(
+        result["is_home"] == 1,
+        result["home_win_expectancy"], result["away_win_expectancy"],
+    )
+    result["is_coldstart_pitcher"] = result["asof_pitcher_n"].isna().astype(int)
+    return result
 
 
 def logit(probability):
@@ -71,20 +98,17 @@ def forecast_rate(rates: dict[int, float], target_year: int) -> float:
     return float(np.clip(intercept + slope * target_year, 0.35, 0.65))
 
 
-def main(repo: Path, train_path: Path, output: Path) -> None:
-    feature_module = load_features(repo)
+def main(train_path: Path, output: Path) -> None:
     frame = pd.read_csv(train_path, encoding="utf-8-sig")
     target = frame[TARGET_COL].astype(int).to_numpy()
     train_mask = (frame["season"] <= 2023).to_numpy()
     valid_mask = (frame["season"] == 2024).to_numpy()
     global_mean = float(target[train_mask].mean())
 
-    x = feature_module.engineer(
-        frame.drop(columns=[ID_COL, TARGET_COL]), global_mean
-    )
-    for column in feature_module.CAT_COLS:
+    x = engineer(frame.drop(columns=[ID_COL, TARGET_COL]), global_mean)
+    for column in CAT_COLS:
         x[column] = x[column].astype(str)
-    cat_indices = [x.columns.get_loc(column) for column in feature_module.CAT_COLS]
+    cat_indices = [x.columns.get_loc(column) for column in CAT_COLS]
 
     rates = (
         frame.loc[train_mask]
@@ -122,9 +146,8 @@ def main(repo: Path, train_path: Path, output: Path) -> None:
             flush=True,
         )
 
-    artifact_dir = repo / "test" / "artifacts" / "auxpred"
     standard = np.mean(
-        [np.load(artifact_dir / f"success_2024_{seed}.npy") for seed in SEEDS],
+        [np.load(ASSET_DIR / f"success_2024_{seed}.npy") for seed in SEEDS],
         axis=0,
     )
     league_baseline = np.mean(predictions, axis=0)
@@ -152,11 +175,10 @@ def main(repo: Path, train_path: Path, output: Path) -> None:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--repo", type=Path, required=True)
     parser.add_argument("--train", type=Path, required=True)
     parser.add_argument(
         "--output", type=Path,
         default=Path("0816_submit012_league_baseline_result.json"),
     )
     args = parser.parse_args()
-    main(args.repo.resolve(), args.train.resolve(), args.output.resolve())
+    main(args.train.resolve(), args.output.resolve())
