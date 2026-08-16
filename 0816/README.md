@@ -81,3 +81,20 @@ python 0816/05_rf_lightgbm_blend_submission.py
 ```
 
 최종 후보는 `0816/results/submit_rf85_lgb15_affine.zip` 하나입니다. 실제 검증 전 기준점은 기존 RF affine의 Public Score `761.7509255482`입니다.
+
+## 06. submit012 League-rate baseline 선별 검증
+
+Public Score `998.0030076995`의 `submit012`를 새 기준점으로 변경했습니다. 동일한 `open.zip`, T4 GPU, CatBoost 3시드 조건에서 기존 방식과 league-rate baseline을 다시 학습해 비교했습니다.
+
+| 모델 | 2024 Score | 예측 평균 |
+| --- | ---: | ---: |
+| submit012 성공모델 구조 | 769.00 | 0.49490 |
+| **League-rate baseline** | **809.11** | **0.48283** |
+
+- **Score 개선:** `+40.1010`
+- **개별 시드:** `795.08 / 798.33 / 799.55`
+- **2024 baseline 외삽값:** `0.487742`
+- **판정:** `continue_to_7_seed_build`
+- **결과 파일:** `0816/results/0816_submit012_league_baseline_result.json`
+
+평균 편향 감소가 개선의 일부이므로 기존 submit012의 전역 shift와 중복 적용하지 않습니다. 다음 단계는 league-rate 7시드 전체 학습, 새 성공모델 OOF에 맞춘 offset 재산출, 2025 baseline 고정 저장 및 제출 ZIP 검증입니다.

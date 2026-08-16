@@ -1,0 +1,45 @@
+{
+  "experiment": "submit012 league-rate baseline screening",
+  "season_rates": {
+    "2019": 0.5646700054335694,
+    "2020": 0.5327116970588356,
+    "2021": 0.5327616072006734,
+    "2022": 0.5289204435249241,
+    "2023": 0.49995723449750534
+  },
+  "forecast_2024_rate": 0.4877420557045298,
+  "actual_2024_rate_for_reporting_only": 0.4861049201797189,
+  "seeds": [
+    42,
+    7,
+    2024
+  ],
+  "best_iterations": [
+    366,
+    330,
+    317
+  ],
+  "standard_best_iterations": [
+    239,
+    223,
+    265
+  ],
+  "seconds": [
+    60.24643194500004,
+    57.353824051999936,
+    56.09584887799997
+  ],
+  "submit012_success_model_reference": {
+    "brier": 0.24788590135125568,
+    "score": 769.0040586434965,
+    "prediction_mean": 0.49490372640162716
+  },
+  "league_baseline_candidate": {
+    "brier": 0.24778572620911632,
+    "score": 809.1050852402915,
+    "prediction_mean": 0.48282697704013944
+  },
+  "score_delta": 40.10102659679501,
+  "decision": "continue_to_7_seed_build",
+  "rule": "continue only when 3-seed 2024 score improves by more than 3.0"
+}
