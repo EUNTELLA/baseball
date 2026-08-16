@@ -98,3 +98,11 @@ Public Score `998.0030076995`의 `submit012`를 새 기준점으로 변경했습
 - **결과 파일:** `0816/results/0816_submit012_league_baseline_result.json`
 
 평균 편향 감소가 개선의 일부이므로 기존 submit012의 전역 shift와 중복 적용하지 않습니다. 다음 단계는 league-rate 7시드 전체 학습, 새 성공모델 OOF에 맞춘 offset 재산출, 2025 baseline 고정 저장 및 제출 ZIP 검증입니다.
+
+## 07. League-rate 7시드 제출 후보 빌드
+
+```text
+0816/07_submit012_league_baseline_build_colab.py
+```
+
+submit012 패키지의 보조 실패모드 모델과 고정 offset을 유지하고 성공모델만 league-rate 7시드로 교체합니다. 2025 baseline은 학습·검증 결과로 확정한 `0.4819150787`을 meta에 저장하며, 기존 전역 logit shift는 제거합니다. Colab 실행 방법은 `0816/COLAB_07.md`에 기록합니다.
