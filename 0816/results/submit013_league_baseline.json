@@ -18,6 +18,14 @@
   },
   "league_baseline_2025": 0.48191507866439054,
   "logit_shift_removed": true,
+  "leaderboard": {
+    "submitted_at": "2026-08-16 22:50:03",
+    "platform_name": "league_baseline",
+    "public_score": 976.8482053318,
+    "reference_public_score": 998.0030076995,
+    "delta": -21.1548023677,
+    "decision": "reject"
+  },
   "zip": "/content/drive/MyDrive/submit013_league_baseline.zip",
   "zip_mib": 2.806680679321289,
   "members": [

@@ -173,6 +173,17 @@
 - **제출 파일:** `0816/results/submit_rf85_lgb15_affine.zip`
 - **비고:** LightGBM 단독은 2024 검증에서 탈락. 두 기준을 모두 개선한 15% 혼합 하나만 제출 후보로 채택
 
+### catboost-league-baseline-012
+
+- **제출일:** 2026-08-16 22:50:03
+- **모델:** CatBoost depth 6 + FE 10개 + League-rate baseline 7시드 + MR/wayoff 고정 offset
+- **로컬 검증:** 기존 CatBoost d6·FE10 동일 조건 `769.0041` → `811.9434` (`+42.9393`)
+- **Public Score:** `976.8482053318`
+- **기준 모델 대비:** CatBoost d6·FE10·7시드 + MR/wayoff offset + 고정 logit shift `998.0030076995` 대비 `-21.1548023677`
+- **제출 파일:** `submit013_league_baseline.zip` (플랫폼 업로드명 `submit.zip`)
+- **판정:** 최종 후보 제외
+- **비고:** 2024 평균 편향 개선이 2025 시즌으로 전이되지 않음. League-rate baseline 축 종료, 기존 고정 shift 모델을 최고 모델로 유지
+
 ## 새 실험 기록 템플릿
 
 아래 형식을 복사하여 새로운 결과를 추가합니다.

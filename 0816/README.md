@@ -120,3 +120,14 @@ Public Score `998.0030076995`의 `CatBoost depth 6 + FE 10개 + 7시드 평균 +
 - **제출 후보 파일:** `submit013_league_baseline.zip`
 
 샘플 test는 5행뿐이므로 샘플 예측 평균 `0.4563`은 모델 선택이나 전체 test 평균 추정에 사용하지 않습니다.
+
+### Public 제출 결과
+
+- **제출일:** 2026-08-16 22:50:03
+- **플랫폼 이름:** `league_baseline`
+- **Public Score:** `976.8482053318`
+- **기준 모델 Public Score:** `998.0030076995`
+- **차이:** `-21.1548023677`
+- **판정:** 최종 후보 제외
+
+동일 조건 2024 검증에서는 `+42.9393`이었지만 2025 Public에서는 하락했습니다. League-rate baseline이 2024 평균 편향을 줄인 효과가 2025용 고정 logit shift와 같은 평균 이동 축에 있었고, 상황별 잔차 구조는 다음 시즌으로 안정적으로 전이되지 않았습니다. 최종 최고 모델은 `CatBoost depth 6 + FE 10개 + 7시드 평균 + MR/wayoff offset + 고정 logit shift`입니다.
