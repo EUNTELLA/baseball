@@ -131,3 +131,13 @@ Public Score `998.0030076995`의 `CatBoost depth 6 + FE 10개 + 7시드 평균 +
 - **판정:** 최종 후보 제외
 
 동일 조건 2024 검증에서는 `+42.9393`이었지만 2025 Public에서는 하락했습니다. League-rate baseline이 2024 평균 편향을 줄인 효과가 2025용 고정 logit shift와 같은 평균 이동 축에 있었고, 상황별 잔차 구조는 다음 시즌으로 안정적으로 전이되지 않았습니다. 최종 최고 모델은 `CatBoost depth 6 + FE 10개 + 7시드 평균 + MR/wayoff offset + 고정 logit shift`입니다.
+
+## 08. CatBoost 투수 역할 피처 선별 검증
+
+현재 최고 모델의 CatBoost d6·FE10 성공모델 구조에 `pitcher_role_score`, `inning_over_role` 두 개만 추가합니다. 역할표는 타깃 없이 2019~2023 투수별 이닝 분포로 만들고 2024에 적용합니다.
+
+```text
+0816/08_catboost_pitcher_role_screen_colab.py
+```
+
+기준 모델과 역할 피처 모델을 동일한 7시드로 비교합니다. 원본 Score가 개선되고 동일 평균 진단에서도 `+5`를 넘을 때만 전체 빌드합니다. Colab 실행 방법은 `0816/COLAB_08.md`에 기록합니다.
