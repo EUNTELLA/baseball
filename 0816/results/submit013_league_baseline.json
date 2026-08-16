@@ -1,0 +1,43 @@
+{
+  "base": "CatBoost d6 FE10 7-seed + MR/wayoff offset + fixed logit shift / LB 998.0030076995",
+  "candidate": "CatBoost d6 FE10 7-seed league-rate baseline + fixed MR/wayoff auxiliary offset",
+  "task_type": "GPU",
+  "best_iterations": [
+    366,
+    330,
+    317,
+    312,
+    334,
+    319,
+    384
+  ],
+  "validation": {
+    "brier": 0.24777863589437524,
+    "score": 811.9434031496953,
+    "prediction_mean": 0.4829028354256997
+  },
+  "league_baseline_2025": 0.48191507866439054,
+  "logit_shift_removed": true,
+  "zip": "/content/drive/MyDrive/submit013_league_baseline.zip",
+  "zip_mib": 2.806680679321289,
+  "members": [
+    "cond.py",
+    "features.py",
+    "model/meta.json",
+    "model/model_Sym_1.cbm",
+    "model/model_Sym_123.cbm",
+    "model/model_Sym_2024.cbm",
+    "model/model_Sym_42.cbm",
+    "model/model_Sym_7.cbm",
+    "model/model_Sym_777.cbm",
+    "model/model_Sym_99.cbm",
+    "model/mr_2024.cbm",
+    "model/mr_42.cbm",
+    "model/mr_7.cbm",
+    "model/wayoff_2024.cbm",
+    "model/wayoff_42.cbm",
+    "model/wayoff_7.cbm",
+    "requirements.txt",
+    "script.py"
+  ]
+}
