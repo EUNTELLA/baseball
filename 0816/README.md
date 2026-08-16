@@ -40,3 +40,44 @@ python 0816/02_offset_rates_blend_submission.py
 ```
 
 2024 OOF에서 학습한 offset 보정 확률 `70%`와 `asof_*` 비율 Ridge 확률 `30%`를 행 단위로 혼합합니다. 생성 파일은 `0816/results/submit_rf_weighted20_offset70_rates30.zip`입니다.
+
+### 제출 결과
+
+- **Public Score:** `747.3463802872`
+- **affine 대비:** `-14.4045452610`
+- **판단:** Ridge meta보다는 높지만 affine보다 낮아 최종 후보에서 제외
+
+## 03. LightGBM 시간 순서 검증
+
+보정 방식의 조합을 중단하고 기본 모델을 RandomForest에서 LightGBM으로 변경합니다.
+
+```powershell
+python 0816/03_lightgbm_time_validation.py
+```
+
+`2021~2022 → 2023`에서 보정식을 학습해 `2022~2023 → 2024` 예측에 적용하는 엄격 검증과, 2024 OOF에서의 affine 상한을 함께 비교합니다. RF 기준은 엄격 Score `171.71`, 2024 affine Score `598.21`, 실제 Public Score `761.7509255482`입니다.
+
+## 04. RF–LightGBM 혼합 검증
+
+```powershell
+python 0816/04_rf_lightgbm_blend_validation.py
+```
+
+LightGBM 단독이 2024 affine 기준에서 RF보다 낮으므로 바로 제출하지 않습니다. LightGBM 비중 `0~0.5`를 탐색하고 엄격 검증과 2024 affine 검증에서 RF 단독을 모두 이길 때만 패키징합니다.
+
+### 선택 결과
+
+| 모델 | 엄격 Score | 2024 affine Score |
+| --- | ---: | ---: |
+| RF 100% | 171.71 | 598.21 |
+| **RF 85% + LightGBM 15%** | **201.03** | **603.06** |
+
+두 기준을 모두 개선하고 2024 affine 점수가 가장 높은 LightGBM 15% 혼합만 최종 패키징합니다.
+
+## 05. 최종 제출 후보 생성
+
+```powershell
+python 0816/05_rf_lightgbm_blend_submission.py
+```
+
+최종 후보는 `0816/results/submit_rf85_lgb15_affine.zip` 하나입니다. 실제 검증 전 기준점은 기존 RF affine의 Public Score `761.7509255482`입니다.
