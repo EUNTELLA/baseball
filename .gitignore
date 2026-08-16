@@ -4,7 +4,7 @@
 /open/data/trackman_history.csv
 
 # Competition reference material
-/*.pdf
+*.pdf
 
 # Generated submissions and model artifacts
 /submit.zip
