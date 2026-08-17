@@ -80,3 +80,16 @@
 개발 시즌 raw 평균 `+3`, 최악 `-2`, 같은 평균 개선과 2024 raw `+3`·같은 평균 개선을 모두 만족할 때만 전체 파이프라인 검증으로 진행합니다.
 
 결과는 개발 시즌에서 선택된 회귀 비중이 `0.0`이었습니다. 즉 RMSE 회귀를 섞지 않은 기존 Logloss 분류 모델이 가장 좋았으며, 2024 확인도 동일 모델 비교가 되어 차이 `0`으로 끝났습니다. 판정은 `reject_brier_regression_axis`이며 이 모델 축은 종료합니다.
+
+## 05. 성공·MR·wayoff 확률 단순합 제약
+
+서로소 라벨인 성공, MR, wayoff를 각각 3시드 CatBoost로 예측한 뒤 `1-p_mr-p_wayoff`, `p_success/(p_success+p_mr+p_wayoff)` 및 기존 성공확률과의 고정 혼합을 비교합니다. 추가 보정 계수는 적합하지 않습니다. 2022·2023에서 결합 방식을 선택하고 2024는 확인에만 사용합니다.
+
+```bash
+!python /content/baseball/0817/05_catboost_failure_simplex_screen_colab.py \
+  --train /content/dataset/data/train.csv \
+  --output /content/drive/MyDrive/0817_catboost_failure_simplex.json \
+  --task-type GPU
+```
+
+개발 시즌 raw 평균 `+5`, 최악 `-2`, 같은 평균 개선과 2024 raw `+5`·같은 평균 개선을 모두 만족할 때만 전체 파이프라인 검증으로 진행합니다.
