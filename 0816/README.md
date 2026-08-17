@@ -153,3 +153,16 @@ rate_2025 = rate_2024 + alpha × (rate_2024 - rate_2023)
 선택 결과 `alpha=0.60`, 2025 목표 `0.4777935316`, 고정 logit shift `-0.0384267193`입니다. test 평균과 외부 데이터는 사용하지 않으며 산식·시즌 평균·선택 기준을 제출 ZIP의 `meta.json`에 저장합니다.
 
 2026-08-17 제출 결과 Public Score는 `997.3951851847`입니다. 기존 외부 자료 참고 가능성이 있는 고정 목표 `0.477` 제출의 `998.0030076995`보다 `0.6078225148` 낮지만, 공식 학습 데이터만으로 shift 선택 근거를 재현할 수 있어 규정 준수 근거가 명확한 최종 후보로 채택합니다.
+
+## 10. CatBoost 다중 시즌 소규모 파라미터 선별
+
+`10_catboost_multiseason_tuning_colab.py`는 공식 train의 2022·2023·2024 시즌을 각각 검증으로 사용합니다. depth `5/6/7`, learning rate `0.03/0.05`, L2 `1/3/5/10`에서 한 변수 중심의 7개 설정을 먼저 1시드로 비교하고, 기존 기준과 최상위 도전자 하나를 3시드로 재확인합니다. 총 33회 학습입니다.
+
+```bash
+!python /content/baseball/0816/10_catboost_multiseason_tuning_colab.py \
+  --train /content/dataset/data/train.csv \
+  --output /content/drive/MyDrive/0817_catboost_multiseason_tuning.json \
+  --task-type GPU
+```
+
+같은 평균 점수의 평균이 기준보다 `+3` 초과, 최악 시즌이 `-2` 이상, 원본 평균이 `-10` 이상일 때만 7시드 제출본 제작으로 진행합니다. 이 단계에서는 ZIP을 만들지 않습니다.
