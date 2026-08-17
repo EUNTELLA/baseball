@@ -29,3 +29,20 @@
 ```
 
 같은 평균 점수의 평균이 기준보다 `+3` 초과, 최악 시즌이 `-2` 이상, 원본 평균이 `-10` 이상일 때만 7시드 제출본 제작으로 진행합니다. 이 단계에서는 ZIP을 만들지 않습니다.
+
+결과: `d6_lr03_l2_3`이 3시드 확인에서 같은 평균 평균 `+4.4015`, 최악 시즌 `+2.4662`, 원본 평균 `+4.9291`로 세 기준을 모두 통과했습니다.
+
+## 02. 통과 파라미터 7시드 train-only 제출본
+
+기존 TEST 예측 평균은 사용하지 않습니다. 2019~2023 학습 → 2024 OOF 예측으로 MR/wayoff offset을 다시 적합하고, 공식 train 시즌 추세 목표 `0.4777935316`에 맞는 고정 shift를 학습 단계에서 저장합니다.
+
+```bash
+!python /content/baseball/0817/02_catboost_tuned_build_colab.py \
+  --train /content/dataset/data/train.csv \
+  --test /content/dataset/data/test.csv \
+  --sample /content/dataset/data/sample_submission.csv \
+  --output-dir /content/drive/MyDrive/0817 \
+  --task-type GPU
+```
+
+출력 ZIP은 `/content/drive/MyDrive/0817/submit_catboost_lr03_l2_3_train_only.zip`입니다.

@@ -291,8 +291,17 @@
 - **채택 기준:** 같은 평균 점수 평균 `+3` 초과, 최악 시즌 `-2` 이상, 원본 점수 평균 `-10` 이상
 - **사용 데이터:** 공식 `train.csv`만 사용
 - **실행 코드:** `0817/01_catboost_multiseason_tuning_colab.py`
+- **결과:** `d6_lr03_l2_3` 채택. 같은 평균 평균 `+4.4015316253`, 최악 시즌 `+2.4662248756`, 원본 평균 `+4.9291059810`
+- **판정:** `continue_to_7_seed_build`
+- **비고:** depth는 6을 유지하고 learning rate `0.05→0.03`, L2 `1→3`으로 변경
+
+### catboost-lr03-l2-3-train-only-build-022
+
+- **실험일:** 2026-08-17
+- **모델:** CatBoost d6·lr0.03·L2=3·7시드 + MR/wayoff 재적합 offset + 공식 train 추세 shift
+- **규정 설계:** 공식 train과 train-derived 2024 OOF 예측만 사용, 외부 데이터 및 TEST 집계 미사용
+- **실행 코드:** `0817/02_catboost_tuned_build_colab.py`
 - **결과:** 실행 전
-- **비고:** 통과 후보가 있을 때만 7시드 전체 재학습과 제출 ZIP 생성을 진행
 
 ## 새 실험 기록 템플릿
 
