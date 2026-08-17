@@ -110,3 +110,16 @@
 개발 평균 `+5`, 최악 `-2`, 평균 보정 오차 비악화와 2024 `+5`·보정 오차 비악화를 모두 만족할 때만 제출 ZIP 하나를 만듭니다.
 
 결과는 `simplex_replace_offset`이 개발 시즌 평균 `+207.8028`, 최악 `+163.2570`, 평균 절대 보정 오차 `-0.0025843`으로 크게 개선됐습니다. 그러나 2024에서 shift 전에는 약 `+6.17`이었지만 최종 shift 적용 후 `-2.1561`로 뒤집혔고 평균 절대 오차도 `+0.0002981` 악화됐습니다. 사전 기준에 따라 `keep_997_baseline`으로 판정하며 이 구성의 ZIP은 만들지 않습니다.
+
+## 07. 실패 여집합 공통 shift 민감도
+
+후보별 shift 재계산을 제거하고 기준과 후보에 동일한 고정 shift를 적용합니다. 기준은 직전 시즌에서 적합한 기존 offset, 후보는 offset을 제거한 실패 여집합 10% 혼합입니다. 현재 `997` 모델의 배포 shift `-0.0384267193`과 주변 `±0.01`을 핵심 판정에 사용합니다.
+
+```bash
+!python /content/baseball/0817/07_failure_simplex_shared_shift_validation_colab.py \
+  --train /content/dataset/data/train.csv \
+  --output /content/drive/MyDrive/0817_failure_simplex_shared_shift.json \
+  --task-type GPU
+```
+
+배포 shift에서 개발 평균 `+5`, 최악 `-2`, 2024 `+5`, 2024 주변 shift 두 값 모두 양수이고 평균 오차 악화가 `0.001` 이하일 때만 기존 `997` ZIP을 단일 변수로 패치합니다.
