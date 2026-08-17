@@ -1,0 +1,92 @@
+{
+  "experiment": "CatBoost d6 lr0.03 l2=3 7-seed + refit MR/wayoff offset + train-only trend shift",
+  "official_train_only": true,
+  "external_data_used": false,
+  "test_aggregate_used": false,
+  "best_iterations": [
+    480,
+    396,
+    403,
+    461,
+    461,
+    393,
+    579
+  ],
+  "validation_seconds": [
+    74.10378841700003,
+    66.49686749199964,
+    65.20483563399966,
+    71.52888943100015,
+    71.8195858680001,
+    63.96865657900025,
+    86.47834027999988
+  ],
+  "full_seconds": [
+    75.15358478600001,
+    64.345377009,
+    64.4065109369999,
+    72.7280575990003,
+    72.79086733399981,
+    63.42025436999984,
+    90.02204553599995
+  ],
+  "validation_success": {
+    "brier": 0.24787166507405117,
+    "score": 774.7029707550812,
+    "prediction_mean": 0.49505629196185175,
+    "target_mean": 0.4861049201797189
+  },
+  "offset_fit_rows": 253116,
+  "offset": {
+    "b": -0.11061659418747623,
+    "c": 0.010577791900697058,
+    "mu_mr": -0.5127720817592395,
+    "mu_wayoff": -1.987630651312223
+  },
+  "offset_validation_before": {
+    "brier": 0.24787083960537454,
+    "score": 774.3807967632521,
+    "prediction_mean": 0.49508681572503227,
+    "target_mean": 0.486045923608148
+  },
+  "offset_validation_after": {
+    "brier": 0.24780650005781246,
+    "score": 800.1366761408613,
+    "prediction_mean": 0.49509309474310553,
+    "target_mean": 0.486045923608148
+  },
+  "target_2025": 0.477793531589047,
+  "train_only_reference_mean": 0.49509309474310553,
+  "logit_shift": -0.06985805295113606,
+  "shifted_reference_mean": 0.477793531589047,
+  "zip": "submit_catboost_lr03_l2_3_train_only.zip",
+  "zip_mib": 3.188396453857422,
+  "zip_test_error": null,
+  "members": [
+    "__pycache__/cond.cpython-312.pyc",
+    "__pycache__/features.cpython-312.pyc",
+    "cond.py",
+    "features.py",
+    "model/meta.json",
+    "model/model_Sym_1.cbm",
+    "model/model_Sym_123.cbm",
+    "model/model_Sym_2024.cbm",
+    "model/model_Sym_42.cbm",
+    "model/model_Sym_7.cbm",
+    "model/model_Sym_777.cbm",
+    "model/model_Sym_99.cbm",
+    "model/mr_2024.cbm",
+    "model/mr_42.cbm",
+    "model/mr_7.cbm",
+    "model/wayoff_2024.cbm",
+    "model/wayoff_42.cbm",
+    "model/wayoff_7.cbm",
+    "requirements.txt",
+    "script.py"
+  ],
+  "sample_validation": "passed",
+  "sample_rows": 5,
+  "sample_min": 0.3952615948431469,
+  "sample_max": 0.4869680822512824,
+  "sample_stdout": "Saved ./output/submission.csv rows=5 seeds=7 offset=Y mean=0.4453"
+}
