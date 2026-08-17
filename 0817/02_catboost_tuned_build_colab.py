@@ -181,6 +181,10 @@ def main(
     package_dir = work_dir / "package"
     with zipfile.ZipFile(BASE_ZIP) as archive:
         archive.extractall(package_dir)
+    for cache_dir in package_dir.rglob("__pycache__"):
+        shutil.rmtree(cache_dir)
+    for bytecode in package_dir.rglob("*.pyc"):
+        bytecode.unlink()
     model_dir = package_dir / "model"
     for old_model in model_dir.glob("model_*.cbm"):
         old_model.unlink()
