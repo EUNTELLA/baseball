@@ -93,3 +93,18 @@
 ```
 
 개발 시즌 raw 평균 `+5`, 최악 `-2`, 같은 평균 개선과 2024 raw `+5`·같은 평균 개선을 모두 만족할 때만 전체 파이프라인 검증으로 진행합니다.
+
+선별 결과 `blend_complement_10`이 개발 raw 평균 `+5.6301`, 최악 `+3.9737`, 같은 평균 평균 `+5.2463`으로 선택됐습니다. 2024에서도 raw `+5.3559`, 같은 평균 `+6.8821`로 확인되어 전체 파이프라인 검증으로 진행합니다.
+
+## 06. 실패 여집합 10% 전체 파이프라인 검증
+
+기존 성공확률 90%와 실패 여집합 10%를 혼합한 뒤 기존 offset을 대체하는 방식과, 혼합 후 offset을 다시 적합하는 방식을 비교합니다. 직전 시즌에서 반복 수·offset·shift를 확정하는 중첩 walk-forward이며 기존 offset 파이프라인이 기준입니다.
+
+```bash
+!python /content/baseball/0817/06_failure_simplex_full_pipeline_colab.py \
+  --train /content/dataset/data/train.csv \
+  --output /content/drive/MyDrive/0817_failure_simplex_full_pipeline.json \
+  --task-type GPU
+```
+
+개발 평균 `+5`, 최악 `-2`, 평균 보정 오차 비악화와 2024 `+5`·보정 오차 비악화를 모두 만족할 때만 제출 ZIP 하나를 만듭니다.
