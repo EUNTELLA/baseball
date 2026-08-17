@@ -65,3 +65,16 @@
 최종 점수 평균 `+5`, 3개 중 2개 시즌 개선, 최악 시즌 `-3` 이상, 2024 개선, 평균 보정 오차 비악화를 모두 만족할 때만 단일 변수 제출본을 만듭니다. 중간 결과는 fold가 끝날 때마다 JSON에 저장합니다.
 
 결과는 평균 최종 점수 `+10.0668`, 2/3 시즌 개선, 최악 `-0.2776`이었지만 2024가 `-0.2776` 하락했고 평균 절대 보정 오차도 `+0.0002831` 악화됐습니다. 사전 채택 기준을 통과하지 못했으므로 새 파라미터 제출본은 만들지 않고 Public Score `997.3951851847` 모델을 유지합니다.
+
+## 04. Brier 직접 최적화 CatBoost 회귀
+
+기존 CatBoostClassifier의 Logloss 확률과 CatBoostRegressor의 RMSE 예측을 비교합니다. RMSE는 대회 핵심인 Brier의 제곱오차를 직접 최소화합니다. 2022·2023에서 회귀 혼합 비율을 선택하고 2024는 확인 전용으로 남겨 선택 과적합을 줄입니다.
+
+```bash
+!python /content/baseball/0817/04_catboost_brier_regression_screen_colab.py \
+  --train /content/dataset/data/train.csv \
+  --output /content/drive/MyDrive/0817_catboost_brier_regression.json \
+  --task-type GPU
+```
+
+개발 시즌 raw 평균 `+3`, 최악 `-2`, 같은 평균 개선과 2024 raw `+3`·같은 평균 개선을 모두 만족할 때만 전체 파이프라인 검증으로 진행합니다.
