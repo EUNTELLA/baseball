@@ -193,3 +193,22 @@
 - 선택된 보조 신호와 추가 계수: 없음
 - 판정: `keep_1029_champion`
 - 결론: MR과 큰 이탈을 각각 검사했지만 같은 추가 계수로 2023·2024를 모두 개선한 후보가 없어 결합 검증과 ZIP 생성을 진행하지 않음
+
+## 09. F 행 큰 이탈 `+0.025` 탐색 제출본
+
+08의 정식 통과 후보는 없었지만, 가장 안정적인 근접 후보였던 F 행 큰 이탈 추가 계수 `+0.025`를 한 차례 리더보드 탐색용으로 만듭니다. 현재 `1029.0832235020` ZIP은 보존합니다.
+
+- 2023 BSS 변화: `+1.2352`
+- 2024 BSS 변화: `-0.1054`
+- 평균 변화: `+0.5649`
+- 2024 절대 평균 오차 변화: `-0.0000662`
+
+```bash
+!python /content/baseball/0819/08_build_f_large_miss_probe_colab.py \
+  --train /content/dataset/data/train.csv \
+  --test /content/dataset/data/test.csv \
+  --sample /content/dataset/data/sample_submission.csv \
+  --report /content/drive/MyDrive/0819_f_large_miss_0025_build.json
+```
+
+출력 제출본은 `/content/baseball/0819/results/submit_catboost_f_large_miss_0025.zip`입니다. 로컬 채택 기준을 통과한 모델이 아니라 제출 기회가 남아 있을 때 전이 여부를 확인하는 탐색 후보로만 취급합니다.
