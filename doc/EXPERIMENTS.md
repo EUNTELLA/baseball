@@ -450,6 +450,21 @@
 - **시간 규칙:** 2023은 2021·2022, 2024는 2022·2023 strictly OOF 잔차표 사용
 - **실행 코드:** `0819/02_residual_differential_full_pipeline_colab.py`
 - **채택 기준:** 2023·2024 BSS·corr² 모두 양수, 2024 BSS `+5` 이상, 2024 평균 오차 악화 `0.001` 이하
+- **2023 BSS / corr² 증분:** `+8.6274251576` / `+9.4676831751`
+- **2024 BSS / corr² 증분:** `+57.3686996122` / `-87.2904561877`
+- **2024 절대 평균 오차 변화:** `-0.0001572907` (개선)
+- **자동 판정:** `keep_997_baseline` (보조 corr² 하드 게이트 미통과)
+- **해석:** 공식 BSS는 두 시즌 모두 개선해 구조 신호가 전체 파이프라인에서도 유지됨. 안전 기준 997은 보존하고 별도 제출 후보를 제작해 비교
+
+### catboost-residual-differential-build-031
+
+- **실험일:** 2026-08-19
+- **목적:** 기존 997 ZIP을 보존하면서 잔차 차등 3축을 추가한 별도 제출 후보 생성
+- **표 원천:** 2023·2024 strictly OOF 잔차, 각 시즌 직전 연도까지만 학습한 7시드 CatBoost
+- **추론:** test 현재 행의 투수·손·스트라이크·주자 값만 조회하고 성공확률에 보정 후 기존 offset·shift 적용
+- **기준 ZIP:** `0816/results/submit_catboost_train_trend_shift.zip`
+- **출력 ZIP:** `0819/results/submit_catboost_residual_differential.zip`
+- **실행 코드:** `0819/03_build_residual_differential_submission_colab.py`
 - **결과:** 실행 전
 
 ## 새 실험 기록 템플릿

@@ -45,3 +45,25 @@
 ```
 
 2023·2024 BSS와 `corr²`가 모두 양수이고, 2024 BSS가 `+5` 이상이며 평균 오차가 `0.001`보다 크게 악화되지 않을 때만 제출 ZIP을 생성합니다.
+
+### 결과
+
+- 2023 전체 파이프라인 BSS / corr² 증분: `+8.6274` / `+9.4677`
+- 2024 전체 파이프라인 BSS / corr² 증분: `+57.3687` / `-87.2905`
+- 2024 절대 평균 오차 변화: `-0.0001573` (개선)
+- 자동 판정: `keep_997_baseline` (`corr²` 하드 게이트 미통과)
+- 해석: 공식 BSS는 두 시즌 모두 개선했으므로 기존 997을 대체하지 않는 별도 제출 후보 제작
+
+## 03. 7시드 잔차 차등 제출 후보 제작
+
+기존 Public `997.3951851847` ZIP은 수정하지 않습니다. 2023·2024를 각각 직전 시즌까지만 학습한 7시드 모델로 예측해 OOF 잔차표를 만들고, 기존 ZIP 사본에 세 표와 행 단위 추론 코드만 추가합니다.
+
+```bash
+!python /content/baseball/0819/03_build_residual_differential_submission_colab.py \
+  --train /content/dataset/data/train.csv \
+  --test /content/dataset/data/test.csv \
+  --sample /content/dataset/data/sample_submission.csv \
+  --report /content/drive/MyDrive/0819_residual_differential_build.json
+```
+
+생성 파일은 `/content/baseball/0819/results/submit_catboost_residual_differential.zip`입니다.
