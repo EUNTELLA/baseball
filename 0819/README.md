@@ -91,3 +91,26 @@
   --output /content/drive/MyDrive/0819_error_adjustment_weight_screen.json \
   --task-type GPU
 ```
+
+### 결과
+
+- 선택 구성: 같은 손 조합 + 2스트라이크
+- 적용 강도: `1.25`
+- 2023 BSS 증분: `+32.0812`
+- 2024 BSS 증분: `+33.1534`
+- 판정: 전체 offset·shift 과정에서 재검증
+
+## 05. 선택 구성 전체 과정 검증
+
+04에서 선택한 두 보정을 `1.25배` 적용하고 기존 MR/wayoff offset과 공식 train 추세 shift를 포함해 다시 확인합니다.
+
+```bash
+!python /content/baseball/0819/02_residual_differential_full_pipeline_colab.py \
+  --train /content/dataset/data/train.csv \
+  --output /content/drive/MyDrive/0819_hand_two_strikes_weight125_full.json \
+  --task-type GPU \
+  --axes hand,two_strikes \
+  --weight 1.25
+```
+
+이 결과가 현재 3종 보정의 전체 과정 결과보다 안정적일 때만 새 제출본을 만듭니다.

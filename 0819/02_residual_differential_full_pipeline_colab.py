@@ -40,7 +40,13 @@ def write_json(path: Path, payload: dict) -> None:
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
-def main(train_path: Path, output: Path, task_type: str) -> None:
+def main(
+    train_path: Path,
+    output: Path,
+    task_type: str,
+    selected_axes: tuple[str, ...] = ("hand", "two_strikes", "runners_on"),
+    adjustment_weight: float = 1.0,
+) -> None:
     common = load_module("full_pipeline_common", COMMON_PATH)
     screen = load_module("residual_differential_screen", SCREEN_PATH)
     frame = pd.read_csv(train_path, encoding="utf-8-sig")
@@ -59,6 +65,8 @@ def main(train_path: Path, output: Path, task_type: str) -> None:
         "official_train_only": True,
         "test_aggregate_used": False,
         "axes": {name: shrinkage for name, shrinkage in screen.AXES},
+        "selected_axes": list(selected_axes),
+        "adjustment_weight": adjustment_weight,
         "seeds": list(common.SEEDS),
         "pretraining": [],
         "results": [],
@@ -144,7 +152,9 @@ def main(train_path: Path, output: Path, task_type: str) -> None:
                 "pitchers": int(len(table)),
                 "median_absolute_difference": float(table.abs().median()) if len(table) else 0.0,
             }
-        correction = additions["hand"] + additions["two_strikes"] + additions["runners_on"]
+        correction = adjustment_weight * sum(
+            (additions[name] for name in selected_axes), np.zeros(int(validation.sum()))
+        )
 
         calibration_target = target[calibration]
         offset = common.fit_offset(
@@ -235,5 +245,19 @@ if __name__ == "__main__":
     parser.add_argument("--train", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--task-type", choices=("CPU", "GPU"), default="GPU")
+    parser.add_argument(
+        "--axes", default="hand,two_strikes,runners_on",
+        help="쉼표로 구분한 적용 보정: hand,two_strikes,runners_on",
+    )
+    parser.add_argument("--weight", type=float, default=1.0)
     args = parser.parse_args()
-    main(args.train.resolve(), args.output.resolve(), args.task_type)
+    selected_axes = tuple(item.strip() for item in args.axes.split(",") if item.strip())
+    allowed_axes = {name for name, _ in load_module("axis_check", SCREEN_PATH).AXES}
+    if not selected_axes or any(name not in allowed_axes for name in selected_axes):
+        parser.error(f"--axes는 {sorted(allowed_axes)} 중 하나 이상이어야 합니다.")
+    if args.weight <= 0:
+        parser.error("--weight는 0보다 커야 합니다.")
+    main(
+        args.train.resolve(), args.output.resolve(), args.task_type,
+        selected_axes, args.weight,
+    )
