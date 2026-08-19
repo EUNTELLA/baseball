@@ -130,3 +130,16 @@
 ## 후속 실험 범위
 
 모델 계열 교체, 데이터 분할형 전문가, 단순 용량 확대, 광범위한 사후 변환은 재검토 보류로 분류했습니다. 이후에는 현재 최고 모델 위의 행 단위 오차 보정과 F 행 조건부 후처리를 중심으로 진행합니다. 상세 기준은 `doc/EXPERIMENT_FILTER.md`에 기록했습니다.
+
+## 06. F 행 조건부 보정 선별
+
+현재 최고를 만든 세 보정은 그대로 유지합니다. 과거 두 시즌에서 `game_type=F`와 나머지 행의 평균 예측 오차 차이를 계산하고, F 행에만 추가하는 강도 `0.25~1.25`를 비교합니다. 별도 F 모델을 학습하거나 test의 F 행을 모아 통계를 계산하지 않습니다.
+
+```bash
+!python /content/baseball/0819/05_f_row_adjustment_screen_colab.py \
+  --train /content/dataset/data/train.csv \
+  --output /content/drive/MyDrive/0819_f_row_adjustment_screen.json \
+  --task-type GPU
+```
+
+현재 3종 보정 대비 2023·2024가 모두 개선되고 2024 증분이 `+3` 이상일 때만 전체 과정으로 진행합니다.
