@@ -436,6 +436,20 @@
 - **채택 기준:** 2023·2024 BSS 증분 모두 양수, 2024 `+5` 이상
 - **실행 코드:** `0819/01_catboost_residual_differential_screen_colab.py`
 - **후속:** 통과할 때만 MR/wayoff offset과 공식 train 추세 shift를 결합한 전체 997 파이프라인 검증
+- **2023 BSS / corr² 증분:** `+31.7693760408` / `+31.93`
+- **2024 BSS / corr² 증분:** `+36.2943178506` / `+36.81`
+- **판정:** `continue_full_997_pipeline`
+- **결론:** 두 확인 시즌에서 BSS와 순위 구조가 함께 개선되어 MR/wayoff offset 및 공식 train 추세 shift를 포함한 전체 파이프라인 검증으로 진행
+
+### catboost-residual-differential-full-pipeline-030
+
+- **실험일:** 2026-08-19
+- **목적:** 잔차 차등 3축을 Public `997.3951851847` 구성의 offset·shift와 결합해 중첩 효과 검증
+- **기준:** CatBoost d6·lr0.05·L2=1 + MR/wayoff offset + 공식 train 추세 shift
+- **후보:** 기준 성공확률에 손·2스트라이크·주자유무 잔차 차등을 더한 뒤 동일 offset·shift 적용
+- **시간 규칙:** 2023은 2021·2022, 2024는 2022·2023 strictly OOF 잔차표 사용
+- **실행 코드:** `0819/02_residual_differential_full_pipeline_colab.py`
+- **채택 기준:** 2023·2024 BSS·corr² 모두 양수, 2024 BSS `+5` 이상, 2024 평균 오차 악화 `0.001` 이하
 - **결과:** 실행 전
 
 ## 새 실험 기록 템플릿

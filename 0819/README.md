@@ -22,3 +22,26 @@
   --output /content/drive/MyDrive/0819_catboost_residual_differential.json \
   --task-type GPU
 ```
+
+### 결과
+
+- 2023 BSS 증분: `+31.7693760408`
+- 2024 BSS 증분: `+36.2943178506`
+- 2023 `corr²` 증분: `+31.93`
+- 2024 `corr²` 증분: `+36.81`
+- 판정: `continue_full_997_pipeline`
+
+두 시즌에서 BSS와 순위 구조가 함께 개선되어 전체 파이프라인 검증으로 진행합니다.
+
+## 02. 전체 997 파이프라인 검증
+
+01에서 만든 차등 보정을 성공확률에 더한 뒤, 기존과 같은 MR/wayoff offset과 공식 train 시즌 추세 shift를 기준·후보에 공통 적용합니다. 2023은 개발 확인, 2024는 최종 확인 역할이며 두 시즌 모두 strictly OOF 잔차표만 사용합니다.
+
+```bash
+!python /content/baseball/0819/02_residual_differential_full_pipeline_colab.py \
+  --train /content/dataset/data/train.csv \
+  --output /content/drive/MyDrive/0819_residual_differential_full_pipeline.json \
+  --task-type GPU
+```
+
+2023·2024 BSS와 `corr²`가 모두 양수이고, 2024 BSS가 `+5` 이상이며 평균 오차가 `0.001`보다 크게 악화되지 않을 때만 제출 ZIP을 생성합니다.
