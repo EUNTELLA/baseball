@@ -149,3 +149,22 @@
 - 선택된 강도: 없음
 - 판정: `keep_1029_champion`
 - 결론: 시험한 모든 강도에서 2023·2024 동시 개선 조건을 충족하지 못해 F 행 단독 보정을 종료
+
+## 07. 투수 기록량 기반 보정 완화
+
+현재 최고를 만든 세 보정은 유지하되, `asof_pitcher_n`이 작은 행에서는 적용량을 줄입니다. 현재 행의 공식 누적 투구 수만 사용하며 test의 다른 행은 참조하지 않습니다.
+
+```text
+적용 비율 = asof_pitcher_n / (asof_pitcher_n + k)
+```
+
+`k=0, 50, 100, 300, 500, 1000`을 비교합니다. `k=0`은 현재 구성과 같습니다.
+
+```bash
+!python /content/baseball/0819/06_history_amount_adjustment_screen_colab.py \
+  --train /content/dataset/data/train.csv \
+  --output /content/drive/MyDrive/0819_history_amount_adjustment_screen.json \
+  --task-type GPU
+```
+
+현재 구성 대비 2023·2024가 모두 개선되고 2024 증분이 `+3` 이상일 때만 전체 과정으로 진행합니다.
