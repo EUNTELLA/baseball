@@ -1,4 +1,4 @@
-"""기존 Public 997 ZIP에 2023·2024 7시드 OOF 잔차 차등표를 추가한다."""
+"""기존 Public 997 ZIP에 과거 시즌 예측 오차 기반 보정표를 추가한다."""
 from __future__ import annotations
 
 import argparse
@@ -90,7 +90,7 @@ def differential_table(
 
 def inference_block() -> str:
     return '''
-    # Train의 2023·2024 strictly OOF 잔차로 만든 투수별 상황 차등표.
+    # Train의 2023·2024를 학습하지 않은 예측 오차로 만든 투수별 보정표.
     # test에서는 현재 행의 값만 조회하며 다른 test 행을 집계하지 않는다.
     differential_path = os.path.join(BASE, "model", "residual_differential.json")
     if os.path.exists(differential_path):
@@ -166,7 +166,7 @@ def main(train_path: Path, test_path: Path, sample_path: Path, report_path: Path
     with zipfile.ZipFile(BASE_ZIP) as archive:
         archive.extractall(BUILD_DIR)
     table_payload = {
-        "source": "official train 2023+2024 strictly OOF residuals",
+        "source": "official train; predictions made without fitting the predicted season",
         "seeds": list(SEEDS),
         "axes": table_stats,
         "tables": tables,

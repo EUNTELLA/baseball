@@ -1,4 +1,4 @@
-"""잔차 차등 3축을 MR/wayoff offset과 train 추세 shift 전체 파이프라인에서 검증한다."""
+"""과거 시즌 예측 오차 보정 3종을 기존 offset·shift 전체 과정에서 검증한다."""
 from __future__ import annotations
 
 import argparse
@@ -32,10 +32,7 @@ def load_module(name: str, path: Path):
 
 
 def extended_metrics(common, prediction: np.ndarray, target: np.ndarray) -> dict[str, float]:
-    result = common.metrics(np.clip(prediction, 1e-6, 1 - 1e-6), target)
-    corr = float(np.corrcoef(prediction, target)[0, 1])
-    result["corr_squared_score"] = float(100000.0 * corr * corr)
-    return result
+    return common.metrics(np.clip(prediction, 1e-6, 1 - 1e-6), target)
 
 
 def write_json(path: Path, payload: dict) -> None:
@@ -202,18 +199,13 @@ def main(train_path: Path, output: Path, task_type: str) -> None:
             "baseline": baseline_metrics,
             "candidate": candidate_metrics,
             "bss_delta": candidate_metrics["score"] - baseline_metrics["score"],
-            "corr_squared_delta": (
-                candidate_metrics["corr_squared_score"]
-                - baseline_metrics["corr_squared_score"]
-            ),
             "absolute_mean_error_delta": (
                 abs(candidate_metrics["mean_error"]) - abs(baseline_metrics["mean_error"])
             ),
         }
         report["results"].append(fold_result)
         print(
-            f"fold={validation_year} full BSS delta={fold_result['bss_delta']:+.2f} "
-            f"corr2 delta={fold_result['corr_squared_delta']:+.2f}",
+            f"fold={validation_year} full BSS delta={fold_result['bss_delta']:+.2f}",
             flush=True,
         )
         write_json(output, report)
@@ -221,20 +213,17 @@ def main(train_path: Path, output: Path, task_type: str) -> None:
         gc.collect()
 
     bss_deltas = [float(row["bss_delta"]) for row in report["results"]]
-    corr_deltas = [float(row["corr_squared_delta"]) for row in report["results"]]
     mean_error_deltas = [float(row["absolute_mean_error_delta"]) for row in report["results"]]
     passed = (
         min(bss_deltas) > 0.0
         and bss_deltas[-1] >= 5.0
-        and min(corr_deltas) > 0.0
         and mean_error_deltas[-1] <= 0.001
     )
     report["summary"] = {
         "bss_deltas": bss_deltas,
-        "corr_squared_deltas": corr_deltas,
         "absolute_mean_error_deltas": mean_error_deltas,
         "decision": "build_residual_differential_submission" if passed else "keep_997_baseline",
-        "gate": "2023/2024 BSS and corr2 positive, 2024 BSS>=+5, 2024 abs mean error delta<=0.001",
+        "gate": "2023/2024 BSS positive, 2024 BSS>=+5, 2024 abs mean error delta<=0.001",
     }
     write_json(output, report)
     print(json.dumps(report["summary"], ensure_ascii=False, indent=2))

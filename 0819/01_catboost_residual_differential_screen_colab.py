@@ -1,6 +1,6 @@
-"""CatBoost OOF 잔차의 투수별 상황 차등 3축을 시간 순서로 선별한다.
+"""CatBoost 과거 시즌 예측 오차를 이용한 행 단위 보정 3종을 선별한다.
 
-검증 시즌 S의 보정표는 S-2, S-1 시즌의 strictly OOF 잔차만 사용한다.
+검증 시즌 S의 보정값은 S-2, S-1을 학습에 포함하지 않은 예측 오차만 사용한다.
 평가 데이터에서는 각 행 자체의 투수/손/카운트/주자 값으로 표를 조회한다.
 """
 from __future__ import annotations
@@ -65,11 +65,9 @@ def metrics(prediction: np.ndarray, target: np.ndarray) -> dict[str, float]:
     target = np.asarray(target, dtype=float)
     rate = float(target.mean())
     brier = float(np.mean((prediction - target) ** 2))
-    corr = float(np.corrcoef(prediction, target)[0, 1])
     return {
         "brier": brier,
         "bss_score": float(100000.0 * (1.0 - brier / (rate * (1.0 - rate)))),
-        "corr_squared_score": float(100000.0 * corr * corr),
         "prediction_mean": float(prediction.mean()),
         "target_mean": rate,
     }
@@ -205,10 +203,6 @@ def main(train_path: Path, output: Path, task_type: str) -> None:
                 "name": name,
                 "metrics": candidate_metrics,
                 "bss_delta": candidate_metrics["bss_score"] - baseline_metrics["bss_score"],
-                "corr_squared_delta": (
-                    candidate_metrics["corr_squared_score"]
-                    - baseline_metrics["corr_squared_score"]
-                ),
             })
         evaluations.append({
             "fold": fold,
@@ -218,8 +212,7 @@ def main(train_path: Path, output: Path, task_type: str) -> None:
         })
         final_row = rows[-1]
         print(
-            f"fold={fold} all_three BSS delta={final_row['bss_delta']:+.2f} "
-            f"corr2 delta={final_row['corr_squared_delta']:+.2f}",
+            f"fold={fold} all_three BSS delta={final_row['bss_delta']:+.2f}",
             flush=True,
         )
 
@@ -230,7 +223,7 @@ def main(train_path: Path, output: Path, task_type: str) -> None:
     confirmation = final_deltas[-1]
     passed = min(final_deltas) > 0.0 and confirmation >= 5.0
     report = {
-        "experiment": "CatBoost OOF residual pitcher-context differential screen",
+        "experiment": "CatBoost past-season prediction-error adjustment screen",
         "official_train_only": True,
         "test_aggregate_used": False,
         "baseline": "CatBoost d6 lr0.05 l2=1 success model, 3-seed OOF",
