@@ -174,3 +174,16 @@
 - 선택된 완화 상수: 없음
 - 판정: `keep_1029_champion`
 - 결론: 누적 투구 수에 따라 보정을 줄이는 모든 후보가 두 시즌 동시 개선에 실패해 현재 적용량 유지
+
+## 08. F 행 실패유형 보조 신호 선별
+
+현재 최고 `1029.0832235020`의 세 가지 과거 예측 오차 보정과 전역 MR/큰 이탈 offset을 모두 유지합니다. 그 위에서 `game_type=F`인 행에만 MR 또는 큰 이탈 보조 확률의 중심화된 logit을 추가합니다.
+
+```bash
+!python /content/baseball/0819/07_f_failure_signal_screen_colab.py \
+  --train /content/dataset/data/train.csv \
+  --output /content/drive/MyDrive/0819_f_failure_signal_screen.json \
+  --task-type GPU
+```
+
+추가 계수는 `-0.10, -0.05, -0.025, 0.025, 0.05, 0.10`을 비교합니다. MR과 큰 이탈을 먼저 따로 검사하며, 동일한 신호와 계수가 2023·2024에서 모두 개선되고 2024 증분이 `+3` 이상일 때만 다음 단계로 진행합니다. 중심값은 직전 시즌 보정 학습에서 저장한 Train 통계만 사용하고 test 행 집계는 사용하지 않습니다.
