@@ -465,7 +465,11 @@
 - **기준 ZIP:** `0816/results/submit_catboost_train_trend_shift.zip`
 - **출력 ZIP:** `0819/results/submit_catboost_residual_differential.zip`
 - **실행 코드:** `0819/03_build_residual_differential_submission_colab.py`
-- **결과:** 실행 전
+- **표 규모:** 같은 손 499명, 2스트라이크 508명, 주자 존재 499명
+- **중앙 보정 차이 절댓값:** `0.0042121` / `0.0027521` / `0.0016151`
+- **ZIP 검사:** 손상 없음 (`zip_test_error=null`)
+- **샘플 추론:** 5행, 결측 0, 범위 `0.3999831~0.4954599`, 평균 `0.4529250`
+- **판정:** 제출 가능
 
 ## 새 실험 기록 템플릿
 
