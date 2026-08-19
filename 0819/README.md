@@ -76,3 +76,18 @@
 - Public Score: `1029.0832235020`
 - 기존 `997.3951851847` 대비: `+31.6880383173`
 - 판정: 새 규정 준수 최고 모델로 채택
+
+## 04. 보정 구성과 적용 강도 비교
+
+현재 최고 `1029.0832235020`을 만든 세 보정의 기여를 분리합니다. 같은 손 조합, 2스트라이크, 주자 존재의 7개 단독·조합과 적용 강도 `0.5, 0.75, 1.0, 1.25`를 비교합니다.
+
+비교 비용을 줄이기 위해 선별 단계는 기준 CatBoost 성공모델 3시드의 과거 시즌 예측을 사용합니다. 여기서 선택된 한 구성만 기존 offset·shift를 포함한 전체 과정으로 다시 확인합니다.
+
+두 확인 시즌에서 모두 공식 점수가 개선되는 후보만 남기고, 그중 낮은 쪽의 개선값이 가장 큰 구성을 선택합니다. 이 단계에서는 새 제출 ZIP을 만들지 않습니다.
+
+```bash
+!python /content/baseball/0819/04_error_adjustment_weight_screen_colab.py \
+  --train /content/dataset/data/train.csv \
+  --output /content/drive/MyDrive/0819_error_adjustment_weight_screen.json \
+  --task-type GPU
+```
