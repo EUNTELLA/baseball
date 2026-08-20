@@ -69,3 +69,33 @@
 - 현재 최고 `1029.0832235020` 대비: `-19.6499396993`
 - 판정: 폐기
 - 해석: 보조 채널 6시드 확대와 함께 재계산된 `-0.0689738607` 전역 shift가 예측 수준을 과도하게 낮췄으며, 로컬 2024 하락 경고가 리더보드에서 더 크게 나타남
+
+## 04. 동적 투수 기준확률 잔차 모델
+
+공개 저장소 검토에서 반복적으로 성과가 있었던 `동적 기준확률 + 잔차 학습 + 3개 연도 순방향 검증` 원리만 독립 구현합니다. 외부 코드·모델·Trackman 매핑·고정 계수는 사용하지 않습니다.
+
+공식 `asof_pitcher_n`, 커리어 성공률, 최근 1·3·5경기 성공률로 투수 기준확률을 만들고 CatBoostRegressor가 `정답-기준확률`을 학습합니다. 현재 직접 CatBoost 분류기와 2022·2023·2024에서 비교합니다.
+
+```bash
+!python /content/baseball/0820/04_dynamic_pitcher_baseline_residual_screen_colab.py \
+  --train /content/dataset/data/train.csv \
+  --output /content/drive/MyDrive/0820_dynamic_pitcher_baseline_residual.json \
+  --task-type GPU
+```
+
+세 연도 모두 개선되고 2024 증분이 `+5` 이상일 때만 다중 잔차 채널과 행별 결합 단계로 진행합니다.
+
+## 04. 동적 투수 기준확률 잔차 모델
+
+공개 저장소 검토에서 반복적으로 성과가 있었던 `동적 기준확률 + 잔차 학습 + 3개 연도 순방향 검증` 원리만 독립 구현합니다. 외부 코드·모델·Trackman 매핑·고정 계수는 사용하지 않습니다.
+
+공식 `asof_pitcher_n`, 커리어 성공률, 최근 1·3·5경기 성공률로 투수 기준확률을 만들고 CatBoostRegressor가 `정답-기준확률`을 학습합니다. 현재 직접 CatBoost 분류기와 2022·2023·2024에서 비교합니다.
+
+```bash
+!python /content/baseball/0820/04_dynamic_pitcher_baseline_residual_screen_colab.py \
+  --train /content/dataset/data/train.csv \
+  --output /content/drive/MyDrive/0820_dynamic_pitcher_baseline_residual.json \
+  --task-type GPU
+```
+
+세 연도 모두 개선되고 2024 증분이 `+5` 이상일 때만 다중 잔차 채널과 행별 결합 단계로 진행합니다.

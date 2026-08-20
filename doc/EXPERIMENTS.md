@@ -612,6 +612,18 @@
 - **판정:** 폐기, Public `1029.0832235020` 유지
 - **결론:** 6시드 보조 평균과 재계산 shift의 결합이 예측 수준을 과도하게 낮췄고 최신 순방향 검증의 음수 경고가 리더보드에서 확대됨
 
+### dynamic-pitcher-baseline-residual-screen-041
+
+- **실험일:** 2026-08-20
+- **근거:** 공개 저장소에서 확인한 동적 기준확률·잔차 학습·3연도 순방향 검증 원리
+- **독립 구현:** 공식 `asof_*`와 기존 우리 피처만 사용, 외부 코드·모델·Trackman 매핑·고정 계수 미사용
+- **기준확률:** 투수 커리어 성공률의 리그 평균 축소 + 최근 1·3·5경기 기록의 약한 신뢰도 반영
+- **후보:** CatBoostRegressor가 `control_success - dynamic_pitcher_base` 학습
+- **비교:** 동일 피처의 직접 CatBoostClassifier
+- **검증:** 2022·2023·2024 개별 BSS, pooled BSS, 오차 상관
+- **실행 코드:** `0820/04_dynamic_pitcher_baseline_residual_screen_colab.py`
+- **상태:** 실행 대기
+
 ## 새 실험 기록 템플릿
 
 아래 형식을 복사하여 새로운 결과를 추가합니다.
