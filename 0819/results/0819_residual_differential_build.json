@@ -1,0 +1,100 @@
+{
+  "model": "Public 997 CatBoost + OOF residual differential hand/2S/runners",
+  "official_train_only": true,
+  "test_aggregate_used": false,
+  "base_zip": "0816/results/submit_catboost_train_trend_shift.zip",
+  "output_zip": "0819/results/submit_catboost_residual_differential.zip",
+  "source_folds": [
+    2023,
+    2024
+  ],
+  "training": [
+    {
+      "fold": 2023,
+      "best_iterations": [
+        1,
+        1,
+        2,
+        1,
+        1,
+        1,
+        1
+      ],
+      "seconds": [
+        14.095347563999894,
+        14.364404427999943,
+        14.544528432000334,
+        14.172932280999703,
+        14.392719118000059,
+        14.326377296999908,
+        14.223376025000107
+      ]
+    },
+    {
+      "fold": 2024,
+      "best_iterations": [
+        286,
+        278,
+        232,
+        274,
+        250,
+        201,
+        210
+      ],
+      "seconds": [
+        50.62813673799974,
+        51.68808066299971,
+        44.45054312000002,
+        49.80147706300022,
+        47.135040578999906,
+        40.944253656,
+        42.09974331100011
+      ]
+    }
+  ],
+  "tables": {
+    "hand": {
+      "shrinkage": 1000.0,
+      "pitchers": 499,
+      "median_absolute_difference": 0.0042121487519752865
+    },
+    "two_strikes": {
+      "shrinkage": 1000.0,
+      "pitchers": 508,
+      "median_absolute_difference": 0.0027521386478930356
+    },
+    "runners_on": {
+      "shrinkage": 2000.0,
+      "pitchers": 499,
+      "median_absolute_difference": 0.0016150546647705772
+    }
+  },
+  "members": [
+    "cond.py",
+    "features.py",
+    "model/meta.json",
+    "model/model_Sym_1.cbm",
+    "model/model_Sym_123.cbm",
+    "model/model_Sym_2024.cbm",
+    "model/model_Sym_42.cbm",
+    "model/model_Sym_7.cbm",
+    "model/model_Sym_777.cbm",
+    "model/model_Sym_99.cbm",
+    "model/mr_2024.cbm",
+    "model/mr_42.cbm",
+    "model/mr_7.cbm",
+    "model/residual_differential.json",
+    "model/wayoff_2024.cbm",
+    "model/wayoff_42.cbm",
+    "model/wayoff_7.cbm",
+    "requirements.txt",
+    "script.py"
+  ],
+  "zip_test_error": null,
+  "sample_rows": 5,
+  "sample_missing": 0,
+  "sample_min": 0.3999830780547267,
+  "sample_max": 0.4954598517998687,
+  "sample_mean": 0.4529249718302221,
+  "sample_stdout": "Saved ./output/submission.csv rows=5 seeds=7 offset=Y mean=0.4529"
+}

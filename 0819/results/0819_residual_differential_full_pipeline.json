@@ -1,0 +1,318 @@
+{
+  "experiment": "OOF residual differential 3-axis in complete 997 pipeline",
+  "official_train_only": true,
+  "test_aggregate_used": false,
+  "axes": {
+    "hand": 1000.0,
+    "two_strikes": 1000.0,
+    "runners_on": 2000.0
+  },
+  "seeds": [
+    42,
+    7,
+    2024
+  ],
+  "pretraining": [
+    {
+      "fold": 2021,
+      "global_mean": 0.5484693665628245,
+      "best_iterations": [
+        113,
+        157,
+        114
+      ],
+      "seconds": [
+        13.087082440000131,
+        14.414288813999974,
+        12.426112472000113
+      ],
+      "metrics": {
+        "brier": 0.24558606623063747,
+        "score": 1342.0059681810703,
+        "prediction_mean": 0.5243178698082249,
+        "target_mean": 0.5327616072006734,
+        "mean_error": -0.008443737392448525,
+        "corr_squared_score": 1489.786376124307
+      }
+    },
+    {
+      "fold": 2022,
+      "global_mean": 0.5431423520563061,
+      "best_iterations": [
+        315,
+        215,
+        232
+      ],
+      "seconds": [
+        30.038266843999963,
+        24.61329227200008,
+        24.994613582000056
+      ],
+      "metrics": {
+        "brier": 0.24329054856190852,
+        "score": 2357.1096248045988,
+        "prediction_mean": 0.53323293740498,
+        "target_mean": 0.5289204435249241,
+        "mean_error": 0.004312493880055945,
+        "corr_squared_score": 2373.579286061804
+      }
+    }
+  ],
+  "results": [
+    {
+      "validation_year": 2023,
+      "source_seasons": [
+        2021,
+        2022
+      ],
+      "inner_global_mean": 0.5431423520563061,
+      "outer_global_mean": 0.5395365039034485,
+      "training": {
+        "success": {
+          "best_iterations": [
+            315,
+            215,
+            232
+          ],
+          "inner_seconds": [
+            30.498617248999835,
+            25.18033929000012,
+            25.352244276999954
+          ],
+          "outer_seconds": [
+            32.231153750999965,
+            24.791909100999874,
+            25.086022705000005
+          ]
+        },
+        "mr": {
+          "best_iterations": [
+            346,
+            327,
+            323
+          ],
+          "inner_seconds": [
+            32.093219050000016,
+            31.506525024999974,
+            32.346187394000026
+          ],
+          "outer_seconds": [
+            35.20418450199986,
+            35.434892347000186,
+            33.00008894300004
+          ]
+        },
+        "wayoff": {
+          "best_iterations": [
+            501,
+            430,
+            524
+          ],
+          "inner_seconds": [
+            42.78366716800019,
+            38.6494398599998,
+            43.65753543400001
+          ],
+          "outer_seconds": [
+            50.51677056900007,
+            43.23119836500018,
+            50.84505174300011
+          ]
+        }
+      },
+      "tables": {
+        "hand": {
+          "shrinkage": 1000.0,
+          "pitchers": 506,
+          "median_absolute_difference": 0.0037587209972426584
+        },
+        "two_strikes": {
+          "shrinkage": 1000.0,
+          "pitchers": 511,
+          "median_absolute_difference": 0.002551978069981636
+        },
+        "runners_on": {
+          "shrinkage": 2000.0,
+          "pitchers": 501,
+          "median_absolute_difference": 0.0013467261895387598
+        }
+      },
+      "offset": {
+        "b": -0.05399118607343494,
+        "c": -0.009448995479683166,
+        "mu_mr": -0.6652026543483676,
+        "mu_wayoff": -2.012464688426948
+      },
+      "rate_forecast": {
+        "alpha": 0.0,
+        "backtest_years": [
+          2022
+        ],
+        "previous_rate": 0.5289204435249241,
+        "forecast": 0.5289204435249241
+      },
+      "shift": -0.016641361132894644,
+      "correction": {
+        "mean": 0.00010339699741592302,
+        "std": 0.008114364761399257,
+        "min": -0.04087270734487479,
+        "max": 0.04087270734487479
+      },
+      "baseline": {
+        "brier": 0.25321952115414753,
+        "score": -1287.8092026353372,
+        "prediction_mean": 0.5163967233044446,
+        "target_mean": 0.49995723449750534,
+        "mean_error": 0.016439488806939295,
+        "corr_squared_score": 65.77506491546215
+      },
+      "candidate": {
+        "brier": 0.2531979525914112,
+        "score": -1279.1817774777003,
+        "prediction_mean": 0.5165025669136146,
+        "target_mean": 0.49995723449750534,
+        "mean_error": 0.016545332416109282,
+        "corr_squared_score": 75.24274809056882
+      },
+      "bss_delta": 8.627425157636935,
+      "corr_squared_delta": 9.467683175106671,
+      "absolute_mean_error_delta": 0.00010584360916998659
+    },
+    {
+      "validation_year": 2024,
+      "source_seasons": [
+        2022,
+        2023
+      ],
+      "inner_global_mean": 0.5395365039034485,
+      "outer_global_mean": 0.5315815109059132,
+      "training": {
+        "success": {
+          "best_iterations": [
+            1,
+            1,
+            2
+          ],
+          "inner_seconds": [
+            13.447231973999806,
+            13.643607641000017,
+            13.464626941999995
+          ],
+          "outer_seconds": [
+            5.588256252000065,
+            4.271185356999922,
+            4.261846441000216
+          ]
+        },
+        "mr": {
+          "best_iterations": [
+            37,
+            38,
+            37
+          ],
+          "inner_seconds": [
+            17.62942397300003,
+            16.67591247600012,
+            16.620061766000163
+          ],
+          "outer_seconds": [
+            7.525153820000014,
+            5.466582832000313,
+            6.9820770299998
+          ]
+        },
+        "wayoff": {
+          "best_iterations": [
+            440,
+            520,
+            553
+          ],
+          "inner_seconds": [
+            53.37794906299996,
+            61.46902531600017,
+            64.0516692010001
+          ],
+          "outer_seconds": [
+            58.16648983499999,
+            67.46059843800003,
+            71.60439327099994
+          ]
+        }
+      },
+      "tables": {
+        "hand": {
+          "shrinkage": 1000.0,
+          "pitchers": 478,
+          "median_absolute_difference": 0.004020844233145419
+        },
+        "two_strikes": {
+          "shrinkage": 1000.0,
+          "pitchers": 482,
+          "median_absolute_difference": 0.0025186063797848317
+        },
+        "runners_on": {
+          "shrinkage": 2000.0,
+          "pitchers": 475,
+          "median_absolute_difference": 0.0017569713319541746
+        }
+      },
+      "offset": {
+        "b": -0.06646390586872516,
+        "c": 0.01522984877315224,
+        "mu_mr": -0.5280921305407741,
+        "mu_wayoff": -1.9796286060352017
+      },
+      "rate_forecast": {
+        "alpha": 1.0,
+        "backtest_years": [
+          2022,
+          2023
+        ],
+        "previous_rate": 0.49995723449750534,
+        "forecast": 0.4709940254700866
+      },
+      "shift": -0.12285024146036777,
+      "correction": {
+        "mean": 0.00014969591407044513,
+        "std": 0.007896746275630152,
+        "min": -0.038704855549148626,
+        "max": 0.038704855549148626
+      },
+      "baseline": {
+        "brier": 0.2498846851464133,
+        "score": -31.127395318786277,
+        "prediction_mean": 0.4676458597796345,
+        "target_mean": 0.4861049201797189,
+        "mean_error": -0.01845906040008438,
+        "corr_squared_score": 363.2395020996163
+      },
+      "candidate": {
+        "brier": 0.24974137416099182,
+        "score": 26.241304293372902,
+        "prediction_mean": 0.4678031504702569,
+        "target_mean": 0.4861049201797189,
+        "mean_error": -0.018301769709462012,
+        "corr_squared_score": 275.94904591196524
+      },
+      "bss_delta": 57.368699612159176,
+      "corr_squared_delta": -87.29045618765105,
+      "absolute_mean_error_delta": -0.00015729069062236922
+    }
+  ],
+  "summary": {
+    "bss_deltas": [
+      8.627425157636935,
+      57.368699612159176
+    ],
+    "corr_squared_deltas": [
+      9.467683175106671,
+      -87.29045618765105
+    ],
+    "absolute_mean_error_deltas": [
+      0.00010584360916998659,
+      -0.00015729069062236922
+    ],
+    "decision": "keep_997_baseline",
+    "gate": "2023/2024 BSS and corr2 positive, 2024 BSS>=+5, 2024 abs mean error delta<=0.001"
+  }
+}
