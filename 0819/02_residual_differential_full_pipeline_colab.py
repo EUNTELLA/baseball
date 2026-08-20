@@ -94,6 +94,7 @@ def main(
     mapping_path: Path | None = None,
     trackman_blend: float = 1.0,
     screen_r_residual: bool = False,
+    anchor_output: Path | None = None,
 ) -> None:
     common = load_module("full_pipeline_common", COMMON_PATH)
     screen = load_module("residual_differential_screen", SCREEN_PATH)
@@ -328,6 +329,16 @@ def main(
         baseline_final = common.sigmoid(common.logit(baseline_offset) + shift)
         candidate_final = common.sigmoid(common.logit(candidate_offset) + candidate_shift)
         anchor_oof[validation] = candidate_final
+        if anchor_output is not None and validation_year == 2024:
+            anchor_output.parent.mkdir(parents=True, exist_ok=True)
+            np.savez_compressed(
+                anchor_output,
+                row_id=frame.loc[validation, ID_COL].to_numpy(),
+                target=target[validation].astype(np.int8),
+                prediction=candidate_final.astype(np.float32),
+                game_type=frame.loc[validation, "game_type"].astype(str).to_numpy(),
+            )
+            print(f"saved 2024 anchor: {anchor_output}", flush=True)
         validation_target = target[validation]
         baseline_metrics = extended_metrics(common, baseline_final, validation_target)
         candidate_metrics = extended_metrics(common, candidate_final, validation_target)
@@ -464,6 +475,7 @@ if __name__ == "__main__":
     parser.add_argument("--mapping", type=Path, default=None)
     parser.add_argument("--trackman-blend", type=float, default=1.0)
     parser.add_argument("--screen-r-residual", action="store_true")
+    parser.add_argument("--anchor-output", type=Path, default=None)
     args = parser.parse_args()
     selected_axes = tuple(item.strip() for item in args.axes.split(",") if item.strip())
     allowed_axes = {name for name, _ in load_module("axis_check", SCREEN_PATH).AXES}
@@ -483,4 +495,5 @@ if __name__ == "__main__":
         args.mapping.resolve() if args.mapping else None,
         args.trackman_blend,
         args.screen_r_residual,
+        args.anchor_output.resolve() if args.anchor_output else None,
     )
