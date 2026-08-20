@@ -1,6 +1,6 @@
-"""외부 공개 OOF와 우리 기준 OOF의 오차 차이를 행 조건별로 진단한다.
+"""참조 OOF와 기준 OOF의 오차 차이를 행 조건별로 진단한다.
 
-외부 예측은 조건 탐색에만 사용하며 제출 예측, 보정값, ZIP에는 포함하지 않는다.
+참조 예측은 조건 탐색에만 사용하며 제출 예측, 보정값, ZIP에는 포함하지 않는다.
 """
 from __future__ import annotations
 
@@ -88,7 +88,7 @@ def main(train_path: Path, external_root: Path, output: Path, task_type: str) ->
     target = frame[TARGET_COL].astype(int).to_numpy()
     season = frame["season"].astype(int).to_numpy()
     report = {
-        "experiment": "external OOF row-condition error audit",
+        "experiment": "reference OOF row-condition error audit",
         "diagnostic_only": True, "official_train_only_for_our_models": True,
         "external_predictions_used_in_submission": False,
         "external_fixed_coefficients_copied": False,
@@ -104,9 +104,9 @@ def main(train_path: Path, external_root: Path, output: Path, task_type: str) ->
         external_pitcher = np.asarray(anchor[f"pitcher{str(year)[-2:]}"]).astype(str)
         local_pitcher = rows["pitcher_id"].astype(str).to_numpy()
         if len(y) != len(external_y) or not np.array_equal(y.astype(np.float32), external_y.astype(np.float32)):
-            raise ValueError(f"{year} 외부 OOF target 행 정렬이 공식 Train과 다릅니다.")
+            raise ValueError(f"{year} 참조 OOF target 행 정렬이 공식 Train과 다릅니다.")
         if not np.array_equal(local_pitcher, external_pitcher):
-            raise ValueError(f"{year} 외부 OOF pitcher_id 행 정렬이 공식 Train과 다릅니다.")
+            raise ValueError(f"{year} 참조 OOF pitcher_id 행 정렬이 공식 Train과 다릅니다.")
 
         league_rate = float(target[train_mask].mean())
         x = feature_module.engineer(frame.drop(columns=[ID_COL, TARGET_COL]), league_rate)
