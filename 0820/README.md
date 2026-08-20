@@ -25,3 +25,16 @@
 - 선택된 적용 강도: 없음
 - 판정: `keep_1029_champion`
 - 결론: F 행 순방향 잔차를 별도 회귀기로 학습해도 시험한 동일 강도로 2023·2024를 함께 개선하지 못해 전체 학습 및 ZIP 제작 중단
+
+## 02. 보조 채널 6시드 평균과 전역 shift 재계산
+
+현재 MR·큰 이탈 보조 채널만 `3→6`시드로 늘립니다. 추가 시드는 `99, 1, 123`입니다. 6시드 결과는 현재 3시드 shift를 공유한 경우와 6시드 Train 예측으로 shift를 다시 계산한 경우를 분리해 비교합니다.
+
+```bash
+!python /content/baseball/0820/02_auxiliary_six_seed_calibration_screen_colab.py \
+  --train /content/dataset/data/train.csv \
+  --output /content/drive/MyDrive/0820_auxiliary_six_seed_calibration.json \
+  --task-type GPU
+```
+
+동일 구성이 2023·2024에서 모두 개선되고 2024 BSS가 `+3` 이상일 때만 제출 빌드로 진행합니다.
