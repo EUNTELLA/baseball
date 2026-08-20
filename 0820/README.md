@@ -239,3 +239,14 @@ python 0820/12_trackman_linkage_audit_colab.py \
   --mapping-output /content/drive/MyDrive/0820_trackman_pitcher_mapping.csv \
   --report-output /content/drive/MyDrive/0820_trackman_linkage_audit.json
 ```
+
+연결 감사 통과 후 고신뢰 투수의 이전 시즌 Trackman 물리·구종 피처를 직접 CatBoost에 추가해 3연도 전방 검증한다.
+
+```bash
+python 0820/13_trackman_prior_feature_screen_colab.py \
+  --train /content/dataset/data/train.csv \
+  --trackman /content/dataset/data/trackman_history.csv \
+  --mapping /content/drive/MyDrive/0820_trackman_pitcher_mapping.csv \
+  --output /content/drive/MyDrive/0820_trackman_prior_feature_screen.json \
+  --task-type GPU
+```
