@@ -250,3 +250,14 @@ python 0820/13_trackman_prior_feature_screen_colab.py \
   --output /content/drive/MyDrive/0820_trackman_prior_feature_screen.json \
   --task-type GPU
 ```
+
+전체 피처 결과는 2022 `+3.50`, 2023 `-0.61`, 2024 `+11.51`로 근접 탈락했다. 매핑 신뢰도와 과거 투구 수를 강화하고 직접 모델과 혼합해 안정성을 재검증한다.
+
+```bash
+python 0820/14_trackman_reliability_blend_screen_colab.py \
+  --train /content/dataset/data/train.csv \
+  --trackman /content/dataset/data/trackman_history.csv \
+  --mapping /content/drive/MyDrive/0820_trackman_pitcher_mapping.csv \
+  --output /content/drive/MyDrive/0820_trackman_reliability_blend.json \
+  --task-type GPU
+```
