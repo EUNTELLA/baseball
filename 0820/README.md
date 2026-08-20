@@ -176,3 +176,15 @@ python 0819/02_residual_differential_full_pipeline_colab.py \
   --count-hand-shrinkage 500 \
   --count-hand-scale 0.3
 ```
+
+전체 파이프라인 통과 후 현재 1029 ZIP에 새 표만 추가한 제출을 만든다.
+
+```bash
+python 0820/08_build_count_hand_incremental_submission_colab.py \
+  --train /content/dataset/data/train.csv \
+  --test /content/dataset/data/test.csv \
+  --sample /content/dataset/data/sample_submission.csv \
+  --report /content/drive/MyDrive/0820_count_hand_submission_report.json
+```
+
+생성물: `0820/results/submit_catboost_count_hand_incremental.zip`
