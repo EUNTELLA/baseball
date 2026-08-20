@@ -217,3 +217,15 @@ python 0820/10_hierarchical_prior_stack_screen_colab.py \
   --output /content/drive/MyDrive/0820_hierarchical_prior_stack.json \
   --task-type GPU
 ```
+
+결과는 `selected=null`이었다. 2023은 약 `+30~34`였지만 2022와 2024가 각각 약 `-10`, `-16`으로 하락해 2023 조기종료 붕괴만 메운 것으로 판정한다.
+
+## 공식 데이터 자산 점검
+
+외부 v2/v3 구조의 핵심 후보인 Trackman·시즌 이력 파일이 공식 데이터에 포함되어 있는지 파일명, 컬럼과 연결 식별자를 확인한다.
+
+```bash
+python 0820/11_official_asset_inventory_colab.py \
+  --data-dir /content/dataset/data \
+  --output /content/drive/MyDrive/0820_official_asset_inventory.json
+```
