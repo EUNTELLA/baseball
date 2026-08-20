@@ -204,3 +204,16 @@ python 0820/09_adaptive_residual_gate_screen_colab.py \
   --output /content/drive/MyDrive/0820_adaptive_residual_gate.json \
   --task-type GPU
 ```
+
+결과는 `selected=null`이었다. 최상위 설정도 2023 `-71.65`, 2024 `+10.11`로 전이가 깨져 폐기한다. 다음 단계는 게이트가 아니라 투수·타자·상황을 부분풀링한 선행 계층형 기본 예측 재구성이다.
+
+## 계층형 prior Ridge 스택
+
+투수·타자 공식 as-of 성공률과 경기유형×카운트×좌우조합 prior를 부분풀링하고, 작은 Ridge 예측을 직접 CatBoost와 혼합한다. 학습 행의 상황 prior는 자기 정답을 제외한다.
+
+```bash
+python 0820/10_hierarchical_prior_stack_screen_colab.py \
+  --train /content/dataset/data/train.csv \
+  --output /content/drive/MyDrive/0820_hierarchical_prior_stack.json \
+  --task-type GPU
+```
