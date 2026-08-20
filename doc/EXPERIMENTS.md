@@ -598,6 +598,16 @@
 - **판정:** `keep_1029_champion`
 - **결론:** 보조 채널 6시드 평균이 최신 확인 연도로 전이되지 않았으며 전역 shift 재계산의 추가 효과도 미미해 ZIP 생성 중단
 
+### catboost-auxiliary-six-seed-probe-build-040
+
+- **실험일:** 2026-08-20
+- **후보:** MR·큰 이탈 6시드 평균 + 공식 Train 기반 2025 shift 재계산
+- **근거 JSON:** `0820_auxiliary_six_seed_calibration.json`
+- **성격:** 정식 로컬 게이트 미통과, 사용자 요청 탐색 제출
+- **실행 코드:** `0820/03_build_auxiliary_six_seed_probe_colab.py`
+- **출력:** `0820/results/submit_catboost_aux6_recomputed_shift_probe.zip`
+- **상태:** 빌드 및 제출 대기
+
 ## 새 실험 기록 템플릿
 
 아래 형식을 복사하여 새로운 결과를 추가합니다.

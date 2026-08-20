@@ -46,3 +46,19 @@
 - 선택 결과: 없음
 - 판정: `keep_1029_champion`
 - 결론: 보조 채널 시드 확대는 2023에서는 개선됐지만 2024로 전이되지 않았고, Train 기반 전역 shift 재계산도 하락을 복구하지 못해 제출 빌드 중단
+
+## 03. 보조 채널 6시드 탐색 제출 빌드
+
+정식 로컬 게이트는 통과하지 못했지만 남은 제출 기회로 전이 여부를 확인하기 위해 `aux6_train_recomputed_shift`를 별도 탐색 ZIP으로 만듭니다. 검증 JSON에서 선택 설정과 iteration을 읽고, production offset과 2025 shift에 필요한 2024 예측만 다시 생성합니다.
+
+```bash
+!python /content/baseball/0820/03_build_auxiliary_six_seed_probe_colab.py \
+  --train /content/dataset/data/train.csv \
+  --test /content/dataset/data/test.csv \
+  --sample /content/dataset/data/sample_submission.csv \
+  --validation-json /content/drive/MyDrive/0820_auxiliary_six_seed_calibration.json \
+  --report /content/drive/MyDrive/0820_auxiliary_six_seed_probe_build.json \
+  --task-type GPU
+```
+
+출력은 `/content/baseball/0820/results/submit_catboost_aux6_recomputed_shift_probe.zip`입니다. 현재 1029 ZIP은 보존하며 이 파일은 탐색 후보로만 취급합니다.
