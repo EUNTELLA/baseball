@@ -184,7 +184,10 @@ python 0820/08_build_count_hand_incremental_submission_colab.py \
   --train /content/dataset/data/train.csv \
   --test /content/dataset/data/test.csv \
   --sample /content/dataset/data/sample_submission.csv \
+  --base-zip /content/drive/MyDrive/submit_catboost_residual_differential.zip \
   --report /content/drive/MyDrive/0820_count_hand_submission_report.json
 ```
 
 생성물: `0820/results/submit_catboost_count_hand_incremental.zip`
+
+Drive에 기준 ZIP이 없다면 먼저 `0819/03_build_residual_differential_submission_colab.py`를 실행해 재생성한 뒤 그 경로를 `--base-zip`으로 지정한다.

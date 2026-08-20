@@ -67,9 +67,12 @@ def inference_block() -> str:
 '''
 
 
-def main(train_path: Path, test_path: Path, sample_path: Path, report_path: Path) -> None:
-    if not BASE_ZIP.exists():
-        raise FileNotFoundError(BASE_ZIP)
+def main(train_path: Path, test_path: Path, sample_path: Path, report_path: Path, base_zip: Path) -> None:
+    if not base_zip.exists():
+        raise FileNotFoundError(
+            f"기준 1029 ZIP이 없습니다: {base_zip}. "
+            "Drive에 보관한 ZIP을 --base-zip으로 지정하거나 0819/03 빌더로 재생성하세요."
+        )
     frame = pd.read_csv(train_path, encoding="utf-8-sig")
     target = frame[TARGET_COL].astype(int).to_numpy()
     season = frame["season"].astype(int).to_numpy()
@@ -103,7 +106,7 @@ def main(train_path: Path, test_path: Path, sample_path: Path, report_path: Path
 
     if BUILD_DIR.exists():
         shutil.rmtree(BUILD_DIR)
-    with zipfile.ZipFile(BASE_ZIP) as archive:
+    with zipfile.ZipFile(base_zip) as archive:
         archive.extractall(BUILD_DIR)
     asset = {"source": "official Train 2024 OOF only", "axis": "count×hand match",
              "shrinkage": SHRINKAGE, "scale": SCALE, "source_global_residual_mean_removed": global_mean,
@@ -144,7 +147,7 @@ def main(train_path: Path, test_path: Path, sample_path: Path, report_path: Path
         raise ValueError("샘플 추론 결과의 결측 또는 확률 범위 오류")
     report = {"model": "1029 residual differential + count-hand incremental differential",
               "official_train_only": True, "test_aggregate_used": False,
-              "base_zip": str(BASE_ZIP.relative_to(ROOT)), "output_zip": str(OUTPUT_ZIP.relative_to(ROOT)),
+              "base_zip": str(base_zip), "output_zip": str(OUTPUT_ZIP.relative_to(ROOT)),
               "source_fold": 2024, "seeds": list(SEEDS), "best_iterations": iterations,
               "seconds": seconds, "groups": len(table), "shrinkage": SHRINKAGE, "scale": SCALE,
               "members": members, "zip_test_error": bad_member, "sample_rows": int(len(submission)),
@@ -162,5 +165,6 @@ if __name__ == "__main__":
     parser.add_argument("--test", type=Path, required=True)
     parser.add_argument("--sample", type=Path, required=True)
     parser.add_argument("--report", type=Path, required=True)
+    parser.add_argument("--base-zip", type=Path, default=BASE_ZIP)
     args = parser.parse_args()
-    main(args.train.resolve(), args.test.resolve(), args.sample.resolve(), args.report.resolve())
+    main(args.train.resolve(), args.test.resolve(), args.sample.resolve(), args.report.resolve(), args.base_zip.resolve())
