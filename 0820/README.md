@@ -162,3 +162,17 @@ python 0820/07_count_hand_leverage_differential_screen_colab.py \
   --output /content/drive/MyDrive/0820_count_hand_leverage_differential.json \
   --task-type GPU
 ```
+
+선별 게이트를 통과하면 현재 1029 구조 위의 순증분을 전체 offset·Train 추세 shift 과정에서 확인한다.
+
+```bash
+python 0819/02_residual_differential_full_pipeline_colab.py \
+  --train /content/dataset/data/train.csv \
+  --output /content/drive/MyDrive/0820_count_hand_incremental_full.json \
+  --task-type GPU \
+  --axes hand,two_strikes,runners_on \
+  --weight 1.0 \
+  --include-count-hand \
+  --count-hand-shrinkage 500 \
+  --count-hand-scale 0.3
+```

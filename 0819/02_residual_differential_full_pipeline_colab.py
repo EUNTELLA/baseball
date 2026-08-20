@@ -18,6 +18,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 ROOT = SCRIPT_DIR.parent
 COMMON_PATH = ROOT / "0817" / "03_catboost_full_pipeline_walkforward_colab.py"
 SCREEN_PATH = SCRIPT_DIR / "01_catboost_residual_differential_screen_colab.py"
+COUNT_HAND_PATH = ROOT / "0820" / "07_count_hand_leverage_differential_screen_colab.py"
 LABEL_PATH = ROOT / "0816" / "reference_catboost_best" / "recovered_labels.csv.gz"
 BASE_CONFIG = {"name": "catboost_d6_lr05_l2_1", "depth": 6, "learning_rate": 0.05, "l2_leaf_reg": 1.0}
 
@@ -46,9 +47,13 @@ def main(
     task_type: str,
     selected_axes: tuple[str, ...] = ("hand", "two_strikes", "runners_on"),
     adjustment_weight: float = 1.0,
+    include_count_hand: bool = False,
+    count_hand_shrinkage: float = 500.0,
+    count_hand_scale: float = 0.3,
 ) -> None:
     common = load_module("full_pipeline_common", COMMON_PATH)
     screen = load_module("residual_differential_screen", SCREEN_PATH)
+    count_hand_module = load_module("count_hand_differential", COUNT_HAND_PATH) if include_count_hand else None
     frame = pd.read_csv(train_path, encoding="utf-8-sig")
     target = frame[TARGET_COL].astype(int).to_numpy()
     season = frame["season"].astype(int).to_numpy()
@@ -67,6 +72,12 @@ def main(
         "axes": {name: shrinkage for name, shrinkage in screen.AXES},
         "selected_axes": list(selected_axes),
         "adjustment_weight": adjustment_weight,
+        "incremental_count_hand": {
+            "enabled": include_count_hand,
+            "shrinkage": count_hand_shrinkage,
+            "scale": count_hand_scale,
+            "source": "previous season only",
+        },
         "seeds": list(common.SEEDS),
         "pretraining": [],
         "results": [],
@@ -155,6 +166,21 @@ def main(
         correction = adjustment_weight * sum(
             (additions[name] for name in selected_axes), np.zeros(int(validation.sum()))
         )
+        count_hand_correction = np.zeros(int(validation.sum()))
+        if include_count_hand:
+            count_hand_keys = count_hand_module.keys(frame)["count_hand"]
+            previous_season = season == (validation_year - 1)
+            count_hand_correction, count_hand_groups = count_hand_module.differential(
+                count_hand_keys.loc[previous_season], residual[previous_season],
+                count_hand_keys.loc[validation], count_hand_shrinkage,
+            )
+            count_hand_correction *= count_hand_scale
+            tables["count_hand"] = {
+                "shrinkage": count_hand_shrinkage,
+                "scale": count_hand_scale,
+                "groups": count_hand_groups,
+                "source_season": validation_year - 1,
+            }
 
         calibration_target = target[calibration]
         offset = common.fit_offset(
@@ -170,13 +196,15 @@ def main(
             predictions["wayoff"]["inner"],
             offset,
         )
+        incumbent_success = np.clip(predictions["success"]["outer"] + correction, 1e-6, 1 - 1e-6)
+        baseline_success = incumbent_success if include_count_hand else predictions["success"]["outer"]
         baseline_offset = common.apply_offset(
-            predictions["success"]["outer"],
+            baseline_success,
             predictions["mr"]["outer"],
             predictions["wayoff"]["outer"],
             offset,
         )
-        corrected_success = np.clip(predictions["success"]["outer"] + correction, 1e-6, 1 - 1e-6)
+        corrected_success = np.clip(incumbent_success + count_hand_correction, 1e-6, 1 - 1e-6)
         candidate_offset = common.apply_offset(
             corrected_success,
             predictions["mr"]["outer"],
@@ -205,6 +233,12 @@ def main(
                 "std": float(correction.std()),
                 "min": float(correction.min()),
                 "max": float(correction.max()),
+            },
+            "count_hand_correction": {
+                "mean": float(count_hand_correction.mean()),
+                "std": float(count_hand_correction.std()),
+                "min": float(count_hand_correction.min()),
+                "max": float(count_hand_correction.max()),
             },
             "baseline": baseline_metrics,
             "candidate": candidate_metrics,
@@ -250,6 +284,9 @@ if __name__ == "__main__":
         help="쉼표로 구분한 적용 보정: hand,two_strikes,runners_on",
     )
     parser.add_argument("--weight", type=float, default=1.0)
+    parser.add_argument("--include-count-hand", action="store_true")
+    parser.add_argument("--count-hand-shrinkage", type=float, default=500.0)
+    parser.add_argument("--count-hand-scale", type=float, default=0.3)
     args = parser.parse_args()
     selected_axes = tuple(item.strip() for item in args.axes.split(",") if item.strip())
     allowed_axes = {name for name, _ in load_module("axis_check", SCREEN_PATH).AXES}
@@ -259,5 +296,6 @@ if __name__ == "__main__":
         parser.error("--weight는 0보다 커야 합니다.")
     main(
         args.train.resolve(), args.output.resolve(), args.task_type,
-        selected_axes, args.weight,
+        selected_axes, args.weight, args.include_count_hand,
+        args.count_hand_shrinkage, args.count_hand_scale,
     )
