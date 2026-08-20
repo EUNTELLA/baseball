@@ -229,3 +229,13 @@ python 0820/11_official_asset_inventory_colab.py \
   --data-dir /content/dataset/data \
   --output /content/drive/MyDrive/0820_official_asset_inventory.json
 ```
+
+공식 Trackman 파일이 확인되면 일정 분포로 투수 ID를 일대일 연결하고 공식 as-of 구종 비율로 독립 검증한다.
+
+```bash
+python 0820/12_trackman_linkage_audit_colab.py \
+  --train /content/dataset/data/train.csv \
+  --trackman /content/dataset/data/trackman_history.csv \
+  --mapping-output /content/drive/MyDrive/0820_trackman_pitcher_mapping.csv \
+  --report-output /content/drive/MyDrive/0820_trackman_linkage_audit.json
+```
