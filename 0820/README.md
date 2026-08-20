@@ -295,6 +295,20 @@ python 0820/15_trackman_physical_change_screen_colab.py \
 
 결과는 `selected=null`이었다. 최상위 설정도 alpha 100000·강도 0.05에서 2023 `-0.95`, 2024 `+0.97`로 방향이 반대였다. 물리 변화량은 최신 시즌에만 약하게 나타났고 시간 전이를 통과하지 못했으므로 Trackman 실험을 종료한다.
 
+다음에는 현재 3축 차등 전체 예측을 고정한 채 R 행에만 3시드 CatBoost 잔차의 0.025~0.15를 적용한다. 2022 전체 anchor를 먼저 만들어 2022→2023과 2023→2024를 동일 조건으로 검증한다.
+
+```bash
+python 0819/02_residual_differential_full_pipeline_colab.py \
+  --train /content/dataset/data/train.csv \
+  --output /content/drive/MyDrive/0820_r_residual_low_scale.json \
+  --task-type GPU \
+  --axes hand,two_strikes,runners_on \
+  --weight 1.0 \
+  --screen-r-residual
+```
+
+동일 강도가 2023·2024 모두 양수이고 2024 `+1` 이상일 때만 7시드 학습과 제출 ZIP 생성으로 진행한다.
+
 다음 실험은 고신뢰 투수의 직전 시즌 물리 특성과 그 이전 누적 평균의 차이만 잔차 신호로 검증한다.
 
 ```bash

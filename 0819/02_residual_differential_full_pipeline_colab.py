@@ -9,11 +9,14 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from catboost import CatBoostRegressor, Pool
 
 
 ID_COL = "row_id"
 TARGET_COL = "control_success"
 VALIDATION_FOLDS = (2023, 2024)
+R_RESIDUAL_SEEDS = (17, 42, 777)
+R_RESIDUAL_SCALES = (0.025, 0.05, 0.075, 0.10, 0.15)
 SCRIPT_DIR = Path(__file__).resolve().parent
 ROOT = SCRIPT_DIR.parent
 COMMON_PATH = ROOT / "0817" / "03_catboost_full_pipeline_walkforward_colab.py"
@@ -42,6 +45,42 @@ def write_json(path: Path, payload: dict) -> None:
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
+def train_r_residual(
+    features: pd.DataFrame,
+    cat_indices: list[int],
+    residual: np.ndarray,
+    train_mask: np.ndarray,
+    valid_mask: np.ndarray,
+    season: np.ndarray,
+    validation_year: int,
+    task_type: str,
+) -> tuple[np.ndarray, list[float]]:
+    train_pool = Pool(
+        features.loc[train_mask], residual[train_mask],
+        cat_features=cat_indices,
+        weight=np.power(0.65, validation_year - 1 - season[train_mask]),
+    )
+    valid_pool = Pool(features.loc[valid_mask], cat_features=cat_indices)
+    members, seconds = [], []
+    for seed in R_RESIDUAL_SEEDS:
+        model = CatBoostRegressor(
+            iterations=1200, depth=7, learning_rate=0.025,
+            loss_function="RMSE", l2_leaf_reg=20,
+            random_strength=0.35, bootstrap_type="Bernoulli", subsample=0.85,
+            one_hot_max_size=16, random_seed=seed, task_type=task_type,
+            devices="0" if task_type == "GPU" else None,
+            thread_count=6, allow_writing_files=False, verbose=False,
+        )
+        started = __import__("time").perf_counter()
+        model.fit(train_pool)
+        seconds.append(float(__import__("time").perf_counter() - started))
+        members.append(model.predict(valid_pool))
+        print(f"fold={validation_year} R residual seed={seed} sec={seconds[-1]:.1f}", flush=True)
+        del model
+        gc.collect()
+    return np.mean(members, axis=0), seconds
+
+
 def main(
     train_path: Path,
     output: Path,
@@ -54,6 +93,7 @@ def main(
     trackman_path: Path | None = None,
     mapping_path: Path | None = None,
     trackman_blend: float = 1.0,
+    screen_r_residual: bool = False,
 ) -> None:
     common = load_module("full_pipeline_common", COMMON_PATH)
     screen = load_module("residual_differential_screen", SCREEN_PATH)
@@ -85,6 +125,7 @@ def main(
         for column in trackman_columns:
             trackman_attached[column] = pd.to_numeric(trackman_attached[column], errors="coerce").where(reliable)
     success_oof = np.full(len(frame), np.nan, dtype=float)
+    anchor_oof = np.full(len(frame), np.nan, dtype=float)
     report = {
         "experiment": "OOF residual differential 3-axis in complete 997 pipeline",
         "official_train_only": True,
@@ -103,12 +144,19 @@ def main(
             "similarity_floor": 0.90, "margin_floor": 0.02, "prior_n_floor": 200.0,
         },
         "seeds": list(common.SEEDS),
+        "r_residual_screen": {
+            "enabled": screen_r_residual,
+            "seeds": list(R_RESIDUAL_SEEDS),
+            "scales": list(R_RESIDUAL_SCALES),
+            "rows": "game_type=R only",
+        },
         "pretraining": [],
         "results": [],
     }
 
-    # 2023 검증표의 원천인 2021·2022 성공 OOF를 먼저 만든다.
-    for fold in (2021, 2022):
+    validation_folds = (2022, 2023, 2024) if screen_r_residual else VALIDATION_FOLDS
+    # 차등표의 두 원천 시즌 성공 OOF를 먼저 만든다.
+    for fold in ((2020, 2021) if screen_r_residual else (2021, 2022)):
         train_mask = season < fold
         valid_mask = season == fold
         features, cat_indices, global_mean = common.engineer(
@@ -137,7 +185,7 @@ def main(
         del features
         gc.collect()
 
-    for validation_year in VALIDATION_FOLDS:
+    for validation_year in validation_folds:
         calibration_year = validation_year - 1
         inner_train = season < calibration_year
         calibration = season == calibration_year
@@ -278,6 +326,7 @@ def main(
         candidate_shift = common.fixed_shift(candidate_inner_offset, forecast["forecast"])
         baseline_final = common.sigmoid(common.logit(baseline_offset) + shift)
         candidate_final = common.sigmoid(common.logit(candidate_offset) + candidate_shift)
+        anchor_oof[validation] = candidate_final
         validation_target = target[validation]
         baseline_metrics = extended_metrics(common, baseline_final, validation_target)
         candidate_metrics = extended_metrics(common, candidate_final, validation_target)
@@ -312,6 +361,34 @@ def main(
                 abs(candidate_metrics["mean_error"]) - abs(baseline_metrics["mean_error"])
             ),
         }
+        if screen_r_residual and validation_year >= 2023:
+            r_train = (season == calibration_year) & frame["game_type"].astype(str).eq("R").to_numpy()
+            r_valid = validation & frame["game_type"].astype(str).eq("R").to_numpy()
+            if np.isnan(anchor_oof[r_train]).any():
+                raise RuntimeError(f"fold={validation_year} R 잔차 원천 anchor OOF 누락")
+            anchor_residual = target.astype(float) - anchor_oof
+            r_correction, r_seconds = train_r_residual(
+                outer_x, outer_ci, anchor_residual, r_train, r_valid,
+                season, validation_year, task_type,
+            )
+            scale_results = []
+            anchor_score = candidate_metrics["score"]
+            r_positions = np.flatnonzero(frame["game_type"].loc[validation].astype(str).eq("R").to_numpy())
+            for scale in R_RESIDUAL_SCALES:
+                adjusted = candidate_final.copy()
+                adjusted[r_positions] = np.clip(
+                    adjusted[r_positions] + scale * r_correction, 1e-6, 1 - 1e-6
+                )
+                metrics = extended_metrics(common, adjusted, validation_target)
+                scale_results.append({
+                    "scale": scale, "metrics": metrics,
+                    "bss_delta": metrics["score"] - anchor_score,
+                    "absolute_mean_error_delta": abs(metrics["mean_error"]) - abs(candidate_metrics["mean_error"]),
+                })
+            fold_result["r_residual"] = {
+                "train_rows": int(r_train.sum()), "valid_rows": int(r_valid.sum()),
+                "training_seconds": r_seconds, "scale_results": scale_results,
+            }
         report["results"].append(fold_result)
         print(
             f"fold={validation_year} full BSS delta={fold_result['bss_delta']:+.2f}",
@@ -322,6 +399,34 @@ def main(
         if inner_tm_x is not None:
             del inner_tm_x, outer_tm_x
         gc.collect()
+
+    if screen_r_residual:
+        summaries = []
+        scored = [row for row in report["results"] if "r_residual" in row]
+        for scale in R_RESIDUAL_SCALES:
+            rows = [next(item for item in fold["r_residual"]["scale_results"] if item["scale"] == scale)
+                    for fold in scored]
+            deltas = [float(row["bss_delta"]) for row in rows]
+            summaries.append({
+                "scale": scale, "fold_2023_delta": deltas[0], "fold_2024_delta": deltas[1],
+                "mean_delta": float(np.mean(deltas)), "worst_delta": float(np.min(deltas)),
+                "both_positive": bool(min(deltas) > 0),
+            })
+        stable = [row for row in summaries if row["both_positive"] and row["fold_2024_delta"] >= 1.0]
+        selected = max(stable, key=lambda row: (row["worst_delta"], row["mean_delta"])) if stable else None
+        report["r_residual_summaries"] = sorted(
+            summaries, key=lambda row: (row["worst_delta"], row["mean_delta"]), reverse=True
+        )
+        report["summary"] = {
+            "selected": selected,
+            "decision": "continue_r_residual_submission_validation" if selected else "reject_r_residual_axis",
+            "gate": "same scale positive in 2023/2024 and 2024 >= +1",
+        }
+        write_json(output, report)
+        print(json.dumps({"selected": selected, "top": report["r_residual_summaries"],
+                          "decision": report["summary"]["decision"]}, ensure_ascii=False, indent=2))
+        print(f"saved: {output}")
+        return
 
     bss_deltas = [float(row["bss_delta"]) for row in report["results"]]
     mean_error_deltas = [float(row["absolute_mean_error_delta"]) for row in report["results"]]
@@ -357,6 +462,7 @@ if __name__ == "__main__":
     parser.add_argument("--trackman", type=Path, default=None)
     parser.add_argument("--mapping", type=Path, default=None)
     parser.add_argument("--trackman-blend", type=float, default=1.0)
+    parser.add_argument("--screen-r-residual", action="store_true")
     args = parser.parse_args()
     selected_axes = tuple(item.strip() for item in args.axes.split(",") if item.strip())
     allowed_axes = {name for name, _ in load_module("axis_check", SCREEN_PATH).AXES}
@@ -375,4 +481,5 @@ if __name__ == "__main__":
         args.trackman.resolve() if args.trackman else None,
         args.mapping.resolve() if args.mapping else None,
         args.trackman_blend,
+        args.screen_r_residual,
     )
