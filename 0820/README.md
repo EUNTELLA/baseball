@@ -138,3 +138,16 @@
 ```
 
 세 연도 모두 개선되고 2024 증분이 `+5` 이상일 때만 다중 잔차 채널과 행별 결합 단계로 진행합니다.
+## 외부 OOF 행 조건 오차 진단
+
+외부 공개 OOF를 제출 예측에 섞지 않고, 동일한 공식 Train 행에서 우리 기준 OOF보다 오차가 작은 조건만 찾는다. target과 `pitcher_id`가 완전히 일치하지 않으면 즉시 중단한다.
+
+```bash
+python 0820/06_external_oof_error_condition_audit_colab.py \
+  --train /content/dataset/data/train.csv \
+  --external-root /content/baseball/LG-Aimers-9th \
+  --output /content/drive/MyDrive/0820_external_oof_error_condition_audit.json \
+  --task-type GPU
+```
+
+결과에서 2023·2024 모두 양수인 조건만 다음 독립 피처 실험 후보로 사용한다. 외부 예측값·계수·모델은 ZIP에 포함하지 않는다.
