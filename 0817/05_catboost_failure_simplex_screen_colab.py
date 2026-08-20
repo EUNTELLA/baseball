@@ -22,9 +22,17 @@ CONFIRMATION_FOLD = 2024
 SEEDS = (42, 7, 2024)
 BLEND_WEIGHTS = (0.1, 0.2, 0.3, 0.4, 0.5)
 SCRIPT_DIR = Path(__file__).resolve().parent
-REFERENCE = SCRIPT_DIR.parent / "0816" / "reference_catboost_best"
-FEATURE_PATH = REFERENCE / "common" / "features.py"
-LABEL_PATH = REFERENCE / "recovered_labels.csv.gz"
+FEATURE_PATH = SCRIPT_DIR.parent / "common" / "model_features.py"
+FAILURE_LABEL_PATH = SCRIPT_DIR.parent / "common" / "failure_labels.py"
+
+
+def load_module(name: str, path: Path):
+    spec = importlib.util.spec_from_file_location(name, path)
+    if spec is None or spec.loader is None:
+        raise FileNotFoundError(path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 def load_features_module():
@@ -137,7 +145,8 @@ def write_json(path: Path, payload: dict) -> None:
 def main(train_path: Path, output: Path, task_type: str) -> None:
     frame = pd.read_csv(train_path, encoding="utf-8-sig")
     target = frame[TARGET_COL].astype(int).to_numpy()
-    recovered = frame[[ID_COL]].merge(pd.read_csv(LABEL_PATH), on=ID_COL, how="left")
+    failure_module = load_module("failure_labels", FAILURE_LABEL_PATH)
+    recovered = failure_module.recover_failure_labels(frame)
     have = recovered["middle"].notna().to_numpy()
     mr_target = (
         ((recovered["middle"] == 1) | (recovered["reverse"] == 1))

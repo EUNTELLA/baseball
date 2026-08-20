@@ -23,7 +23,7 @@ OOF_FOLDS = (2021, 2022, 2023, 2024)
 EVAL_FOLDS = (2023, 2024)
 SEEDS = (42, 7, 2024)
 SCRIPT_DIR = Path(__file__).resolve().parent
-FEATURE_PATH = SCRIPT_DIR.parent / "0816" / "reference_catboost_best" / "common" / "features.py"
+FEATURE_PATH = SCRIPT_DIR.parent / "common" / "model_features.py"
 AXES = (
     ("hand", 1000.0),
     ("two_strikes", 1000.0),

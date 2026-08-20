@@ -26,7 +26,7 @@ EXPERT_WEIGHTS = (0.0, 0.25, 0.5, 0.75, 1.0)
 MIN_TRAIN_ROWS = 10_000
 MIN_VALID_ROWS = 2_000
 SCRIPT_DIR = Path(__file__).resolve().parent
-FEATURE_PATH = SCRIPT_DIR.parent / "0816" / "reference_catboost_best" / "common" / "features.py"
+FEATURE_PATH = SCRIPT_DIR.parent / "common" / "model_features.py"
 
 
 def load_features_module():

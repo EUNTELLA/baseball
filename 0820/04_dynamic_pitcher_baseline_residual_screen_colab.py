@@ -18,7 +18,7 @@ FOLDS = (2022, 2023, 2024)
 SEEDS = (42, 7, 2024)
 SCRIPT_DIR = Path(__file__).resolve().parent
 ROOT = SCRIPT_DIR.parent
-FEATURE_PATH = ROOT / "0816" / "reference_catboost_best" / "common" / "features.py"
+FEATURE_PATH = ROOT / "common" / "model_features.py"
 
 
 def load_features_module():

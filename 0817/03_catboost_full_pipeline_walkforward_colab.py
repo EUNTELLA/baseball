@@ -20,8 +20,8 @@ FOLDS = (2022, 2023, 2024)
 SEEDS = (42, 7, 2024)
 SCRIPT_DIR = Path(__file__).resolve().parent
 ROOT = SCRIPT_DIR.parent
-LABEL_PATH = ROOT / "0816" / "reference_catboost_best" / "recovered_labels.csv.gz"
-FEATURE_PATH = ROOT / "0816" / "reference_catboost_best" / "common" / "features.py"
+FEATURE_PATH = ROOT / "common" / "model_features.py"
+FAILURE_LABEL_PATH = ROOT / "common" / "failure_labels.py"
 
 CONFIGS = (
     {"name": "baseline_d6_lr05_l2_1", "depth": 6, "learning_rate": 0.05, "l2_leaf_reg": 1.0},
@@ -221,7 +221,8 @@ def write_checkpoint(output: Path, payload: dict) -> None:
 def main(train_path: Path, output: Path, task_type: str) -> None:
     frame = pd.read_csv(train_path, encoding="utf-8-sig")
     target = frame[TARGET_COL].astype(int).to_numpy()
-    recovered = frame[[ID_COL]].merge(pd.read_csv(LABEL_PATH), on=ID_COL, how="left")
+    failure_module = load_module("failure_labels", FAILURE_LABEL_PATH)
+    recovered = failure_module.recover_failure_labels(frame)
     have = recovered["middle"].notna().to_numpy()
     mr_target = ((recovered["middle"] == 1) | (recovered["reverse"] == 1)).fillna(False).astype(int).to_numpy()
     wayoff_target = ((target == 0) & (mr_target == 0)).astype(int)

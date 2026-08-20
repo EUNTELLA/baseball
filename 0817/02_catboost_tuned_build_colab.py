@@ -23,16 +23,25 @@ ID_COL = "row_id"
 TARGET_COL = "control_success"
 SCRIPT_DIR = Path(__file__).resolve().parent
 ROOT = SCRIPT_DIR.parent
-REFERENCE = ROOT / "0816" / "reference_catboost_best"
 BASE_ZIP = ROOT / "0816" / "results" / "submit_catboost_train_trend_shift.zip"
-AUX_DIR = REFERENCE / "artifacts" / "auxpred"
-LABEL_PATH = REFERENCE / "recovered_labels.csv.gz"
+AUX_DIR = ROOT / "0816" / "derived" / "auxpred"
+FEATURE_PATH = ROOT / "common" / "model_features.py"
+FAILURE_LABEL_PATH = ROOT / "common" / "failure_labels.py"
 OUTPUT_NAME = "submit_catboost_lr03_l2_3_train_only"
 TARGET_2025 = 0.477793531589047
 
 
+def load_module(name: str, path: Path):
+    spec = importlib.util.spec_from_file_location(name, path)
+    if spec is None or spec.loader is None:
+        raise FileNotFoundError(path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def load_features_module():
-    path = REFERENCE / "common" / "features.py"
+    path = FEATURE_PATH
     spec = importlib.util.spec_from_file_location("official_features", path)
     if spec is None or spec.loader is None:
         raise FileNotFoundError(path)
@@ -163,7 +172,8 @@ def main(
         print(f"validation seed={seed} iter={best_iterations[-1]} sec={validation_seconds[-1]:.1f}", flush=True)
 
     success_all_valid = np.mean(validation_predictions, axis=0)
-    labels = pd.read_csv(LABEL_PATH)
+    failure_module = load_module("failure_labels", FAILURE_LABEL_PATH)
+    labels = failure_module.recover_failure_labels(frame)
     have_labels = frame[[ID_COL]].merge(labels, on=ID_COL, how="left")["middle"].notna().to_numpy()
     offset_mask = valid_mask & have_labels
     success = success_all_valid[have_labels[valid_mask]]

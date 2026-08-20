@@ -53,7 +53,7 @@ Phase 2 결과와 코드 검증을 바탕으로 약 100명의 Phase 3 진출자�
 - `trackman_history.csv`: 2019~2024년 Trackman 과거 로그, 1,793,078행 × 30열
 - `open/submit.zip`: 운영진 베이스라인 기반 제출 파일 예시
 
-전체 컬럼 정의는 [데이터 설명서](open/data_description.md)를 참고하세요.
+전체 컬럼 정의는 [데이터 설명서](open/data_description.md), 현재 코드에서 사용하는 구조와 파생 정보는 [데이터 구조 문서](doc/DATA_STRUCTURE.md)를 참고하세요.
 
 모델별 실험 내용과 리더보드 제출 결과는 [실험 및 제출 기록](EXPERIMENTS.md)에 누적합니다.
 

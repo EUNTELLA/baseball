@@ -57,7 +57,8 @@ def main(train_path: Path, output: Path, task_type: str) -> None:
     common = load_common()
     frame = pd.read_csv(train_path, encoding="utf-8-sig")
     target = frame[TARGET_COL].astype(int).to_numpy()
-    recovered = frame[[ID_COL]].merge(pd.read_csv(common.LABEL_PATH), on=ID_COL, how="left")
+    failure_module = common.load_module("failure_labels", common.FAILURE_LABEL_PATH)
+    recovered = failure_module.recover_failure_labels(frame)
     have = recovered["middle"].notna().to_numpy()
     mr_target = (
         ((recovered["middle"] == 1) | (recovered["reverse"] == 1))

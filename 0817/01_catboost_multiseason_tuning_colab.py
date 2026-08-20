@@ -32,7 +32,7 @@ CONFIGS = [
 
 
 def load_features_module():
-    path = SCRIPT_DIR.parent / "0816" / "reference_catboost_best" / "common" / "features.py"
+    path = SCRIPT_DIR.parent / "common" / "model_features.py"
     spec = importlib.util.spec_from_file_location("official_features", path)
     if spec is None or spec.loader is None:
         raise FileNotFoundError(path)

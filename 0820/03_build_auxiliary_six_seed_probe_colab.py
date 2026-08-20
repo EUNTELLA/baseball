@@ -25,7 +25,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 ROOT = SCRIPT_DIR.parent
 COMMON_PATH = ROOT / "0817" / "03_catboost_full_pipeline_walkforward_colab.py"
 BASE_BUILDER_PATH = ROOT / "0819" / "03_build_residual_differential_submission_colab.py"
-LABEL_PATH = ROOT / "0816" / "reference_catboost_best" / "recovered_labels.csv.gz"
+FAILURE_LABEL_PATH = ROOT / "common" / "failure_labels.py"
 BASE_ZIP = ROOT / "0819" / "results" / "submit_catboost_residual_differential.zip"
 OUTPUT_ZIP = SCRIPT_DIR / "results" / "submit_catboost_aux6_recomputed_shift_probe.zip"
 BUILD_DIR = SCRIPT_DIR / "results" / "build_aux6_recomputed_shift_probe"
@@ -94,7 +94,8 @@ def main(train_path: Path, test_path: Path, sample_path: Path,
     target = frame[TARGET_COL].astype(int).to_numpy()
     season = frame["season"].astype(int).to_numpy()
     train_mask, valid_mask = season < 2024, season == 2024
-    labels = frame[[ID_COL]].merge(pd.read_csv(LABEL_PATH), on=ID_COL, how="left")
+    failure_module = load_module("failure_labels", FAILURE_LABEL_PATH)
+    labels = failure_module.recover_failure_labels(frame)
     have = labels["middle"].notna().to_numpy()
     mr_target = ((labels["middle"].eq(1) | labels["reverse"].eq(1)).fillna(False).astype(int).to_numpy())
     large_miss_target = ((target == 0) & (mr_target == 0)).astype(int)

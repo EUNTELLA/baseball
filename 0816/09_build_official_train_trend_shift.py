@@ -19,6 +19,7 @@ TEST_PATH = ROOT / "open" / "data" / "test.csv"
 SAMPLE_PATH = ROOT / "open" / "data" / "sample_submission.csv"
 BASE_ZIP = Path(__file__).resolve().parent / "assets" / "submit012.zip"
 RESULTS_DIR = Path(__file__).resolve().parent / "results"
+BASE_PREDICTION_PATH = Path(__file__).resolve().parent / "derived" / "sub010.csv.gz"
 OUTPUT_STEM = "submit_catboost_train_trend_shift"
 BUILD_DIR = RESULTS_DIR / "build" / OUTPUT_STEM
 OUTPUT_ZIP = RESULTS_DIR / f"{OUTPUT_STEM}.zip"
@@ -62,10 +63,7 @@ def main() -> None:
         season_rates[2024] - season_rates[2023]
     )
 
-    reference_prediction = pd.read_csv(
-        Path(__file__).resolve().parent
-        / "reference_catboost_best" / "artifacts" / "sub010.csv.gz"
-    )[TARGET_COL].to_numpy(dtype=float)
+    reference_prediction = pd.read_csv(BASE_PREDICTION_PATH)[TARGET_COL].to_numpy(dtype=float)
     reference_mean = float(reference_prediction.mean())
     logits = np.log(
         np.clip(reference_prediction, 1e-6, 1 - 1e-6)

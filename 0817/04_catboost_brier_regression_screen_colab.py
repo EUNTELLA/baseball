@@ -22,7 +22,7 @@ CONFIRMATION_FOLD = 2024
 SEEDS = (42, 7, 2024)
 WEIGHTS = np.round(np.linspace(0.0, 1.0, 11), 1)
 SCRIPT_DIR = Path(__file__).resolve().parent
-FEATURE_PATH = SCRIPT_DIR.parent / "0816" / "reference_catboost_best" / "common" / "features.py"
+FEATURE_PATH = SCRIPT_DIR.parent / "common" / "model_features.py"
 
 
 def load_features_module():

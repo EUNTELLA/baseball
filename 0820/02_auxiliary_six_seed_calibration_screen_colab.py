@@ -19,7 +19,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 ROOT = SCRIPT_DIR.parent
 COMMON_PATH = ROOT / "0817" / "03_catboost_full_pipeline_walkforward_colab.py"
 SCREEN_PATH = ROOT / "0819" / "01_catboost_residual_differential_screen_colab.py"
-LABEL_PATH = ROOT / "0816" / "reference_catboost_best" / "recovered_labels.csv.gz"
+FAILURE_LABEL_PATH = ROOT / "common" / "failure_labels.py"
 BASE_CONFIG = {"name": "d6_lr05_l2_1", "depth": 6, "learning_rate": 0.05, "l2_leaf_reg": 1.0}
 
 
@@ -87,7 +87,8 @@ def main(train_path: Path, output: Path, task_type: str) -> None:
     season = frame["season"].astype(int).to_numpy()
     pitcher = frame["pitcher_id"].to_numpy()
     contexts = screen.contexts(frame)
-    recovered = frame[[ID_COL]].merge(pd.read_csv(LABEL_PATH), on=ID_COL, how="left")
+    failure_module = load_module("failure_labels", FAILURE_LABEL_PATH)
+    recovered = failure_module.recover_failure_labels(frame)
     have = recovered["middle"].notna().to_numpy()
     mr_target = ((recovered["middle"].eq(1) | recovered["reverse"].eq(1)).fillna(False).astype(int).to_numpy())
     large_miss_target = ((target == 0) & (mr_target == 0)).astype(int)
