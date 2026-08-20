@@ -151,3 +151,14 @@ python 0820/06_external_oof_error_condition_audit_colab.py \
 ```
 
 결과에서 2023·2024 모두 양수인 조건만 다음 독립 피처 실험 후보로 사용한다. 외부 예측값·계수·모델은 ZIP에 포함하지 않는다.
+
+## 카운트·손 조합·LI 잔차 차등 선별
+
+외부 OOF 진단에서 반복된 조건 구조만 공식 Train으로 독립 검증한다. 직전 시즌의 조건별 잔차에서 시즌 전체 잔차를 뺀 차등을 축소하여 다음 시즌에 적용한다.
+
+```bash
+python 0820/07_count_hand_leverage_differential_screen_colab.py \
+  --train /content/dataset/data/train.csv \
+  --output /content/drive/MyDrive/0820_count_hand_leverage_differential.json \
+  --task-type GPU
+```
