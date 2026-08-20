@@ -191,3 +191,5 @@ python 0820/08_build_count_hand_incremental_submission_colab.py \
 생성물: `0820/results/submit_catboost_count_hand_incremental.zip`
 
 Drive에 기준 ZIP이 없다면 먼저 `0819/03_build_residual_differential_submission_colab.py`를 실행해 재생성한 뒤 그 경로를 `--base-zip`으로 지정한다.
+
+리더보드 결과는 `1025.5301788847`로 현재 최고 `1029.0832235020`보다 `3.5530` 낮았다. 로컬 전방 검증과 달리 2025로 전이되지 않아 이 후보는 폐기하고 기존 1029 제출을 유지한다.
