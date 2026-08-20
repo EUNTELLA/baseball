@@ -95,6 +95,24 @@
 - 판정: `reject_dynamic_baseline_residual`
 - 결론: 단일 동적 기준확률과 고정 잔차 회귀기는 직접 분류기보다 모든 연도에서 나쁘고 2023 체제 변화에서 크게 붕괴해 다중 채널 확장 중단
 
+## 05. 다중 잔차 채널 구조 선별
+
+외부 구조처럼 하나의 모델을 시드만 늘리지 않고, 서로 다른 입력 범위와 시간 감쇠를 가진 잔차 채널 3개를 먼저 만듭니다. 이 단계는 채널 구조 선별이므로 각 잔차 채널은 단일시드이며, 통과한 채널만 이후 3시드·6시드로 확대합니다.
+
+- compact slow: 핵심 공식 피처, decay `0.75`, depth 6
+- expanded slow: 전체 기존 피처, decay `0.55`, depth 8
+- expanded recent: 전체 기존 피처, decay `0.30`, depth 8
+- 후보: 각 단독 채널과 세 채널 동일가중 평균
+
+```bash
+!python /content/baseball/0820/05_multichannel_residual_architecture_screen_colab.py \
+  --train /content/dataset/data/train.csv \
+  --output /content/drive/MyDrive/0820_multichannel_residual_architecture.json \
+  --task-type GPU
+```
+
+2022·2023·2024 모두 직접 분류기보다 개선되고 2024 증분이 `+5` 이상인 구조만 시드 앙상블 단계로 진행합니다.
+
 ## 04. 동적 투수 기준확률 잔차 모델
 
 공개 저장소 검토에서 반복적으로 성과가 있었던 `동적 기준확률 + 잔차 학습 + 3개 연도 순방향 검증` 원리만 독립 구현합니다. 외부 코드·모델·Trackman 매핑·고정 계수는 사용하지 않습니다.

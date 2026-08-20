@@ -628,6 +628,17 @@
 - **판정:** `reject_dynamic_baseline_residual`
 - **결론:** 단일 동적 기준확률의 잔차 회귀가 모든 확인 연도에서 직접 분류기보다 낮고 2023에서 붕괴해 다중 잔차 채널 확장 중단
 
+### multichannel-residual-architecture-screen-042
+
+- **실험일:** 2026-08-20
+- **목적:** 시드 확대 전에 서로 다른 피처 범위·시간 감쇠의 잔차 채널 구조 선별
+- **채널:** compact decay `0.75`, expanded decay `0.55`, expanded decay `0.30`
+- **후보:** 세 단독 채널 및 동일가중 평균
+- **검증:** 2022·2023·2024 개별 BSS, pooled BSS, 직접 분류기와 오차 상관
+- **시드:** 구조 선별 단계 단일시드; 통과 채널만 3→6시드 확대
+- **실행 코드:** `0820/05_multichannel_residual_architecture_screen_colab.py`
+- **상태:** 실행 대기
+
 ## 새 실험 기록 템플릿
 
 아래 형식을 복사하여 새로운 결과를 추가합니다.
