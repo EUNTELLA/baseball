@@ -279,3 +279,29 @@ python 0819/02_residual_differential_full_pipeline_colab.py \
 전체 파이프라인 결과는 2023 `-17.95`, 2024 `+1.01`이었다. 단독 성공모델 선별에서는 세 시즌이 모두 양수였지만, 현재 3축 차등·보조 실패유형 offset·Train 추세 shift와 결합하면 2023 성능이 크게 하락하고 2024 개선도 게이트 `+5`에 미달했다.
 
 따라서 Trackman 성공모델 교체는 폐기하고 현재 `1029.0832` 제출을 유지한다. 혼합 0.75는 같은 정보의 강도만 줄이는 후보이고 전체 구조에서 방향이 뒤집힌 원인을 해결하지 못하므로 추가 실행하지 않는다.
+
+다음 실험은 고신뢰 투수의 직전 시즌 물리 특성과 그 이전 누적 평균의 차이만 잔차 신호로 검증한다.
+
+```bash
+python 0820/15_trackman_physical_change_screen_colab.py \
+  --train /content/dataset/data/train.csv \
+  --trackman /content/dataset/data/trackman_history.csv \
+  --mapping /content/drive/MyDrive/0820_trackman_pitcher_mapping.csv \
+  --output /content/drive/MyDrive/0820_trackman_physical_change.json \
+  --task-type GPU
+```
+
+동일 Ridge alpha와 적용 강도가 2023·2024 모두 양수이고 2024 `+3` 이상일 때만 현재 최고 전체 구조에서 재검증한다.
+
+다음 실험은 고신뢰 투수의 직전 시즌 물리 특성과 그 이전 누적 평균의 차이만 잔차 신호로 검증한다.
+
+```bash
+python 0820/15_trackman_physical_change_screen_colab.py \
+  --train /content/dataset/data/train.csv \
+  --trackman /content/dataset/data/trackman_history.csv \
+  --mapping /content/drive/MyDrive/0820_trackman_pitcher_mapping.csv \
+  --output /content/drive/MyDrive/0820_trackman_physical_change.json \
+  --task-type GPU
+```
+
+동일 Ridge alpha와 적용 강도가 2023·2024 모두 양수이고 2024 `+3` 이상일 때만 현재 최고 전체 구조에서 재검증한다.
