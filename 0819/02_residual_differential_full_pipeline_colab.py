@@ -19,6 +19,7 @@ ROOT = SCRIPT_DIR.parent
 COMMON_PATH = ROOT / "0817" / "03_catboost_full_pipeline_walkforward_colab.py"
 SCREEN_PATH = SCRIPT_DIR / "01_catboost_residual_differential_screen_colab.py"
 COUNT_HAND_PATH = ROOT / "0820" / "07_count_hand_leverage_differential_screen_colab.py"
+TRACKMAN_FEATURE_PATH = ROOT / "0820" / "13_trackman_prior_feature_screen_colab.py"
 LABEL_PATH = ROOT / "0816" / "reference_catboost_best" / "recovered_labels.csv.gz"
 BASE_CONFIG = {"name": "catboost_d6_lr05_l2_1", "depth": 6, "learning_rate": 0.05, "l2_leaf_reg": 1.0}
 
@@ -50,6 +51,9 @@ def main(
     include_count_hand: bool = False,
     count_hand_shrinkage: float = 500.0,
     count_hand_scale: float = 0.3,
+    trackman_path: Path | None = None,
+    mapping_path: Path | None = None,
+    trackman_blend: float = 1.0,
 ) -> None:
     common = load_module("full_pipeline_common", COMMON_PATH)
     screen = load_module("residual_differential_screen", SCREEN_PATH)
@@ -64,6 +68,22 @@ def main(
     mr_target = ((recovered["middle"] == 1) | (recovered["reverse"] == 1)).fillna(False).astype(int).to_numpy()
     wayoff_target = ((target == 0) & (mr_target == 0)).astype(int)
     feature_module = common.load_features_module()
+    include_trackman = trackman_path is not None and mapping_path is not None
+    trackman_attached = None
+    trackman_columns: list[str] = []
+    if include_trackman:
+        trackman_module = load_module("trackman_prior_features", TRACKMAN_FEATURE_PATH)
+        assets = trackman_module.build_prior_assets(frame, trackman_path, mapping_path)
+        merge_key = pd.DataFrame({"pitcher_id": frame["pitcher_id"].astype(str), "season": season,
+                                  "_row_order": np.arange(len(frame))})
+        trackman_attached = (merge_key.merge(assets, on=["pitcher_id", "season"], how="left", sort=False)
+                             .sort_values("_row_order").reset_index(drop=True))
+        trackman_columns = [column for column in trackman_attached.columns if column.startswith("tm_")]
+        reliable = (trackman_attached["tm_mapping_similarity"].ge(0.90)
+                    & trackman_attached["tm_mapping_margin"].ge(0.02)
+                    & trackman_attached["tm_prior_n"].ge(200.0))
+        for column in trackman_columns:
+            trackman_attached[column] = pd.to_numeric(trackman_attached[column], errors="coerce").where(reliable)
     success_oof = np.full(len(frame), np.nan, dtype=float)
     report = {
         "experiment": "OOF residual differential 3-axis in complete 997 pipeline",
@@ -77,6 +97,10 @@ def main(
             "shrinkage": count_hand_shrinkage,
             "scale": count_hand_scale,
             "source": "previous season only",
+        },
+        "trackman_success_replacement": {
+            "enabled": include_trackman, "blend": trackman_blend,
+            "similarity_floor": 0.90, "margin_floor": 0.02, "prior_n_floor": 200.0,
         },
         "seeds": list(common.SEEDS),
         "pretraining": [],
@@ -122,6 +146,12 @@ def main(
         print(f"\n===== fold {validation_year}: calibrate {calibration_year} =====", flush=True)
         inner_x, inner_ci, inner_mean = common.engineer(frame, feature_module, inner_train, target)
         outer_x, outer_ci, outer_mean = common.engineer(frame, feature_module, outer_train, target)
+        inner_tm_x, outer_tm_x = None, None
+        if include_trackman:
+            inner_tm_x, outer_tm_x = inner_x.copy(), outer_x.copy()
+            for column in trackman_columns:
+                values = trackman_attached[column].to_numpy()
+                inner_tm_x[column], outer_tm_x[column] = values, values
 
         predictions = {}
         training = {}
@@ -144,6 +174,20 @@ def main(
                 "inner_seconds": inner_seconds,
                 "outer_seconds": outer_seconds,
             }
+            if name == "success" and include_trackman:
+                tm_inner, tm_iterations, tm_inner_seconds = common.train_inner_and_predict(
+                    inner_tm_x, inner_ci, labels, eligible, inner_train, calibration,
+                    config, task_type, f"fold={validation_year} success Trackman",
+                )
+                tm_outer, tm_outer_seconds = common.train_outer_and_predict(
+                    outer_tm_x, outer_ci, labels, eligible, outer_train, validation,
+                    config, tm_iterations, task_type, f"fold={validation_year} success Trackman",
+                )
+                predictions["success_trackman"] = {"inner": tm_inner, "outer": tm_outer}
+                training["success_trackman"] = {
+                    "best_iterations": tm_iterations,
+                    "inner_seconds": tm_inner_seconds, "outer_seconds": tm_outer_seconds,
+                }
         success_oof[validation] = predictions["success"]["outer"]
 
         residual = target.astype(float) - success_oof
@@ -196,25 +240,44 @@ def main(
             predictions["wayoff"]["inner"],
             offset,
         )
+        blended_inner_success = predictions["success"]["inner"]
+        blended_outer_success = predictions["success"]["outer"]
+        candidate_offset_parameters = offset
+        candidate_inner_offset = inner_offset
+        if include_trackman:
+            blended_inner_success = ((1.0 - trackman_blend) * predictions["success"]["inner"]
+                                     + trackman_blend * predictions["success_trackman"]["inner"])
+            blended_outer_success = ((1.0 - trackman_blend) * predictions["success"]["outer"]
+                                     + trackman_blend * predictions["success_trackman"]["outer"])
+            candidate_offset_parameters = common.fit_offset(
+                blended_inner_success, predictions["mr"]["inner"], predictions["wayoff"]["inner"],
+                calibration_target, have[calibration],
+            )
+            candidate_inner_offset = common.apply_offset(
+                blended_inner_success, predictions["mr"]["inner"], predictions["wayoff"]["inner"],
+                candidate_offset_parameters,
+            )
         incumbent_success = np.clip(predictions["success"]["outer"] + correction, 1e-6, 1 - 1e-6)
-        baseline_success = incumbent_success if include_count_hand else predictions["success"]["outer"]
+        baseline_success = incumbent_success if (include_count_hand or include_trackman) else predictions["success"]["outer"]
         baseline_offset = common.apply_offset(
             baseline_success,
             predictions["mr"]["outer"],
             predictions["wayoff"]["outer"],
             offset,
         )
-        corrected_success = np.clip(incumbent_success + count_hand_correction, 1e-6, 1 - 1e-6)
+        candidate_incumbent = np.clip(blended_outer_success + correction, 1e-6, 1 - 1e-6)
+        corrected_success = np.clip(candidate_incumbent + count_hand_correction, 1e-6, 1 - 1e-6)
         candidate_offset = common.apply_offset(
             corrected_success,
             predictions["mr"]["outer"],
             predictions["wayoff"]["outer"],
-            offset,
+            candidate_offset_parameters,
         )
         forecast = common.select_alpha_and_forecast(frame, validation_year)
         shift = common.fixed_shift(inner_offset, forecast["forecast"])
+        candidate_shift = common.fixed_shift(candidate_inner_offset, forecast["forecast"])
         baseline_final = common.sigmoid(common.logit(baseline_offset) + shift)
-        candidate_final = common.sigmoid(common.logit(candidate_offset) + shift)
+        candidate_final = common.sigmoid(common.logit(candidate_offset) + candidate_shift)
         validation_target = target[validation]
         baseline_metrics = extended_metrics(common, baseline_final, validation_target)
         candidate_metrics = extended_metrics(common, candidate_final, validation_target)
@@ -228,6 +291,8 @@ def main(
             "offset": offset,
             "rate_forecast": forecast,
             "shift": shift,
+            "candidate_offset": candidate_offset_parameters,
+            "candidate_shift": candidate_shift,
             "correction": {
                 "mean": float(correction.mean()),
                 "std": float(correction.std()),
@@ -254,6 +319,8 @@ def main(
         )
         write_json(output, report)
         del inner_x, outer_x, predictions
+        if inner_tm_x is not None:
+            del inner_tm_x, outer_tm_x
         gc.collect()
 
     bss_deltas = [float(row["bss_delta"]) for row in report["results"]]
@@ -287,6 +354,9 @@ if __name__ == "__main__":
     parser.add_argument("--include-count-hand", action="store_true")
     parser.add_argument("--count-hand-shrinkage", type=float, default=500.0)
     parser.add_argument("--count-hand-scale", type=float, default=0.3)
+    parser.add_argument("--trackman", type=Path, default=None)
+    parser.add_argument("--mapping", type=Path, default=None)
+    parser.add_argument("--trackman-blend", type=float, default=1.0)
     args = parser.parse_args()
     selected_axes = tuple(item.strip() for item in args.axes.split(",") if item.strip())
     allowed_axes = {name for name, _ in load_module("axis_check", SCREEN_PATH).AXES}
@@ -294,8 +364,15 @@ if __name__ == "__main__":
         parser.error(f"--axes는 {sorted(allowed_axes)} 중 하나 이상이어야 합니다.")
     if args.weight <= 0:
         parser.error("--weight는 0보다 커야 합니다.")
+    if (args.trackman is None) != (args.mapping is None):
+        parser.error("--trackman과 --mapping은 함께 지정해야 합니다.")
+    if not 0.0 <= args.trackman_blend <= 1.0:
+        parser.error("--trackman-blend는 0과 1 사이여야 합니다.")
     main(
         args.train.resolve(), args.output.resolve(), args.task_type,
         selected_axes, args.weight, args.include_count_hand,
         args.count_hand_shrinkage, args.count_hand_scale,
+        args.trackman.resolve() if args.trackman else None,
+        args.mapping.resolve() if args.mapping else None,
+        args.trackman_blend,
     )

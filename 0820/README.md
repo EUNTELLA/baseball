@@ -261,3 +261,19 @@ python 0820/14_trackman_reliability_blend_screen_colab.py \
   --output /content/drive/MyDrive/0820_trackman_reliability_blend.json \
   --task-type GPU
 ```
+
+신뢰도 필터 결과 `sim90_n200`, 혼합 1.0이 2022 `+1.67`, 2023 `+0.19`, 2024 `+11.34`로 통과했다. 현재 3축 차등·offset·Train 추세 shift 전체 과정 위의 순증분을 확인한다.
+
+```bash
+python 0819/02_residual_differential_full_pipeline_colab.py \
+  --train /content/dataset/data/train.csv \
+  --output /content/drive/MyDrive/0820_trackman_full_pipeline_blend100.json \
+  --task-type GPU \
+  --axes hand,two_strikes,runners_on \
+  --weight 1.0 \
+  --trackman /content/dataset/data/trackman_history.csv \
+  --mapping /content/drive/MyDrive/0820_trackman_pitcher_mapping.csv \
+  --trackman-blend 1.0
+```
+
+혼합 0.75는 같은 명령에서 출력명과 `--trackman-blend 0.75`만 바꿔 비교한다.
