@@ -193,3 +193,14 @@ python 0820/08_build_count_hand_incremental_submission_colab.py \
 Drive에 기준 ZIP이 없다면 먼저 `0819/03_build_residual_differential_submission_colab.py`를 실행해 재생성한 뒤 그 경로를 `--base-zip`으로 지정한다.
 
 리더보드 결과는 `1025.5301788847`로 현재 최고 `1029.0832235020`보다 `3.5530` 낮았다. 로컬 전방 검증과 달리 2025로 전이되지 않아 이 후보는 폐기하고 기존 1029 제출을 유지한다.
+
+## 저용량 적응형 잔차 게이트
+
+조건별 고정표 대신 과거 OOF 잔차를 작은 행 단위 CatBoost가 학습한다. 원시 잔차와 시즌 평균 제거 잔차를 모두 검증하며 외부 코드·계수·예측은 사용하지 않는다.
+
+```bash
+python 0820/09_adaptive_residual_gate_screen_colab.py \
+  --train /content/dataset/data/train.csv \
+  --output /content/drive/MyDrive/0820_adaptive_residual_gate.json \
+  --task-type GPU
+```
