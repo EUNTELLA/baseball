@@ -88,3 +88,16 @@ python 0821/02_repack_r_residual_scales_colab.py \
 - R 잔차 적용 전 3축 기준 대비 누적 개선: `+3.9294083759`
 
 0.05를 새 최고로 승격한다. 0.075는 생성·검증된 상태로 보관하되 별도 판단 없이 연속 제출하지 않는다.
+
+## F행 조건 오차 전이 선별
+
+R행은 `scale=0.05`로 동결하고 F행만 대상으로 직전 시즌 조건별 예측 오차가 다음 시즌에 재현되는지 검사한다. 기존 F 전용 모델과 실패유형 실험을 반복하지 않고 카운트×손, 카운트×레버리지, 손×주자, 카운트×이닝, 카운트×손×주자 조건을 강하게 축소한다.
+
+```bash
+python 0821/03_f_condition_error_screen_colab.py \
+  --train /content/dataset/data/train.csv \
+  --output /content/drive/MyDrive/0821_f_condition_error_screen.json \
+  --task-type GPU
+```
+
+2023·2024가 모두 양수이고 2024 증분이 `+2` 이상인 동일 설정만 다음 전체 파이프라인 검증으로 넘긴다. 이 단계에서는 제출 ZIP을 만들지 않는다.
