@@ -26,8 +26,8 @@
 | 55969 | `submit_catboost_f_large_miss_0025` | 2026-08-19 23:15:44 | 1028.8717014405 | 3초 | F행 큰 이탈 보조계수 +0.025 탐색 |
 | 56642 | `submit_catboost_aux6_recomputed_shift_probe` | 2026-08-20 12:27:23 | 1009.4332838027 | 4초 | 보조 채널 6시드와 재계산 shift 탐색 |
 | 56851 | `submit_catboost_count_hand_incremental` | 2026-08-20 15:03:19 | 1025.5301788847 | 4초 | 카운트×손 조합 잔차 차등 추가 |
-| 미확인 | `submit_catboost_r_residual_scale0025` | 2026-08-21 11:09:10 | 1031.5033329643 | 미확인 | 기존 3축 모델 + R 행 3시드 잔차 0.025, 이전 최고 |
-| 미확인 | `submit_catboost_r_residual_scale0050` | 2026-08-21 11:20:42 | **1033.0126318779** | 미확인 | 동일 R 행 잔차 강도 0.05, 현재 최고 |
+| 58269 | `submit_catboost_r_residual_scale0025` | 2026-08-21 11:09:10 | 1031.5033329643 | 4초 | 기존 3축 모델 + R 행 3시드 잔차 0.025, 이전 최고 |
+| 미확인 | `submit_catboost_r_residual_scale0050` | 2026-08-21 11:20:42 | **1033.0126318779** | 4초 | 동일 R 행 잔차 강도 0.05, 현재 최고 |
 
 현재 최고 제출은 `submit_catboost_r_residual_scale0050.zip`, Public Score `1033.0126318779`입니다.
 
