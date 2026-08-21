@@ -42,3 +42,15 @@ python 0821/01_build_r_residual_probe_colab.py \
 ```
 
 제출 후보는 `/content/drive/MyDrive/submit_catboost_r_residual_scale0025.zip` 하나다.
+
+### 빌드 결과
+
+- R residual 학습 행: 2024 R 행 223,497개
+- 모델: CatBoostRegressor seed 17/42/777, 각 1200회
+- 적용 강도: 0.025
+- Train 전체 평균 재계산이나 test 행간 집계 없음
+- ZIP 무결성 검사: 통과
+- 샘플 추론: 5행, 결측 0, 범위 `0.399282~0.494669`, 평균 `0.452750`
+- 최종 파일: `/content/drive/MyDrive/submit_catboost_r_residual_scale0025.zip`
+
+이 ZIP은 시간 전방 게이트를 통과한 정식 승격본이 아니라 2024의 강한 양수 신호가 서버에서 전이되는지 확인하는 1회 탐침이다. 기존 `1029.0832` 제출은 계속 기준 최고로 보존한다.
