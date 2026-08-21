@@ -205,6 +205,64 @@ def main(train_path: Path, anchor_path: Path, base_zip: Path, test_path: Path,
                 "test 행 독립성 위반: 단독/일괄 최대 차이 "
                 f"{maximum_singleton_difference:.16g}"
             )
+
+        base_verify_dir = Path(temporary) / "base_verify"
+        with zipfile.ZipFile(base_zip) as archive:
+            archive.extractall(base_verify_dir)
+        (base_verify_dir / "data").mkdir()
+        shutil.copy2(test_path, base_verify_dir / "data" / "test.csv")
+        shutil.copy2(sample_path, base_verify_dir / "data" / "sample_submission.csv")
+        base_completed = subprocess.run(
+            [sys.executable, "script.py"], cwd=base_verify_dir,
+            capture_output=True, text=True, timeout=600,
+        )
+        if base_completed.returncode != 0:
+            raise RuntimeError(
+                f"기준 ZIP 비교 추론 실패\nstdout:\n{base_completed.stdout}\n"
+                f"stderr:\n{base_completed.stderr}"
+            )
+        base_submission = pd.read_csv(base_verify_dir / "output" / "submission.csv")
+        base_prediction = base_submission.set_index(ID_COL)[TARGET_COL].astype(float)
+        common_ids = full_prediction.index.intersection(base_prediction.index)
+        maximum_r_difference = float(
+            np.max(np.abs(full_prediction.loc[common_ids] - base_prediction.loc[common_ids]))
+        )
+        if maximum_r_difference > 1e-12:
+            raise ValueError(f"R행 예측 변경 감지: 최대 차이 {maximum_r_difference:.16g}")
+
+        f_source = frame.loc[
+            frame["season"].astype(int).eq(2024)
+            & frame["game_type"].astype(str).eq("F")
+        ].iloc[[0]].drop(columns=[TARGET_COL]).copy()
+        f_source[ID_COL] = "F_TRANSITION_SMOKE"
+        f_source["season"] = 2025
+        f_sample = pd.DataFrame({ID_COL: ["F_TRANSITION_SMOKE"], TARGET_COL: [0.5]})
+        for directory in (verify_dir, base_verify_dir):
+            f_source.to_csv(directory / "data" / "test.csv", index=False)
+            f_sample.to_csv(directory / "data" / "sample_submission.csv", index=False)
+        f_candidate_run = subprocess.run(
+            [sys.executable, "script.py"], cwd=verify_dir,
+            capture_output=True, text=True, timeout=600,
+        )
+        f_base_run = subprocess.run(
+            [sys.executable, "script.py"], cwd=base_verify_dir,
+            capture_output=True, text=True, timeout=600,
+        )
+        if f_candidate_run.returncode != 0 or f_base_run.returncode != 0:
+            raise RuntimeError(
+                "F행 스모크 추론 실패\n"
+                f"candidate stderr:\n{f_candidate_run.stderr}\n"
+                f"base stderr:\n{f_base_run.stderr}"
+            )
+        f_candidate_prediction = float(pd.read_csv(
+            verify_dir / "output" / "submission.csv"
+        ).loc[0, TARGET_COL])
+        f_base_prediction = float(pd.read_csv(
+            base_verify_dir / "output" / "submission.csv"
+        ).loc[0, TARGET_COL])
+        f_smoke_difference = float(f_candidate_prediction - f_base_prediction)
+        if not np.isfinite(f_smoke_difference) or abs(f_smoke_difference) <= 1e-12:
+            raise ValueError("F행 전환 보정이 스모크 입력에서 적용되지 않았습니다.")
         report = {
             "model": "R residual scale 0.05 champion plus F transition scale 0.05",
             "official_train_only": True, "test_aggregate_used": False,
@@ -217,6 +275,13 @@ def main(train_path: Path, anchor_path: Path, base_zip: Path, test_path: Path,
             "singleton_rows_checked": int(len(test_sample)),
             "maximum_singleton_difference": maximum_singleton_difference,
             "row_independence_verified": True,
+            "r_rows_compared_with_base": int(len(common_ids)),
+            "maximum_r_difference_vs_base": maximum_r_difference,
+            "r_predictions_unchanged": True,
+            "f_smoke_base_prediction": f_base_prediction,
+            "f_smoke_candidate_prediction": f_candidate_prediction,
+            "f_smoke_difference": f_smoke_difference,
+            "f_transition_path_verified": True,
         }
         report_path.parent.mkdir(parents=True, exist_ok=True)
         report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
