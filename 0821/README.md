@@ -157,3 +157,17 @@ python 0821/06_f_transition_full_anchor_validation_colab.py \
 ```
 
 0.05가 `+1` 이상이고 이웃 강도 0.025·0.075도 모두 양수일 때만 제출 ZIP을 만든다.
+
+실행 결과 0.025 `+2.7851`, 0.05 `+4.3528`, 0.075 `+4.7030`으로 모두 양수였다. 선택 강도 0.05의 평균 오차 증분은 `0.000845`로 게이트 안이며 `build_f_transition_submission` 판정을 받았다.
+
+```bash
+python 0821/07_build_f_transition_submission_colab.py \
+  --train /content/dataset/data/train.csv \
+  --anchor /content/drive/MyDrive/0821_full_anchors/anchor_2024.npz \
+  --base-zip /content/drive/MyDrive/submit_catboost_r_residual_scale0050.zip \
+  --test /content/dataset/data/test.csv \
+  --sample /content/dataset/data/sample_submission.csv \
+  --output-zip /content/drive/MyDrive/submit_catboost_r0050_f_transition0050.zip \
+  --report /content/drive/MyDrive/0821_r0050_f_transition0050_build.json \
+  --task-type GPU
+```

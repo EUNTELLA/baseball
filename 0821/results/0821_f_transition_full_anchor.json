@@ -1,0 +1,14 @@
+{
+  "experiment": "F transition residual on complete anchor",
+  "official_train_only": true,
+  "test_aggregate_used": false,
+  "r_scale_fixed": 0.05,
+  "valid_f_rows": 30010,
+  "candidates": [
+    {"scale": 0.025, "bss_delta": 2.7850969921527913, "absolute_mean_error_delta": 0.00042268812522650023},
+    {"scale": 0.05, "bss_delta": 4.3527656442332585, "absolute_mean_error_delta": 0.0008453762504535001},
+    {"scale": 0.075, "bss_delta": 4.703005956252504, "absolute_mean_error_delta": 0.0012680643756800558}
+  ],
+  "selected": {"scale": 0.05, "bss_delta": 4.3527656442332585, "absolute_mean_error_delta": 0.0008453762504535001},
+  "decision": "build_f_transition_submission"
+}
