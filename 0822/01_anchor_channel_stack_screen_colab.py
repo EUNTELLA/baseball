@@ -140,7 +140,7 @@ def main(component_dir: Path, train_path: Path, output: Path) -> None:
         "official_train_only": True, "test_aggregate_used": False,
         "folds": folds, "summaries": summaries,
         "selected": passed[0] if passed else None,
-        "decision": "continue_anchor_reconstruction" if passed else "keep_r_scale0075_champion",
+        "decision": "continue_anchor_reconstruction" if passed else "keep_r0075_verified_shift_champion",
         "gate": "each fold >=+1, magnitude ratio >=0.25, pitcher bootstrap probability >=0.80",
     }
     write_json(output, report)
