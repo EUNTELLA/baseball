@@ -1,0 +1,44 @@
+{
+  "experiment": "seed disagreement row uncertainty shape screen",
+  "selected": null,
+  "training": {
+    "2022_best_iterations": [315, 215, 232, 202, 263, 314, 243],
+    "2023_best_iterations": [1, 1, 2, 1, 1, 1, 1],
+    "2024_best_iterations": [286, 206, 267, 274, 250, 201, 210]
+  },
+  "top": [
+    {
+      "alpha": 10000.0,
+      "scale": 0.25,
+      "fold_2023_delta": 400.4476552355918,
+      "fold_2024_delta": -107.7918222776697,
+      "worst_delta": -107.7918222776697,
+      "magnitude_ratio": 0.2691783079969678,
+      "minimum_pitcher_bootstrap_probability": 0.082,
+      "passed": false
+    },
+    {
+      "alpha": 10000.0,
+      "scale": 0.5,
+      "fold_2023_delta": 714.3930245118169,
+      "fold_2024_delta": -1122.6327411377301,
+      "worst_delta": -1122.6327411377301,
+      "magnitude_ratio": 0.6363550592581297,
+      "minimum_pitcher_bootstrap_probability": 0.0,
+      "passed": false
+    },
+    {
+      "alpha": 1000.0,
+      "scale": 0.25,
+      "fold_2023_delta": 420.3873488965115,
+      "fold_2024_delta": -1220.5403746727627,
+      "worst_delta": -1220.5403746727627,
+      "magnitude_ratio": 0.3444272370008415,
+      "minimum_pitcher_bootstrap_probability": 0.0,
+      "passed": false
+    }
+  ],
+  "decision": "keep_r_scale0050_champion",
+  "reason": "2023과 2024의 최적 반복 수 및 시드 불일치 분포가 크게 달라 이전 시즌 보정이 다음 시즌으로 외삽되지 않았다.",
+  "note": "전체 후보 원본은 Drive의 0821_seed_disagreement_shape_screen.json에 보관한다."
+}
