@@ -229,3 +229,17 @@ python 0821/09_game_state_shape_screen_colab.py \
 2023·2024 각각 `+1` 이상, 개선 크기 비율 `0.25` 이상, 투수 묶음 개선 확률 `0.80` 이상을 동시에 만족해야 다음 전체 파이프라인으로 넘긴다. 이 단계에서는 ZIP을 만들지 않는다.
 
 실행 결과 `selected=null`이었다. 최상위 이닝 구간×공수×아웃 후보도 2023 `+0.269`, 2024 `+0.615`, 개선 크기 비율 `0.438`이었지만 투수 묶음 개선 확률이 `0.582`에 그쳤다. 가장 균형 잡힌 이닝 구간×점수 후보도 최소 개선 `+0.222`, 개선 확률 `0.596`으로 효과 크기와 확신이 모두 부족했다. 경기 상태 형태 축은 폐기하고 R 0.05를 유지한다.
+
+## 시드 불일치 기반 행 불확실성 선별
+
+동일 CatBoost를 7개 시드로 시간 전방 학습하고 행별 표준편차·최대최소 범위·앙상블 평균과 anchor 차이를 불확실성 피처로 만든다. 이전 시즌 anchor 잔차에 강하게 규제한 선형 보정을 적합하고, 학습 시즌 보정 평균을 제거한 형태 성분만 다음 시즌에 적용한다.
+
+```bash
+python 0821/10_seed_disagreement_shape_screen_colab.py \
+  --train /content/dataset/data/train.csv \
+  --anchor-dir /content/drive/MyDrive/0821_full_anchors \
+  --output /content/drive/MyDrive/0821_seed_disagreement_shape_screen.json \
+  --task-type GPU
+```
+
+2023·2024 각각 `+1`, 개선 크기 비율 `0.25`, 투수 묶음 개선 확률 `0.80` 게이트를 그대로 적용한다. 모델 21개를 학습하므로 T4에서 수 분 정도 걸릴 수 있으며 이 단계에서는 ZIP을 만들지 않는다.
