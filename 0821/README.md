@@ -267,3 +267,17 @@ python 0821/11_r_scale_response_analysis.py \
 - 반응곡선 예상치 `1033.6111202428` 대비 오차: `-0.0932369810`
 
 상승 방향과 크기가 근사 예측과 유사하게 재현됐다. `submit_catboost_r_residual_scale0075.zip`을 새 최고 및 현재 유지 제출로 승격하며, 반응곡선 정점과 충분히 가까우므로 0.08 이상의 미세 강도 탐색은 제출 기회를 추가로 사용할 근거가 생기기 전까지 중단한다.
+
+## 경기 문맥 전용 F 저강도 혼합
+
+R 0.075를 고정하고 선수 ID·선수 과거 이력을 모두 제외한 경기 문맥 전용 CatBoost를 별도로 학습한다. 볼카운트·이닝·아웃·주자·점수·레버리지·손 조합·팀만 사용해 기존 anchor와 다른 오류를 만들고 F행에만 `2.5~20%` 혼합한다. 별도 모델의 수준은 이전 시즌 F행에서 anchor 평균에 맞춘 고정 로짓 이동만 사용한다.
+
+```bash
+python 0821/12_context_only_f_blend_screen_colab.py \
+  --train /content/dataset/data/train.csv \
+  --anchor-dir /content/drive/MyDrive/0821_full_anchors \
+  --output /content/drive/MyDrive/0821_context_only_f_blend_screen.json \
+  --task-type GPU
+```
+
+2023·2024 각각 `+1`, 개선 크기 비율 `0.25`, 투수 묶음 개선 확률 `0.80`을 모두 만족할 때만 후속 전체 파이프라인으로 넘긴다. 이 단계에서는 ZIP을 만들지 않는다.
