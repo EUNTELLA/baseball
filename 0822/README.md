@@ -58,3 +58,17 @@ python 0822/03_build_failure_complement_submission_colab.py \
 현재 최고 ZIP의 모델은 재학습하지 않는다. 2024 OOF 구성요소로 고정한 정렬 shift와 기존 MR·큰 이탈 모델을 사용하며, F행 불변·R행 실제 변경·확률 범위·ZIP 무결성을 검사한다.
 
 빌드 결과 ZIP 무결성 오류와 결측은 없었다. 출력 SHA-256은 `1a83c9f0...6288b`, 5행 샘플 평균은 `0.451126`, R행 평균 변화는 `-0.00048443`, 최대 절대 변화는 `0.00192153`이다. 샘플 5행은 모두 R이라 F 차이는 측정 대상이 없었으며 추론 코드는 R 마스크에만 혼합한다. `submit_catboost_r0075_shift_verified_fcblend020.zip`을 제출 가능 후보로 확정한다.
+
+## 5단계: F 보조확률 메타 core
+
+기존 채널을 F행에 직접 혼합한 후보는 모두 시간 전방 게이트를 통과하지 못했다. 다음에는 성공·MR·큰 이탈·여집합 확률과 행 문맥을 함께 입력한 얕은 F 전용 메타 모델을 학습한다. R행은 변경하지 않으며 현재 검증 shift가 적용된 F anchor의 잔차만 대상으로 한다.
+
+```bash
+python 0822/04_f_auxiliary_meta_core_screen_colab.py \
+  --component-dir /content/drive/MyDrive/0822_anchor_components \
+  --train /content/dataset/data/train.csv \
+  --output /content/drive/MyDrive/0822_f_auxiliary_meta_core_screen.json \
+  --task-type GPU
+```
+
+depth 2~3, L2 100~500, 3시드 평균을 사용하고 2.5~10%만 기존 F anchor에 더한다. 2023·2024 각각 `+1`, 크기 비율 `0.25`, 투수 bootstrap `0.80`을 모두 통과해야 다음 단계로 진행한다.
