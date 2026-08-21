@@ -40,3 +40,19 @@ python 0822/02_failure_complement_champion_validation_colab.py \
 ```
 
 기존 anchor 잔차로 학습한 R 3시드 correction을 기준과 후보에 동일하게 적용한다. 실제 ZIP과 같은 순서로 검증 shift 차이 `-0.0032119273`을 먼저 적용하고 R correction 0.075를 마지막에 더한다. 따라서 이 단계의 증분은 현재 챔피언 위에서 실패확률 여집합 혼합만 추가한 효과다.
+
+수정된 실제 연산 순서 검증에서도 0.20 혼합은 2023 `+38.64`, 2024 `+103.17`, 개선 크기 비율 `0.374`, bootstrap `1.0`으로 통과했다. 0.05~0.20이 모두 통과했으며 최상위 0.20으로 제출 후보를 만든다.
+
+## 4단계: 제출 ZIP 생성
+
+```bash
+python 0822/03_build_failure_complement_submission_colab.py \
+  --source-zip /content/drive/MyDrive/submit_catboost_r0075_shift_verified.zip \
+  --component-dir /content/drive/MyDrive/0822_anchor_components \
+  --test /content/dataset/data/test.csv \
+  --sample /content/dataset/data/sample_submission.csv \
+  --output-zip /content/drive/MyDrive/submit_catboost_r0075_shift_verified_fcblend020.zip \
+  --report /content/drive/MyDrive/0822_failure_complement_submission.json
+```
+
+현재 최고 ZIP의 모델은 재학습하지 않는다. 2024 OOF 구성요소로 고정한 정렬 shift와 기존 MR·큰 이탈 모델을 사용하며, F행 불변·R행 실제 변경·확률 범위·ZIP 무결성을 검사한다.
