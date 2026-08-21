@@ -179,3 +179,34 @@ python 0821/07_build_f_transition_submission_colab.py \
 최종 빌드는 모든 검사를 통과했다. 단독·일괄 최대 차이와 기준 ZIP 대비 R행 최대 차이는 모두 `0.0`이었다. F 스모크 예측은 `0.44773518 → 0.44687162`, 차이 `-0.00086356`으로 전환 보정 적용을 확인했다. 제출 ZIP SHA-256은 `543f33e0aeb82e59978af041325f3c6fe12038cfa1003a416ba398928ee9cd66`이다.
 
 리더보드 점수는 `1030.6410723404`로 R 0.05 챔피언 `1033.0126318779`보다 `-2.3715595375` 하락했다. 규정·기능 검증은 통과했지만 로컬 개선 방향이 서버에서 전이되지 않았으므로 F 이전 유형 전환 축은 폐기하고 `submit_catboost_r_residual_scale0050.zip`을 계속 유지한다.
+
+## 후보 보정 전이 강건성 재평가
+
+로컬 양수만으로 제출한 후보가 서버에서 반전된 문제를 보완하기 위해 평가 게이트를 다시 구성한다. R 0.05 전체 시간 전방 anchor를 고정하고 F 이전 유형 전환 보정을 다음 기준으로 재평가한다.
+
+- 2023·2024 각각 BSS `+1` 이상
+- 두 시즌 개선 절댓값의 작은 값/큰 값 비율 `0.25` 이상
+- 투수 묶음 500회 재표본화에서 개선 확률이 두 시즌 모두 `0.80` 이상
+- 후보 보정의 평균 수준을 분리한 행별 형태 기여가 두 시즌 모두 양수
+- 중심화에 쓰는 평균은 검증·평가 행이 아니라 학습 시즌 F행에서만 계산
+
+이 평가는 2022→2023과 2023→2024를 모두 다시 보므로 `anchor_2022.npz`도 필요하다. 기존 폴더에 2023·2024만 있다면 다음 명령으로 2022를 포함한 anchor를 먼저 갱신한다. `--screen-r-residual`은 검증 폴드를 2022부터 열기 위한 기존 옵션이며 저장되는 공통 anchor는 R 추가 보정 전 단계다.
+
+```bash
+python 0819/02_residual_differential_full_pipeline_colab.py \
+  --train /content/dataset/data/train.csv \
+  --output /content/drive/MyDrive/0821_full_anchor_2022_2024_report.json \
+  --anchor-dir /content/drive/MyDrive/0821_full_anchors \
+  --screen-r-residual \
+  --task-type GPU
+```
+
+```bash
+python 0821/08_transfer_robustness_audit_colab.py \
+  --train /content/dataset/data/train.csv \
+  --anchor-dir /content/drive/MyDrive/0821_full_anchors \
+  --output /content/drive/MyDrive/0821_transfer_robustness_audit.json \
+  --task-type GPU
+```
+
+이 실험은 제출 ZIP을 만들지 않는다. 강화된 게이트가 기존 F 전환 후보를 거부하는지 확인하고, 이후 모든 행별 보정 후보의 공통 제출 전 점검 기준으로 사용한다.
