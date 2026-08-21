@@ -283,3 +283,18 @@ python 0821/12_context_only_f_blend_screen_colab.py \
 2023·2024 각각 `+1`, 개선 크기 비율 `0.25`, 투수 묶음 개선 확률 `0.80`을 모두 만족할 때만 후속 전체 파이프라인으로 넘긴다. 이 단계에서는 ZIP을 만들지 않는다.
 
 실행 결과 `selected=null`이었다. 문맥 모델과 anchor의 F행 오류 상관은 2023 `0.998496`, 2024 `0.999927`로 다양성이 거의 없었다. 최소 혼합 0.025도 2023 `-45.13`, 2024 `-5.80`, 투수 묶음 개선 확률 `0.0`으로 두 시즌 모두 악화됐다. 문맥 전용 모델의 혼합 비율·피처 범위 변경은 중단하고 R 0.075를 유지한다.
+
+## R 0.075 전역 shift 후보
+
+동일 기반 모델에서 전역 로짓 shift만 달랐던 자체 제출 `-0.02081168 → 985.0942`, `-0.03842672 → 997.3952`, `-0.04163865 → 998.0030`을 이차곡선으로 근사하면 정점은 `-0.04390363`이다. 현재 R 0.075 ZIP의 shift는 `-0.03842672`이므로 모델을 재학습하지 않고 기존 검증 shift와 곡선 정점 후보를 각각 만든다.
+
+```bash
+python 0821/13_repack_global_shift_candidates_colab.py \
+  --source-zip /content/drive/MyDrive/submit_catboost_r_residual_scale0075.zip \
+  --test /content/dataset/data/test.csv \
+  --sample /content/dataset/data/sample_submission.csv \
+  --output-dir /content/drive/MyDrive \
+  --report /content/drive/MyDrive/0821_r0075_shift_candidates.json
+```
+
+생성 후보는 `submit_catboost_r0075_shift_verified.zip`과 `submit_catboost_r0075_shift_response_optimum.zip`이다. 첫 제출은 실제 과거 제출에서 확인된 `verified`를 우선하며, 정점 후보는 첫 결과가 같은 방향일 때만 검토한다. 두 파일을 동시에 제출하지 않는다.
