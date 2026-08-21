@@ -16,7 +16,13 @@
       "zip_test_error": null,
       "sample_rows": 5,
       "sample_missing": 0,
-      "sample_mean": 0.451610193862498
+      "sample_mean": 0.451610193862498,
+      "leaderboard": {
+        "submitted_at": "2026-08-21 14:49:01",
+        "public_score": 1034.5103741711,
+        "delta_vs_source_submission": 0.9924909093,
+        "runtime_seconds": null
+      }
     },
     {
       "name": "response_optimum",
@@ -31,5 +37,7 @@
     }
   ],
   "recommended_first": "verified",
-  "submission_sequence": "verified 결과가 1033.5178832618보다 높을 때만 response_optimum 검토"
+  "submission_sequence": "verified가 1034.5103741711로 개선됨. response_optimum은 다음 제출일에 anchor 재구성 결과와 비교한 뒤 검토",
+  "decision": "promote_verified_shift_as_champion",
+  "current_champion": "submit_catboost_r0075_shift_verified.zip"
 }

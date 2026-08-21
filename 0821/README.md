@@ -300,3 +300,12 @@ python 0821/13_repack_global_shift_candidates_colab.py \
 생성 후보는 `submit_catboost_r0075_shift_verified.zip`과 `submit_catboost_r0075_shift_response_optimum.zip`이다. 첫 제출은 실제 과거 제출에서 확인된 `verified`를 우선하며, 정점 후보는 첫 결과가 같은 방향일 때만 검토한다. 두 파일을 동시에 제출하지 않는다.
 
 빌드 결과 원본 ZIP의 SHA-256은 `ec836fba...`, 저장 강도는 R `0.075`, 기존 shift는 `-0.0384267193`으로 확인됐다. 두 후보 모두 23개 멤버 ZIP 무결성, 5행 추론, 결측·확률 범위 검사를 통과했다. `verified` SHA-256은 `eb20c3a9...`, 샘플 평균은 `0.451610`이다. 먼저 `submit_catboost_r0075_shift_verified.zip`만 제출한다.
+
+### 검증 shift 리더보드 결과
+
+- 제출 시각: 2026-08-21 14:49:01
+- Public Score: **`1034.5103741711`**
+- R 0.075 원본 대비 개선: `+0.9924909093`
+- R 0.05 대비 누적 개선: `+1.4977422932`
+
+과거 자체 제출에서 확인한 shift 방향이 R 0.075 구조에서도 재현됐다. `submit_catboost_r0075_shift_verified.zip`을 현재 최고로 승격한다. 더 큰 이동인 `response_optimum`은 아직 제출하지 않았으며, 다음 제출일에 0822 anchor 채널 재구성 결과와 비교한 뒤 사용할지 결정한다.
