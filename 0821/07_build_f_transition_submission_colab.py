@@ -162,7 +162,13 @@ def main(train_path: Path, anchor_path: Path, base_zip: Path, test_path: Path,
         shutil.copy2(test_path, verify_dir / "data" / "test.csv")
         shutil.copy2(sample_path, verify_dir / "data" / "sample_submission.csv")
         completed = subprocess.run([sys.executable, "script.py"], cwd=verify_dir,
-                                   capture_output=True, text=True, check=True, timeout=600)
+                                   capture_output=True, text=True, timeout=600)
+        if completed.returncode != 0:
+            raise RuntimeError(
+                "샘플 추론 실패\n"
+                f"stdout:\n{completed.stdout}\n"
+                f"stderr:\n{completed.stderr}"
+            )
         submission = pd.read_csv(verify_dir / "output" / "submission.csv")
         if submission[TARGET_COL].isna().any() or not submission[TARGET_COL].between(0, 1).all():
             raise ValueError("샘플 추론 결측 또는 범위 오류")
