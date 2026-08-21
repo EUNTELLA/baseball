@@ -45,12 +45,20 @@ def find_meta(root: Path) -> Path:
 def verify(candidate_dir: Path, test_path: Path, sample_path: Path) -> dict:
     verify_dir = candidate_dir.parent / f"verify_{candidate_dir.name}"
     shutil.copytree(candidate_dir, verify_dir)
-    shutil.copy2(test_path, verify_dir / "test.csv")
-    shutil.copy2(sample_path, verify_dir / "sample_submission.csv")
+    data_dir = verify_dir / "data"
+    data_dir.mkdir(exist_ok=True)
+    shutil.copy2(test_path, data_dir / "test.csv")
+    shutil.copy2(sample_path, data_dir / "sample_submission.csv")
     completed = subprocess.run(
         [sys.executable, "script.py"], cwd=verify_dir,
-        capture_output=True, text=True, check=True,
+        capture_output=True, text=True, check=False, timeout=600,
     )
+    if completed.returncode != 0:
+        raise RuntimeError(
+            "샘플 추론 실패\n"
+            f"stdout:\n{completed.stdout}\n"
+            f"stderr:\n{completed.stderr}"
+        )
     submission = pd.read_csv(verify_dir / "output" / "submission.csv")
     prediction = pd.to_numeric(submission["control_success"], errors="coerce")
     return {
