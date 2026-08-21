@@ -116,3 +116,16 @@ python 0821/04_f_multichannel_residual_screen_colab.py \
 ```
 
 2023·2024 동일 혼합·동일 강도가 모두 양수이고 2024가 `+3` 이상일 때만 실패유형·리그 전환 보조 신호를 추가하는 2단계 검증으로 넘어간다.
+
+## F행 이전 유형 전환 잔차
+
+다중 채널과 독립적으로 투수의 이전 주 리그 유형, 현재 유형, 전환 조합과 경기 상황을 이용해 잔차를 학습한다. 보정은 검증 연도의 F행에만 적용하고 R행은 그대로 둔다.
+
+```bash
+python 0821/05_f_transition_residual_screen_colab.py \
+  --train /content/dataset/data/train.csv \
+  --output /content/drive/MyDrive/0821_f_transition_residual_screen.json \
+  --task-type GPU
+```
+
+`04`와 결과 의존성이 없으므로 두 번째 실행 후보로 사용할 수 있다. 단일 T4에서 동시에 실행하면 GPU 메모리와 학습 시간이 경합하므로 두 셀을 순차 실행하는 편이 안정적이다.
