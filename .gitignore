@@ -28,7 +28,9 @@ venv/
 .DS_Store
 Thumbs.db
 
-open/
+/open
 baseline/
 *.md
 experiment_filter.md
+check.md
+check2.md
