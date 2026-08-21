@@ -1,0 +1,29 @@
+{
+  "model": "R residual scale 0.05 champion plus F transition scale 0.05",
+  "official_train_only": true,
+  "test_aggregate_used": false,
+  "output_zip": "/content/drive/MyDrive/submit_catboost_r0050_f_transition0050.zip",
+  "sha256": "543f33e0aeb82e59978af041325f3c6fe12038cfa1003a416ba398928ee9cd66",
+  "zip_test_error": null,
+  "training_seconds": {
+    "42": 4.323195902000407,
+    "7": 3.338052859000527,
+    "2024": 3.4736426290000963
+  },
+  "sample_rows": 5,
+  "sample_missing": 0,
+  "sample_min": 0.398580129195592,
+  "sample_max": 0.4938777486328977,
+  "sample_mean": 0.45257622647155715,
+  "singleton_rows_checked": 5,
+  "maximum_singleton_difference": 0.0,
+  "row_independence_verified": true,
+  "r_rows_compared_with_base": 5,
+  "maximum_r_difference_vs_base": 0.0,
+  "r_predictions_unchanged": true,
+  "f_smoke_base_prediction": 0.4477351796570929,
+  "f_smoke_candidate_prediction": 0.4468716155284674,
+  "f_smoke_difference": -0.000863564128625538,
+  "f_transition_path_verified": true,
+  "decision": "ready_to_submit"
+}
