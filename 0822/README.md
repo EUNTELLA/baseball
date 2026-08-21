@@ -56,3 +56,5 @@ python 0822/03_build_failure_complement_submission_colab.py \
 ```
 
 현재 최고 ZIP의 모델은 재학습하지 않는다. 2024 OOF 구성요소로 고정한 정렬 shift와 기존 MR·큰 이탈 모델을 사용하며, F행 불변·R행 실제 변경·확률 범위·ZIP 무결성을 검사한다.
+
+빌드 결과 ZIP 무결성 오류와 결측은 없었다. 출력 SHA-256은 `1a83c9f0...6288b`, 5행 샘플 평균은 `0.451126`, R행 평균 변화는 `-0.00048443`, 최대 절대 변화는 `0.00192153`이다. 샘플 5행은 모두 R이라 F 차이는 측정 대상이 없었으며 추론 코드는 R 마스크에만 혼합한다. `submit_catboost_r0075_shift_verified_fcblend020.zip`을 제출 가능 후보로 확정한다.
