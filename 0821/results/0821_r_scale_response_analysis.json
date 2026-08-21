@@ -1,0 +1,70 @@
+{
+  "experiment": "R residual scale response from own submissions",
+  "observations": [
+    {
+      "scale": 0.0,
+      "score": 1029.083223502,
+      "name": "R 보정 전 기준"
+    },
+    {
+      "scale": 0.025,
+      "score": 1031.5033329643,
+      "name": "R 잔차 0.025"
+    },
+    {
+      "scale": 0.05,
+      "score": 1033.0126318779,
+      "name": "R 잔차 0.05"
+    }
+  ],
+  "quadratic": {
+    "a": -728.6484389591775,
+    "b": 115.02058946596479,
+    "c": 1029.0832235019996,
+    "unconstrained_optimum_scale": 0.0789273559895795
+  },
+  "candidate_predictions": [
+    {
+      "scale": 0.06,
+      "predicted_score": 1033.3613244897044,
+      "predicted_delta_vs_0050": 0.34869261180438116
+    },
+    {
+      "scale": 0.065,
+      "predicted_score": 1033.4810221626847,
+      "predicted_delta_vs_0050": 0.4683902847846184
+    },
+    {
+      "scale": 0.07,
+      "predicted_score": 1033.564287413717,
+      "predicted_delta_vs_0050": 0.5516555358169626
+    },
+    {
+      "scale": 0.075,
+      "predicted_score": 1033.6111202428015,
+      "predicted_delta_vs_0050": 0.5984883649014137
+    },
+    {
+      "scale": 0.08,
+      "predicted_score": 1033.621520649938,
+      "predicted_delta_vs_0050": 0.6088887720379716
+    },
+    {
+      "scale": 0.085,
+      "predicted_score": 1033.5954886351265,
+      "predicted_delta_vs_0050": 0.5828567572264092
+    },
+    {
+      "scale": 0.1,
+      "predicted_score": 1033.2987980590042,
+      "predicted_delta_vs_0050": 0.28616618110413583
+    }
+  ],
+  "recommended": {
+    "scale": 0.075,
+    "predicted_score": 1033.6111202428015,
+    "predicted_delta_vs_0050": 0.5984883649014137
+  },
+  "decision": "submit_existing_scale0075_candidate",
+  "risk": "세 점만 사용한 서버 반응 근사이므로 예상 점수는 보장되지 않는다."
+}
