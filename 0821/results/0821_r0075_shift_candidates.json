@@ -1,0 +1,35 @@
+{
+  "experiment": "R 0.075 global logit shift candidates",
+  "models_retrained": false,
+  "official_train_only": true,
+  "test_aggregate_used": false,
+  "source_sha256": "ec836fbac59caa606243501a343bd8953fc66b90ce9d2cf4e699b0976f2ba2ad",
+  "source_shift": -0.03842671927234861,
+  "source_r_scale": 0.075,
+  "candidates": [
+    {
+      "name": "verified",
+      "shift": -0.0416386466,
+      "delta_vs_source": -0.0032119273276513954,
+      "sha256": "eb20c3a934ffe578be213ea9c9114da3e101eb27798f73f8d2c0f6aca9cd7fb6",
+      "members": 23,
+      "zip_test_error": null,
+      "sample_rows": 5,
+      "sample_missing": 0,
+      "sample_mean": 0.451610193862498
+    },
+    {
+      "name": "response_optimum",
+      "shift": -0.04390362815914772,
+      "delta_vs_source": -0.005476908886799116,
+      "sha256": "47d85e0d1a401df7a3b7ee634c128d3d92def141019d31e8083251c080bf06de",
+      "members": 23,
+      "zip_test_error": null,
+      "sample_rows": 5,
+      "sample_missing": 0,
+      "sample_mean": 0.45105190240382614
+    }
+  ],
+  "recommended_first": "verified",
+  "submission_sequence": "verified 결과가 1033.5178832618보다 높을 때만 response_optimum 검토"
+}
