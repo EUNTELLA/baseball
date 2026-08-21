@@ -47,7 +47,7 @@ def inference_block() -> str:
     # 공식 Train의 2024 전체 anchor 잔차로 학습한 F 이전 유형 전환 보정.
     f_meta_path = os.path.join(BASE, "model", "f_transition_meta.json")
     if os.path.exists(f_meta_path):
-        from catboost import CatBoostRegressor, Pool
+        from catboost import CatBoostRegressor as FTransitionRegressor
         f_meta = json.load(open(f_meta_path, encoding="utf-8"))
         prior = f_meta["prior_type"]
         previous = test["pitcher_id"].astype(str).map(prior).fillna("NEW").astype(str)
@@ -77,7 +77,7 @@ def inference_block() -> str:
         f_pool = Pool(f_x, cat_features=[f_x.columns.get_loc(c) for c in f_meta["cat_cols"]])
         f_members = []
         for seed in f_meta["seeds"]:
-            f_model = CatBoostRegressor()
+            f_model = FTransitionRegressor()
             f_model.load_model(os.path.join(BASE, "model", f"f_transition_{seed}.cbm"))
             f_members.append(f_model.predict(f_pool))
         f_correction = np.mean(f_members, axis=0)
