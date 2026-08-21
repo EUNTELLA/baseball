@@ -39,4 +39,4 @@ python 0822/02_failure_complement_champion_validation_colab.py \
   --task-type GPU
 ```
 
-기존 anchor 잔차로 학습한 R 3시드 correction을 기준과 후보에 동일하게 적용하고 R 강도 0.075, 검증 shift 차이 `-0.0032119273`까지 공통 적용한다. 따라서 이 단계의 증분은 현재 챔피언 위에서 실패확률 여집합 혼합만 추가한 효과다.
+기존 anchor 잔차로 학습한 R 3시드 correction을 기준과 후보에 동일하게 적용한다. 실제 ZIP과 같은 순서로 검증 shift 차이 `-0.0032119273`을 먼저 적용하고 R correction 0.075를 마지막에 더한다. 따라서 이 단계의 증분은 현재 챔피언 위에서 실패확률 여집합 혼합만 추가한 효과다.

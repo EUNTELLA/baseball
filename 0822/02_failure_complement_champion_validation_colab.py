@@ -143,9 +143,9 @@ def main(component_dir: Path, train_path: Path, output: Path, task_type: str):
         target = valid["target"].astype(float)
         anchor = valid["anchor"].astype(float)
         valid_r = valid_rows["game_type"].astype(str).eq("R").to_numpy()
-        champion = anchor.copy()
+        # 실제 제출 ZIP은 기반 확률의 shift를 먼저 바꾼 뒤 R correction을 더한다.
+        champion = sigmoid(logit(anchor) + VERIFIED_SHIFT_DELTA)
         champion[valid_r] = np.clip(champion[valid_r] + R_SCALE * correction, 1e-6, 1 - 1e-6)
-        champion = sigmoid(logit(champion) + VERIFIED_SHIFT_DELTA)
         champion_score = bss(champion, target)
         alignment_shift = shift_to_mean(
             calibration["failure_complement"].astype(float),
@@ -156,8 +156,10 @@ def main(component_dir: Path, train_path: Path, output: Path, task_type: str):
         for blend in BLENDS:
             candidate = anchor.copy()
             candidate[valid_r] = (1 - blend) * candidate[valid_r] + blend * aligned[valid_r]
-            candidate[valid_r] = np.clip(candidate[valid_r] + R_SCALE * correction, 1e-6, 1 - 1e-6)
             candidate = sigmoid(logit(candidate) + VERIFIED_SHIFT_DELTA)
+            candidate[valid_r] = np.clip(
+                candidate[valid_r] + R_SCALE * correction, 1e-6, 1 - 1e-6
+            )
             candidates.append({
                 "blend": blend,
                 "bss_delta": bss(candidate, target) - champion_score,
