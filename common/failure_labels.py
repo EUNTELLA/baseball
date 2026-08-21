@@ -23,5 +23,6 @@ def recover_failure_labels(frame: pd.DataFrame) -> pd.DataFrame:
         recovered[name] = increment.gt(0.5).to_numpy()
 
     result = pd.DataFrame({"row_id": frame["row_id"], **recovered})
+    result[["middle", "reverse"]] = result[["middle", "reverse"]].astype(float)
     result.loc[~available.to_numpy(), ["middle", "reverse"]] = np.nan
     return result
