@@ -42,6 +42,17 @@ def find_meta(root: Path) -> Path:
     return matches[0]
 
 
+def read_r_scale(root: Path) -> float:
+    path = root / "model" / "r_residual_meta.json"
+    if not path.exists():
+        raise FileNotFoundError("원본 ZIP에 model/r_residual_meta.json이 없습니다.")
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    scale = float(payload.get("scale", -1.0))
+    if abs(scale - 0.075) > 1e-12:
+        raise ValueError(f"원본 ZIP의 R 잔차 강도가 0.075가 아닙니다: {scale}")
+    return scale
+
+
 def verify(candidate_dir: Path, test_path: Path, sample_path: Path) -> dict:
     verify_dir = candidate_dir.parent / f"verify_{candidate_dir.name}"
     shutil.copytree(candidate_dir, verify_dir)
@@ -79,6 +90,7 @@ def main(source_zip: Path, test_path: Path, sample_path: Path,
         source_meta_path = find_meta(source_dir)
         source_meta = json.loads(source_meta_path.read_text(encoding="utf-8"))
         source_shift = float(source_meta["logit_shift"])
+        source_r_scale = read_r_scale(source_dir)
         results = []
         for name, shift in CANDIDATES:
             candidate_dir = root / name
@@ -116,7 +128,9 @@ def main(source_zip: Path, test_path: Path, sample_path: Path,
         "experiment": "R 0.075 global logit shift candidates",
         "models_retrained": False, "official_train_only": True,
         "test_aggregate_used": False, "source_zip": str(source_zip),
-        "source_shift": source_shift, "candidates": results,
+        "source_sha256": digest(source_zip),
+        "source_shift": source_shift, "source_r_scale": source_r_scale,
+        "candidates": results,
         "recommended_first": "verified",
         "reason": "기존 자체 제출에서 직접 확인된 shift를 먼저 사용하고 반응곡선 정점은 보관한다.",
     }
