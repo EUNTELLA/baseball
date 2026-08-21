@@ -333,10 +333,10 @@ def main(
             anchor_output.parent.mkdir(parents=True, exist_ok=True)
             np.savez_compressed(
                 anchor_output,
-                row_id=frame.loc[validation, ID_COL].to_numpy(),
+                row_id=frame.loc[validation, ID_COL].astype(str).to_numpy(dtype=str),
                 target=target[validation].astype(np.int8),
                 prediction=candidate_final.astype(np.float32),
-                game_type=frame.loc[validation, "game_type"].astype(str).to_numpy(),
+                game_type=frame.loc[validation, "game_type"].astype(str).to_numpy(dtype=str),
             )
             print(f"saved 2024 anchor: {anchor_output}", flush=True)
         validation_target = target[validation]

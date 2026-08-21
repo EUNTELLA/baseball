@@ -63,12 +63,14 @@ def main(train_path: Path, anchor_path: Path, base_zip: Path, test_path: Path,
     if not base_zip.exists():
         raise FileNotFoundError(base_zip)
     frame = pd.read_csv(train_path, encoding="utf-8-sig")
-    anchor = np.load(anchor_path)
+    # 이 파일은 바로 앞 단계에서 공식 Train으로 직접 생성한 신뢰 가능한 자산이다.
+    # 이전 버전은 row_id/game_type을 object 배열로 저장했으므로 호환 읽기를 허용한다.
+    anchor = np.load(anchor_path, allow_pickle=True)
     year_mask = frame["season"].astype(int).eq(2024).to_numpy()
     year_rows = frame.loc[year_mask].reset_index(drop=True)
     if len(year_rows) != len(anchor["row_id"]):
         raise ValueError("2024 anchor 행 수가 Train과 다릅니다.")
-    if not np.array_equal(year_rows[ID_COL].to_numpy(), anchor["row_id"]):
+    if not np.array_equal(year_rows[ID_COL].astype(str).to_numpy(), anchor["row_id"].astype(str)):
         raise ValueError("2024 anchor row_id 순서가 Train과 다릅니다.")
     target = year_rows[TARGET_COL].astype(float).to_numpy()
     if not np.array_equal(target.astype(np.int8), anchor["target"]):
