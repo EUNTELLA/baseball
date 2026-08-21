@@ -96,6 +96,7 @@ def main(
     screen_r_residual: bool = False,
     anchor_output: Path | None = None,
     anchor_dir: Path | None = None,
+    component_dir: Path | None = None,
 ) -> None:
     common = load_module("full_pipeline_common", COMMON_PATH)
     screen = load_module("residual_differential_screen", SCREEN_PATH)
@@ -330,6 +331,24 @@ def main(
         baseline_final = common.sigmoid(common.logit(baseline_offset) + shift)
         candidate_final = common.sigmoid(common.logit(candidate_offset) + candidate_shift)
         anchor_oof[validation] = candidate_final
+        if component_dir is not None:
+            component_dir.mkdir(parents=True, exist_ok=True)
+            component_path = component_dir / f"components_{validation_year}.npz"
+            np.savez_compressed(
+                component_path,
+                row_id=frame.loc[validation, ID_COL].astype(str).to_numpy(dtype=str),
+                target=target[validation].astype(np.int8),
+                game_type=frame.loc[validation, "game_type"].astype(str).to_numpy(dtype=str),
+                success=predictions["success"]["outer"].astype(np.float32),
+                mr=predictions["mr"]["outer"].astype(np.float32),
+                wayoff=predictions["wayoff"]["outer"].astype(np.float32),
+                base_offset=baseline_offset.astype(np.float32),
+                base_final=baseline_final.astype(np.float32),
+                adjusted_success=corrected_success.astype(np.float32),
+                adjusted_offset=candidate_offset.astype(np.float32),
+                anchor=candidate_final.astype(np.float32),
+            )
+            print(f"saved fold components: {component_path}", flush=True)
         if anchor_dir is not None:
             anchor_dir.mkdir(parents=True, exist_ok=True)
             fold_anchor = anchor_dir / f"anchor_{validation_year}.npz"
@@ -489,6 +508,7 @@ if __name__ == "__main__":
     parser.add_argument("--screen-r-residual", action="store_true")
     parser.add_argument("--anchor-output", type=Path, default=None)
     parser.add_argument("--anchor-dir", type=Path, default=None)
+    parser.add_argument("--component-dir", type=Path, default=None)
     args = parser.parse_args()
     selected_axes = tuple(item.strip() for item in args.axes.split(",") if item.strip())
     allowed_axes = {name for name, _ in load_module("axis_check", SCREEN_PATH).AXES}
@@ -510,4 +530,5 @@ if __name__ == "__main__":
         args.screen_r_residual,
         args.anchor_output.resolve() if args.anchor_output else None,
         args.anchor_dir.resolve() if args.anchor_dir else None,
+        args.component_dir.resolve() if args.component_dir else None,
     )
