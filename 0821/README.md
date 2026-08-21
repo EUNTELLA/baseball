@@ -77,3 +77,5 @@ python 0821/02_repack_r_residual_scales_colab.py \
 ```
 
 생성 파일은 `submit_catboost_r_residual_scale0050.zip`과 `submit_catboost_r_residual_scale0075.zip`이다. 2023 전방 성능 하락을 고려한 우선 제출 후보는 `scale0050`이며, 두 파일을 동시에 제출하지 않는다.
+
+실행 결과 두 후보 모두 23개 멤버의 ZIP 무결성 검사와 5행 독립 추론을 통과했다. 0.05 후보의 샘플 평균은 `0.452576`, 0.075 후보는 `0.452402`였으며 결측은 모두 0이다. 결과 원본은 `0821/results/0821_r_residual_scale_candidates.json`에 저장한다.

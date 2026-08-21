@@ -1,0 +1,37 @@
+{
+  "experiment": "R-only residual scale candidates",
+  "source_zip": "/content/drive/MyDrive/submit_catboost_r_residual_scale0025.zip",
+  "models_retrained": false,
+  "official_train_only": true,
+  "test_aggregate_used": false,
+  "candidates": [
+    {
+      "scale": 0.05,
+      "output_zip": "/content/drive/MyDrive/submit_catboost_r_residual_scale0050.zip",
+      "sha256": "880256e341e2bc689db7ef03cb7f85711d8dbb757159f0901c18aa06dbd99204",
+      "members": 23,
+      "zip_test_error": null,
+      "sample_rows": 5,
+      "sample_missing": 0,
+      "sample_min": 0.398580129195592,
+      "sample_max": 0.4938777486328977,
+      "sample_mean": 0.45257622647155715,
+      "sample_stdout": "Saved ./output/submission.csv rows=5 seeds=7 offset=Y mean=0.4526"
+    },
+    {
+      "scale": 0.075,
+      "output_zip": "/content/drive/MyDrive/submit_catboost_r_residual_scale0075.zip",
+      "sha256": "ec836fbac59caa606243501a343bd8953fc66b90ce9d2cf4e699b0976f2ba2ad",
+      "members": 23,
+      "zip_test_error": null,
+      "sample_rows": 5,
+      "sample_missing": 0,
+      "sample_min": 0.3978786547660247,
+      "sample_max": 0.4930866970494121,
+      "sample_mean": 0.4524021013900966,
+      "sample_stdout": "Saved ./output/submission.csv rows=5 seeds=7 offset=Y mean=0.4524"
+    }
+  ],
+  "recommended_submission": "scale0050",
+  "reason": "scale 0.025 transferred positively, while 0.05 is safer than 0.075 under the negative 2023 forward result"
+}
