@@ -1,0 +1,39 @@
+{
+  "experiment": "F-row prior-type transition residual screen",
+  "official_train_only": true,
+  "test_aggregate_used": false,
+  "r_scale_fixed": 0.05,
+  "selected": {
+    "depth": 3,
+    "scale": 0.05,
+    "fold_2023_delta": 0.033114504949249834,
+    "fold_2024_delta": 2.481666834275302,
+    "mean_delta": 1.2573906696122759,
+    "worst_delta": 0.033114504949249834,
+    "both_positive": true
+  },
+  "top": [
+    {
+      "depth": 3,
+      "scale": 0.05,
+      "fold_2023_delta": 0.033114504949249834,
+      "fold_2024_delta": 2.481666834275302,
+      "both_positive": true
+    },
+    {
+      "depth": 3,
+      "scale": 0.075,
+      "fold_2023_delta": 0.026005279607499432,
+      "fold_2024_delta": 3.590204195269507,
+      "both_positive": true
+    },
+    {
+      "depth": 3,
+      "scale": 0.1,
+      "fold_2023_delta": 0.0031184023585595355,
+      "fold_2024_delta": 4.610544185523736,
+      "both_positive": true
+    }
+  ],
+  "decision": "continue_f_transition_full_pipeline"
+}
