@@ -214,3 +214,16 @@ python 0821/08_transfer_robustness_audit_colab.py \
 실행 결과 `selected=null`, `keep_r_scale0050_champion`이었다. 원본 보정은 모든 강도에서 두 시즌 양수였지만 개선 크기 비율이 `0.054~0.150`으로 기준 `0.25`에 미달했다. 0.05는 2023 `+38.03`, 2024 `+4.50`, 투수 묶음 개선 확률 최소 `0.906`이었지만 시즌 간 크기가 지나치게 달랐다. 더 중요하게 학습 시즌 평균을 제거한 0.05 보정은 2023 `-19.04`, 2024 `-1.57`로 모두 악화됐다. 따라서 원본 이득은 안정적인 행별 형태보다 시즌 수준 이동 의존성이 크다고 판정하며 F 전환 축을 최종 종료한다.
 
 오늘 최종 유지 제출은 `submit_catboost_r_residual_scale0050.zip`, Public Score `1033.0126318779`다. 이번 감사 결과로 새 ZIP은 만들지 않는다.
+
+## 경기 상태 형태 신호 선별
+
+F/R 보정 강도와 기존 카운트·손 차등을 반복하지 않고, 현재 행에서 알 수 있는 이닝 구간·공수·아웃·주자·투수 팀 점수 상황·레버리지 조합을 새 독립 축으로 검사한다. 각 조회표는 원천 시즌의 리그 유형별 평균 잔차를 먼저 제거하므로 전역 수준 이동을 학습하지 않는다. 기존 2022~2024 anchor를 재사용하므로 CatBoost 재학습 없이 실행된다.
+
+```bash
+python 0821/09_game_state_shape_screen_colab.py \
+  --train /content/dataset/data/train.csv \
+  --anchor-dir /content/drive/MyDrive/0821_full_anchors \
+  --output /content/drive/MyDrive/0821_game_state_shape_screen.json
+```
+
+2023·2024 각각 `+1` 이상, 개선 크기 비율 `0.25` 이상, 투수 묶음 개선 확률 `0.80` 이상을 동시에 만족해야 다음 전체 파이프라인으로 넘긴다. 이 단계에서는 ZIP을 만들지 않는다.
