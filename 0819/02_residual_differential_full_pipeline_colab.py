@@ -95,6 +95,7 @@ def main(
     trackman_blend: float = 1.0,
     screen_r_residual: bool = False,
     anchor_output: Path | None = None,
+    anchor_dir: Path | None = None,
 ) -> None:
     common = load_module("full_pipeline_common", COMMON_PATH)
     screen = load_module("residual_differential_screen", SCREEN_PATH)
@@ -329,6 +330,17 @@ def main(
         baseline_final = common.sigmoid(common.logit(baseline_offset) + shift)
         candidate_final = common.sigmoid(common.logit(candidate_offset) + candidate_shift)
         anchor_oof[validation] = candidate_final
+        if anchor_dir is not None:
+            anchor_dir.mkdir(parents=True, exist_ok=True)
+            fold_anchor = anchor_dir / f"anchor_{validation_year}.npz"
+            np.savez_compressed(
+                fold_anchor,
+                row_id=frame.loc[validation, ID_COL].astype(str).to_numpy(dtype=str),
+                target=target[validation].astype(np.int8),
+                prediction=candidate_final.astype(np.float32),
+                game_type=frame.loc[validation, "game_type"].astype(str).to_numpy(dtype=str),
+            )
+            print(f"saved fold anchor: {fold_anchor}", flush=True)
         if anchor_output is not None and validation_year == 2024:
             anchor_output.parent.mkdir(parents=True, exist_ok=True)
             np.savez_compressed(
@@ -476,6 +488,7 @@ if __name__ == "__main__":
     parser.add_argument("--trackman-blend", type=float, default=1.0)
     parser.add_argument("--screen-r-residual", action="store_true")
     parser.add_argument("--anchor-output", type=Path, default=None)
+    parser.add_argument("--anchor-dir", type=Path, default=None)
     args = parser.parse_args()
     selected_axes = tuple(item.strip() for item in args.axes.split(",") if item.strip())
     allowed_axes = {name for name, _ in load_module("axis_check", SCREEN_PATH).AXES}
@@ -496,4 +509,5 @@ if __name__ == "__main__":
         args.trackman_blend,
         args.screen_r_residual,
         args.anchor_output.resolve() if args.anchor_output else None,
+        args.anchor_dir.resolve() if args.anchor_dir else None,
     )
