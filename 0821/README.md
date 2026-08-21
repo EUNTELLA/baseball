@@ -62,3 +62,18 @@ python 0821/01_build_r_residual_probe_colab.py \
 - 로컬 2024 증분 대비 서버 전이율: 약 `17.4%`
 
 R 행 저강도 잔차가 서버에서도 같은 개선 방향을 보였으므로 이 ZIP을 새 최고로 승격한다. 다만 2023 전방 검증은 음수였으므로 더 큰 강도는 한 단계씩 보수적으로 확인한다.
+
+## R 잔차 강도 0.05·0.075 후보 생성
+
+새 최고 ZIP에 저장된 동일한 3시드 R 잔차 모델을 재사용하고 강도만 변경한다. 따라서 재학습 없이 두 후보를 만들며 각각 ZIP 무결성과 샘플 추론을 검사한다.
+
+```bash
+python 0821/02_repack_r_residual_scales_colab.py \
+  --source-zip /content/drive/MyDrive/submit_catboost_r_residual_scale0025.zip \
+  --test /content/dataset/data/test.csv \
+  --sample /content/dataset/data/sample_submission.csv \
+  --output-dir /content/drive/MyDrive \
+  --report /content/drive/MyDrive/0821_r_residual_scale_candidates.json
+```
+
+생성 파일은 `submit_catboost_r_residual_scale0050.zip`과 `submit_catboost_r_residual_scale0075.zip`이다. 2023 전방 성능 하락을 고려한 우선 제출 후보는 `scale0050`이며, 두 파일을 동시에 제출하지 않는다.
