@@ -101,3 +101,16 @@ python 0821/03_f_condition_error_screen_colab.py \
 ```
 
 2023·2024가 모두 양수이고 2024 증분이 `+2` 이상인 동일 설정만 다음 전체 파이프라인 검증으로 넘긴다. 이 단계에서는 제출 ZIP을 만들지 않는다.
+
+## F행 다중 잔차 채널 재구성
+
+R행은 `scale=0.05`로 고정하고 F행에만 장기 기억, 직전 시즌, 강한 최근가중 잔차 채널을 적용한다. 각 채널은 seed 17·42·777 평균이며, 단일 채널과 세 가지 혼합을 동일 강도에서 시간 전방 비교한다.
+
+```bash
+python 0821/04_f_multichannel_residual_screen_colab.py \
+  --train /content/dataset/data/train.csv \
+  --output /content/drive/MyDrive/0821_f_multichannel_residual_screen.json \
+  --task-type GPU
+```
+
+2023·2024 동일 혼합·동일 강도가 모두 양수이고 2024가 `+3` 이상일 때만 실패유형·리그 전환 보조 신호를 추가하는 2단계 검증으로 넘어간다.
