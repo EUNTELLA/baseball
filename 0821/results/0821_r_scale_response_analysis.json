@@ -65,6 +65,15 @@
     "predicted_score": 1033.6111202428015,
     "predicted_delta_vs_0050": 0.5984883649014137
   },
-  "decision": "submit_existing_scale0075_candidate",
+  "official_result": {
+    "submission_id": 58354,
+    "submitted_at": "2026-08-21 14:21:34",
+    "scale": 0.075,
+    "score": 1033.5178832618,
+    "runtime_seconds": 5,
+    "delta_vs_scale0050": 0.5052513839,
+    "prediction_error": -0.0932369810015
+  },
+  "decision": "promote_scale0075_champion",
   "risk": "세 점만 사용한 서버 반응 근사이므로 예상 점수는 보장되지 않는다."
 }
