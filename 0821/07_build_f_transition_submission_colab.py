@@ -172,6 +172,39 @@ def main(train_path: Path, anchor_path: Path, base_zip: Path, test_path: Path,
         submission = pd.read_csv(verify_dir / "output" / "submission.csv")
         if submission[TARGET_COL].isna().any() or not submission[TARGET_COL].between(0, 1).all():
             raise ValueError("샘플 추론 결측 또는 범위 오류")
+        full_prediction = submission.set_index(ID_COL)[TARGET_COL].astype(float)
+        test_sample = pd.read_csv(test_path)
+        submission_sample = pd.read_csv(sample_path)
+        singleton_differences = []
+        for index in range(len(test_sample)):
+            one_test = test_sample.iloc[[index]].copy()
+            one_id = str(one_test.iloc[0][ID_COL])
+            one_sample = submission_sample.loc[
+                submission_sample[ID_COL].astype(str).eq(one_id)
+            ].copy()
+            if len(one_sample) != 1:
+                raise ValueError(f"단독 검증 sample 행 불일치: {one_id}")
+            one_test.to_csv(verify_dir / "data" / "test.csv", index=False)
+            one_sample.to_csv(verify_dir / "data" / "sample_submission.csv", index=False)
+            one_completed = subprocess.run(
+                [sys.executable, "script.py"], cwd=verify_dir,
+                capture_output=True, text=True, timeout=600,
+            )
+            if one_completed.returncode != 0:
+                raise RuntimeError(
+                    f"단독 추론 실패: {one_id}\nstdout:\n{one_completed.stdout}\n"
+                    f"stderr:\n{one_completed.stderr}"
+                )
+            one_output = pd.read_csv(verify_dir / "output" / "submission.csv")
+            one_prediction = float(one_output.loc[0, TARGET_COL])
+            difference = abs(one_prediction - float(full_prediction.loc[one_id]))
+            singleton_differences.append(difference)
+        maximum_singleton_difference = float(max(singleton_differences, default=0.0))
+        if maximum_singleton_difference > 1e-12:
+            raise ValueError(
+                "test 행 독립성 위반: 단독/일괄 최대 차이 "
+                f"{maximum_singleton_difference:.16g}"
+            )
         report = {
             "model": "R residual scale 0.05 champion plus F transition scale 0.05",
             "official_train_only": True, "test_aggregate_used": False,
@@ -181,6 +214,9 @@ def main(train_path: Path, anchor_path: Path, base_zip: Path, test_path: Path,
             "sample_rows": int(len(submission)), "sample_missing": int(submission[TARGET_COL].isna().sum()),
             "sample_min": float(submission[TARGET_COL].min()), "sample_max": float(submission[TARGET_COL].max()),
             "sample_mean": float(submission[TARGET_COL].mean()), "sample_stdout": completed.stdout.strip(),
+            "singleton_rows_checked": int(len(test_sample)),
+            "maximum_singleton_difference": maximum_singleton_difference,
+            "row_independence_verified": True,
         }
         report_path.parent.mkdir(parents=True, exist_ok=True)
         report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

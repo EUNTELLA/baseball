@@ -171,3 +171,5 @@ python 0821/07_build_f_transition_submission_colab.py \
   --report /content/drive/MyDrive/0821_r0050_f_transition0050_build.json \
   --task-type GPU
 ```
+
+빌더는 ZIP 무결성·5행 일괄 추론뿐 아니라 각 행을 하나씩 따로 추론한다. 단독 예측과 일괄 예측의 최대 차이가 `1e-12`를 넘으면 빌드를 실패시켜 test 행간 통계·순서·분포 의존성을 차단한다.
