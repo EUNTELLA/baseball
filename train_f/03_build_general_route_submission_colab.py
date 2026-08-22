@@ -93,7 +93,6 @@ def inference_block():
     # 공식 Train 전체로 학습한 공통 경로를 Futures 행에만 적용한다.
     general_meta_path = os.path.join(BASE, "model", "general_route_meta.json")
     if os.path.exists(general_meta_path):
-        from catboost import CatBoostClassifier, Pool
         from general_route import engineer as general_engineer, prepare as general_prepare
         general_meta = json.load(open(general_meta_path, encoding="utf-8"))
         general_fe = general_engineer(
