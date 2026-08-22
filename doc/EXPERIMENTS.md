@@ -829,3 +829,13 @@
 - F core 후속: 기존 성공·offset·실패여집합의 F 직접 혼합은 모두 불통과했다. 성공·MR·큰 이탈·여집합 확률과 행 문맥을 입력한 depth 2~3의 강규제 F 전용 메타 잔차 모델을 2022→2023, 2023→2024로 새로 선별한다.
 - F 메타 core 선별 결과: depth 3·L2 100·강도 0.025가 2023 `+90.65`, 2024 `+22.90`, 크기 비율 `0.253`, bootstrap `0.912`로 통과했다. 현재 최고 ZIP의 R행은 고정하고 F core만 추가한 독립 제출 후보를 생성한다.
 - F 메타 core 제출 빌드: 새 최고 `fcblend020` ZIP에 2024 F행 30,010개로 학습한 depth 3·L2 100·3시드 correction 0.025만 추가했다. 출력 SHA-256은 `999e702e...c4a6f`, ZIP 오류·결측은 없고 실제 샘플 R행 최대 변화는 `0.0`, 합성 F행 변화는 `-0.00118481`이었다. `submit_catboost_r0075_shift_verified_fmeta0025.zip`을 F 효과 독립 제출 후보로 확정한다.
+
+### 2026-08-22 추가 중복 방지 기준
+
+- RandomForest·HistGradientBoosting·LightGBM·XGBoost·CatBoost의 단순 교체와 선수 ID target encoding은 다시 실행하지 않는다.
+- 성공·실패 다중분류 taxonomy, source-season expert·유사도 gate·시간 외삽, 구종군 mixture-of-experts는 시간 전이 불안정 축으로 분류한다.
+- Trackman 매핑 범위 확대, 세부 구종·물리 변화·타자 matchup·역할·휴식·workload 파생은 기존 검증과 중복되므로 새 독립 근거 없이 반복하지 않는다.
+- 저장 예측 또는 correction의 convex/Ridge/SVD 재가중, 시드 불일치, 고차 interaction, HMM·AR 상태공간, random slope 계열은 우선순위에서 제외한다.
+- 팀·구장·달력·선발/불펜·경력 구간 효과는 동시즌 적합보다 다음 시즌 전이가 약하므로 추가 강도 탐색을 하지 않는다.
+- 투수×count×타자 손 효과의 단순 조회표는 이미 서버 하락이 확인됐다. 저차원 압축은 구조적으로 다르지만 현재 최고보다 우선하지 않는다.
+- 다음 신규 후보는 현재 최고 anchor의 `확률 구간 × count × 주자`에서 두 시즌 부호가 일치하는 안정 구간만 축소 적용하는 방식이다. F 메타 core 서버 결과를 먼저 확인한 뒤 별도 단일 변경으로 검증한다.
