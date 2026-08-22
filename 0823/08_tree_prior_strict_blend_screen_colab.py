@@ -15,6 +15,15 @@ YEARS = (2022, 2023, 2024)
 WEIGHTS = (0.0, 0.01, 0.025, 0.05, 0.075, 0.10, 0.15, 0.20)
 BOOTSTRAPS = 500
 DROP = {"control_success", "row_id", "season"}
+COMPACT_COLUMNS = (
+    "pitcher_id", "batter_id", "pitcher_team_id", "batter_team_id", "game_type",
+    "pitcher_hand", "batter_hand", "balls_before", "strikes_before", "inning",
+    "outs", "num_runners_on", "score_diff", "li", "top_bottom",
+    "asof_pitcher_n", "asof_pitcher_success_rate",
+    "asof_pitcher_prev1_game_success_rate", "asof_pitcher_prev3_game_success_rate",
+    "asof_pitcher_prev5_game_success_rate", "asof_pitcher_middle_rate",
+    "asof_pitcher_reverse_rate", "asof_batter_n", "asof_batter_success_rate",
+)
 
 
 def bss(prediction, target):
@@ -76,12 +85,22 @@ def pitcher_prior(rows: pd.DataFrame, global_rate: float, strength: float = 200.
             / (n.to_numpy(float) + strength))
 
 
-def train_alternative(raw: pd.DataFrame, year: int, estimators: int, workers: int):
+def train_alternative(raw: pd.DataFrame, year: int, estimators: int, workers: int,
+                      max_train_rows: int):
     train = raw.loc[raw["season"].astype(int).lt(year)].reset_index(drop=True)
     valid = raw.loc[raw["season"].astype(int).eq(year)].reset_index(drop=True)
+    if max_train_rows > 0 and len(train) > max_train_rows:
+        # 정답 비율을 유지한 결정적 표본이며 검증연도 정보는 사용하지 않는다.
+        train = train.groupby("control_success", group_keys=False, observed=True).apply(
+            lambda part: part.sample(
+                n=max(1, round(max_train_rows * len(part) / len(train))),
+                random_state=823000 + year,
+            )
+        ).sort_index().head(max_train_rows).reset_index(drop=True)
     target = train["control_success"].to_numpy(np.int8)
     global_rate = float(target.mean())
-    x_train, columns, medians = numeric_frame(train)
+    available = [column for column in COMPACT_COLUMNS if column in train.columns]
+    x_train, columns, medians = numeric_frame(train, available)
     x_valid, _, _ = numeric_frame(valid, columns, medians)
     model = ExtraTreesClassifier(
         n_estimators=estimators, max_depth=14, min_samples_leaf=100,
@@ -124,14 +143,14 @@ def choose_weight(records, region):
 
 
 def main(train_path: Path, anchor_source: Path, output: Path,
-         estimators: int, workers: int):
+         estimators: int, workers: int, max_train_rows: int):
     raw = pd.read_csv(train_path, encoding="utf-8-sig", low_memory=False)
     folds = []
     predictions = {}
     for year in YEARS:
         anchor = load_anchor(anchor_source, year)
         valid, alternative, seconds, feature_count = train_alternative(
-            raw, year, estimators, workers
+            raw, year, estimators, workers, max_train_rows
         )
         predictions[year] = alternative
         if not np.array_equal(valid["row_id"].astype(str), anchor["row_id"].astype(str)):
@@ -179,6 +198,8 @@ def main(train_path: Path, anchor_source: Path, output: Path,
         "selection_years": [2022, 2023],
         "audit_year": 2024,
         "weights": list(WEIGHTS),
+        "estimators": estimators,
+        "max_train_rows": max_train_rows,
         "folds": folds,
         "selected_weights": selected,
         "audit_2024": {
@@ -205,8 +226,9 @@ if __name__ == "__main__":
     parser.add_argument("--train", type=Path, required=True)
     parser.add_argument("--anchor-source", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--estimators", type=int, default=120)
+    parser.add_argument("--estimators", type=int, default=40)
     parser.add_argument("--workers", type=int, default=-1)
+    parser.add_argument("--max-train-rows", type=int, default=400000)
     args = parser.parse_args()
     main(args.train.resolve(), args.anchor_source.resolve(), args.output.resolve(),
-         args.estimators, args.workers)
+         args.estimators, args.workers, args.max_train_rows)
