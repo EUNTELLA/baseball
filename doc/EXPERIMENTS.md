@@ -875,3 +875,4 @@
 - Futures 하드 라우팅 감사: 현재 챔피언 parity의 R행은 완전히 고정하고 `game_type=F` 행만 별도 strict `f_stack` 또는 전체 model-only 예측으로 교체한다. 2023·2024 전체/F delta와 F 투수 bootstrap을 비교하며 R행 최대 변화가 정확히 0인지 검사한다. 통과하더라도 완성 자산을 직접 제출하지 않고 동일 Futures 구조의 자체 재학습 근거로만 사용한다.
 - Futures 하드 라우팅 결과: `f_stack` 교체는 전체 기준 2023 `+310.05`, 2024 `+64.89`, F 내부 `+2972.40/+551.39`, F 투수 bootstrap 최소 `1.0`으로 통과했다. 전체 model-only 교체는 평균 개선은 양수였지만 bootstrap 최소 `0.779`로 탈락했다. 자체 재구성 범위는 F 전문가 stack까지만으로 제한하고 후단 surface·transition은 제외한다.
 - Futures 빌드업 1단계: strict OOF의 `p_shared_stack → p_f_stack` 증분과 F checkpoint의 저장 채널·상관·평균 이동을 연도별로 분해한다. 세 연도 모두 shared 대비 양수인 채널 구조만 공식 Train 기반 자체 재학습 대상으로 넘긴다.
+- 관리 경로 분리: 이후 F 전문가 재구성은 `train_f/` 아래에서 구성요소 감사→채널 재학습→R 챔피언 하드 라우팅 검증→제출 빌드 순으로 관리한다. 날짜별 폴더의 기존 감사 코드는 재현 이력으로 유지한다.
