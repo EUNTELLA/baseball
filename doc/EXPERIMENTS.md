@@ -873,3 +873,5 @@
 - 영역별 strict 판정: R 0.10의 2024 투수 bootstrap은 `0.882`로 `+5.01`과 함께 게이트를 통과했다. F 0.20은 bootstrap `0.016`으로 탈락했다. Tree-Prior 구조는 R-only 후보로 제한하고 120 trees·최대 80만 행의 중간 정식 검증에서 재현될 때만 전체 학습과 제출 빌드로 진행한다.
 - Tree-Prior 중간 검증: 120 trees·최대 80만 행에서도 R 0.10은 2024 `+6.68`, 투수 bootstrap `0.932`로 재현됐다. F 0.20은 `-115.15`, bootstrap `0.022`로 다시 탈락했다. R-only 보조 후보는 유지하되, 이는 현재 R행과 별도 F-regime 행을 하드 라우팅하는 실험과 구분하며 300 trees 확대는 후순위로 둔다.
 - Futures 하드 라우팅 감사: 현재 챔피언 parity의 R행은 완전히 고정하고 `game_type=F` 행만 별도 strict `f_stack` 또는 전체 model-only 예측으로 교체한다. 2023·2024 전체/F delta와 F 투수 bootstrap을 비교하며 R행 최대 변화가 정확히 0인지 검사한다. 통과하더라도 완성 자산을 직접 제출하지 않고 동일 Futures 구조의 자체 재학습 근거로만 사용한다.
+- Futures 하드 라우팅 결과: `f_stack` 교체는 전체 기준 2023 `+310.05`, 2024 `+64.89`, F 내부 `+2972.40/+551.39`, F 투수 bootstrap 최소 `1.0`으로 통과했다. 전체 model-only 교체는 평균 개선은 양수였지만 bootstrap 최소 `0.779`로 탈락했다. 자체 재구성 범위는 F 전문가 stack까지만으로 제한하고 후단 surface·transition은 제외한다.
+- Futures 빌드업 1단계: strict OOF의 `p_shared_stack → p_f_stack` 증분과 F checkpoint의 저장 채널·상관·평균 이동을 연도별로 분해한다. 세 연도 모두 shared 대비 양수인 채널 구조만 공식 Train 기반 자체 재학습 대상으로 넘긴다.
