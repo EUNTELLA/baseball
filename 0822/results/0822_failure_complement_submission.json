@@ -20,5 +20,11 @@
   "sample_game_type": "R only",
   "r_mean_delta": -0.0004844254234314116,
   "r_max_absolute_delta": 0.0019215266785059248,
-  "decision": "ready_for_submission"
+  "decision": "promote_as_champion",
+  "leaderboard": {
+    "submitted_at": "2026-08-22 18:35:18",
+    "public_score": 1035.4845484496,
+    "delta_vs_previous_champion": 0.9741742785,
+    "runtime_seconds": 5
+  }
 }

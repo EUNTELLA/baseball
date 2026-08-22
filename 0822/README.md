@@ -1,6 +1,6 @@
 # 0822 anchor 재구성
 
-현재 유지본은 R 잔차 0.075와 검증 전역 shift `-0.0416386466`을 적용해 Public `1034.5103741711`을 기록한 제출이다. 새 anchor는 이 유지본을 덮어쓰지 않고 시간 전방 구성요소부터 별도로 비교한다.
+현재 유지본은 R 잔차 0.075와 검증 전역 shift `-0.0416386466`, R 실패확률 여집합 0.20을 적용해 Public `1035.4845484496`을 기록한 제출이다. 새 anchor는 이 유지본을 덮어쓰지 않고 시간 전방 구성요소부터 별도로 비교한다.
 
 ## 1단계: 구성요소 OOF 저장
 
@@ -59,6 +59,8 @@ python 0822/03_build_failure_complement_submission_colab.py \
 
 빌드 결과 ZIP 무결성 오류와 결측은 없었다. 출력 SHA-256은 `1a83c9f0...6288b`, 5행 샘플 평균은 `0.451126`, R행 평균 변화는 `-0.00048443`, 최대 절대 변화는 `0.00192153`이다. 샘플 5행은 모두 R이라 F 차이는 측정 대상이 없었으며 추론 코드는 R 마스크에만 혼합한다. `submit_catboost_r0075_shift_verified_fcblend020.zip`을 제출 가능 후보로 확정한다.
 
+리더보드 결과는 `1035.4845484496`으로 직전 최고 `1034.5103741711`보다 `+0.9741742785` 개선됐다. R 실패확률 여집합 재구성의 서버 전이가 확인됐으므로 이 ZIP을 현재 최고로 승격한다.
+
 ## 5단계: F 보조확률 메타 core
 
 기존 채널을 F행에 직접 혼합한 후보는 모두 시간 전방 게이트를 통과하지 못했다. 다음에는 성공·MR·큰 이탈·여집합 확률과 행 문맥을 함께 입력한 얕은 F 전용 메타 모델을 학습한다. R행은 변경하지 않으며 현재 검증 shift가 적용된 F anchor의 잔차만 대상으로 한다.
@@ -72,3 +74,20 @@ python 0822/04_f_auxiliary_meta_core_screen_colab.py \
 ```
 
 depth 2~3, L2 100~500, 3시드 평균을 사용하고 2.5~10%만 기존 F anchor에 더한다. 2023·2024 각각 `+1`, 크기 비율 `0.25`, 투수 bootstrap `0.80`을 모두 통과해야 다음 단계로 진행한다.
+선별 결과 depth 3·L2 100·raw·강도 0.025가 2023 `+90.65`, 2024 `+22.90`, 크기 비율 `0.253`, bootstrap `0.912`로 유일하게 전체 게이트를 통과했다. 더 큰 강도는 시즌 간 크기 불균형과 bootstrap 저하로 제외한다.
+
+## 6단계: F 메타 core 제출 ZIP
+
+```bash
+python 0822/05_build_f_auxiliary_meta_core_submission_colab.py \
+  --source-zip /content/drive/MyDrive/submit_catboost_r0075_shift_verified_fcblend020.zip \
+  --component-dir /content/drive/MyDrive/0822_anchor_components \
+  --train /content/dataset/data/train.csv \
+  --test /content/dataset/data/test.csv \
+  --sample /content/dataset/data/sample_submission.csv \
+  --output-zip /content/drive/MyDrive/submit_catboost_r0075_shift_verified_fmeta0025.zip \
+  --report /content/drive/MyDrive/0822_f_meta_submission.json \
+  --task-type GPU
+```
+
+서버에서 검증된 현재 최고 R failure-complement ZIP에 F core만 추가해 효과를 독립 측정한다. 실제 샘플의 R행 불변과 합성 F행 변경을 모두 검사하므로 새 최고 대비 F core의 서버 효과만 확인할 수 있다.
