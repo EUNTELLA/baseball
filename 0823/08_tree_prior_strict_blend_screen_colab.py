@@ -91,12 +91,12 @@ def train_alternative(raw: pd.DataFrame, year: int, estimators: int, workers: in
     valid = raw.loc[raw["season"].astype(int).eq(year)].reset_index(drop=True)
     if max_train_rows > 0 and len(train) > max_train_rows:
         # 정답 비율을 유지한 결정적 표본이며 검증연도 정보는 사용하지 않는다.
-        train = train.groupby("control_success", group_keys=False, observed=True).apply(
-            lambda part: part.sample(
-                n=max(1, round(max_train_rows * len(part) / len(train))),
-                random_state=823000 + year,
-            )
-        ).sort_index().head(max_train_rows).reset_index(drop=True)
+        total = len(train)
+        parts = []
+        for _, part in train.groupby("control_success", observed=True):
+            size = max(1, round(max_train_rows * len(part) / total))
+            parts.append(part.sample(n=min(size, len(part)), random_state=823000 + year))
+        train = pd.concat(parts).sort_index().head(max_train_rows).reset_index(drop=True)
     target = train["control_success"].to_numpy(np.int8)
     global_rate = float(target.mean())
     available = [column for column in COMPACT_COLUMNS if column in train.columns]
@@ -191,6 +191,24 @@ def main(train_path: Path, anchor_source: Path, output: Path,
         valid_2024["pitcher_id"].to_numpy(), base_2024, candidate_2024,
         target_2024, 823500,
     )
+    region_audit = {}
+    for region, weight in selected.items():
+        mask = valid_2024["game_type"].astype(str).eq(region).to_numpy()
+        region_candidate = (
+            (1 - weight) * base_2024[mask] + weight * alternative_2024[mask]
+        )
+        region_audit[region] = {
+            "weight": weight,
+            "bss_delta": audit[region][str(weight)]["delta"],
+            "pitcher_bootstrap_probability": bootstrap(
+                valid_2024.loc[mask, "pitcher_id"].to_numpy(), base_2024[mask],
+                region_candidate, target_2024[mask], 823600 + ord(region),
+            ),
+        }
+    promoted_regions = [
+        region for region, row in region_audit.items()
+        if row["bss_delta"] >= 1 and row["pitcher_bootstrap_probability"] >= 0.80
+    ]
     report = {
         "experiment": "own tree-prior strict-forward blend",
         "official_train_only": True,
@@ -207,12 +225,13 @@ def main(train_path: Path, anchor_source: Path, output: Path,
             "pitcher_bootstrap_probability": probability,
             "R_delta": audit["R"][str(selected["R"])]["delta"],
             "F_delta": audit["F"][str(selected["F"])]["delta"],
+            "regions": region_audit,
         },
+        "promoted_regions": promoted_regions,
         "decision": (
-            "continue_tree_prior_full_pipeline"
-            if delta_2024 >= 1 and probability >= 0.80 else "keep_current_champion"
+            "continue_tree_prior_full_pipeline" if promoted_regions else "keep_current_champion"
         ),
-        "gate": "weights selected on 2022-2023 only; 2024 delta>=+1 and bootstrap>=0.80",
+        "gate": "weights selected on 2022-2023 only; per-region 2024 delta>=+1 and bootstrap>=0.80",
     }
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
