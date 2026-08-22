@@ -34,3 +34,7 @@ baseline/
 experiment_filter.md
 check.md
 check2.md
+
+# Keep only the consolidated experiment log under doc/ in Git.
+/doc/*
+!/doc/EXPERIMENTS.md
