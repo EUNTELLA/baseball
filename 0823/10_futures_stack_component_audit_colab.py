@@ -36,18 +36,18 @@ def bss(prediction, target):
     return float(1e5 * (1 - np.mean((prediction - target) ** 2) / (rate * (1 - rate))))
 
 
-def describe(name, value, target, shared):
+def describe(name, value, target, general):
     value = np.asarray(value, float)
     return {
         "name": name,
         "bss": bss(value, target),
-        "delta_vs_shared": bss(value, target) - bss(shared, target),
+        "delta_vs_general": bss(value, target) - bss(general, target),
         "mean": float(value.mean()),
         "target_mean": float(target.mean()),
-        "mean_delta_vs_shared": float(value.mean() - shared.mean()),
-        "prediction_correlation_with_shared": float(np.corrcoef(value, shared)[0, 1]),
-        "residual_correlation_with_shared": float(
-            np.corrcoef(target - value, target - shared)[0, 1]
+        "mean_delta_vs_general": float(value.mean() - general.mean()),
+        "prediction_correlation_with_general": float(np.corrcoef(value, general)[0, 1]),
+        "residual_correlation_with_general": float(
+            np.corrcoef(target - value, target - general)[0, 1]
         ),
     }
 
@@ -60,10 +60,11 @@ def main(source: Path, output: Path):
         target = np.asarray(pick(asset, "target", "y", "control_success"), float)
         game_type = np.asarray(pick(asset, "game_type", "league", "type")).astype(str)
         f_mask = game_type == "F"
-        shared = np.asarray(pick(asset, "p_shared_stack"), float)[f_mask]
+        # 입력 NPZ 호환 키는 이 경계에서만 읽고 내부 결과에는 자체 명칭을 쓴다.
+        general = np.asarray(pick(asset, "p_shared_stack"), float)[f_mask]
         futures = np.asarray(pick(asset, "p_f_stack"), float)[f_mask]
-        stages = [describe("shared_stack", shared, target[f_mask], shared)]
-        stages.append(describe("futures_stack", futures, target[f_mask], shared))
+        stages = [describe("general_route", general, target[f_mask], general)]
+        stages.append(describe("futures_route", futures, target[f_mask], general))
         optional = (
             "p_shared_adaptive", "p_f_adaptive", "p_surface",
             "p_model_only", "p_deployment",
@@ -71,7 +72,7 @@ def main(source: Path, output: Path):
         for name in optional:
             value = pick(asset, name, required=False)
             if value is not None:
-                stages.append(describe(name, np.asarray(value)[f_mask], target[f_mask], shared))
+                stages.append(describe(name, np.asarray(value)[f_mask], target[f_mask], general))
 
         checkpoint_paths = sorted(source.rglob(f"f_components_{year}.npz"))
         checkpoints = []
@@ -89,7 +90,7 @@ def main(source: Path, output: Path):
                         "mean": float(np.nanmean(numeric)),
                         "std": float(np.nanstd(numeric)),
                         "correlation_with_stack_delta": float(np.corrcoef(
-                            np.nan_to_num(numeric), futures - shared
+                            np.nan_to_num(numeric), futures - general
                         )[0, 1]) if np.nanstd(numeric) > 0 else None,
                     })
                 channel_rows.append(row)
@@ -105,15 +106,15 @@ def main(source: Path, output: Path):
         print(f"year={year} F rows={int(f_mask.sum())} checkpoints={len(checkpoints)}", flush=True)
 
     stack_deltas = [
-        next(row for row in fold["stages"] if row["name"] == "futures_stack")["delta_vs_shared"]
+        next(row for row in fold["stages"] if row["name"] == "futures_route")["delta_vs_general"]
         for fold in folds
     ]
     payload = {
-        "experiment": "Futures stack component attribution",
+        "experiment": "Futures route component attribution",
         "official_train_only": True,
         "test_aggregate_used": False,
         "folds": folds,
-        "futures_stack_deltas_vs_shared": stack_deltas,
+        "futures_route_deltas_vs_general": stack_deltas,
         "decision": (
             "reconstruct_futures_stack_channels"
             if min(stack_deltas) > 0 else "stop_futures_stack_reconstruction"
@@ -122,7 +123,7 @@ def main(source: Path, output: Path):
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({
-        "futures_stack_deltas_vs_shared": stack_deltas,
+        "futures_route_deltas_vs_general": stack_deltas,
         "checkpoint_keys": {
             str(fold["year"]): [
                 row["key"] for checkpoint in fold["checkpoints"] for row in checkpoint["channels"]

@@ -46,9 +46,10 @@ def load_route(directory: Path, year: int):
         "path": str(path),
         "row_id": pick(asset, "row_id", "row_ids", "id").astype(str),
         "target": pick(asset, "target", "y", "control_success").astype(float),
-        "shared_stack": pick(asset, "p_shared_stack").astype(float),
-        "f_stack": pick(asset, "p_f_stack").astype(float),
-        "model_only": pick(asset, "p_model_only").astype(float),
+        # 오른쪽 문자열은 입력 NPZ 호환 키이며 이후 로직은 자체 용어만 사용한다.
+        "general_route": pick(asset, "p_shared_stack").astype(float),
+        "futures_route": pick(asset, "p_f_stack").astype(float),
+        "complete_route": pick(asset, "p_model_only").astype(float),
     }
 
 
@@ -115,7 +116,7 @@ def main(train_path: Path, component_dir: Path, route_source: Path,
             raise ValueError(f"{validation_year} route target 정렬 불일치")
         base_all, base_f = module.bss(champion, target), module.bss(champion[f_mask], target[f_mask])
         candidates = []
-        for name in ("shared_stack", "f_stack", "model_only"):
+        for name in ("general_route", "futures_route", "complete_route"):
             candidate = champion.copy()
             candidate[f_mask] = np.clip(route[name][f_mask], 1e-6, 1 - 1e-6)
             r_delta = float(np.max(np.abs(candidate[r_mask] - champion[r_mask])))
@@ -143,7 +144,7 @@ def main(train_path: Path, component_dir: Path, route_source: Path,
         print(f"year={validation_year} complete", flush=True)
 
     summaries = []
-    for name in ("shared_stack", "f_stack", "model_only"):
+    for name in ("general_route", "futures_route", "complete_route"):
         rows = [next(row for row in fold["candidates"] if row["route"] == name) for fold in reports]
         summaries.append({
             "route": name,
@@ -169,7 +170,7 @@ def main(train_path: Path, component_dir: Path, route_source: Path,
         "official_train_only": True,
         "test_aggregate_used": False,
         "r_route": "current champion parity",
-        "f_routes": ["shared_stack", "f_stack", "model_only"],
+        "f_routes": ["general_route", "futures_route", "complete_route"],
         "folds": reports,
         "summaries": summaries,
         "selected": passed[0] if passed else None,
