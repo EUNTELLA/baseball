@@ -108,7 +108,8 @@ def build_features(frame, target, season, before_year, module):
     return values, indices
 
 
-def train_fold(frame, target, season, year, seeds, task_type, feature_module):
+def train_fold(frame, target, season, year, seeds, task_type, feature_module,
+               minimum_iterations):
     inner_train = season < year - 1
     inner_valid = season == year - 1
     outer_train = season < year
@@ -134,7 +135,8 @@ def train_fold(frame, target, season, year, seeds, task_type, feature_module):
         started = time.perf_counter()
         selector = CatBoostClassifier(**params(seed, 2000, task_type, early_stopping=True))
         selector.fit(inner_train_pool, eval_set=inner_valid_pool, use_best_model=True)
-        iteration = max(1, int(selector.get_best_iteration()) + 1)
+        selected_iteration = max(1, int(selector.get_best_iteration()) + 1)
+        iteration = max(minimum_iterations, selected_iteration)
         inner_members.append(selector.predict_proba(inner_valid_pool)[:, 1])
         del selector
         gc.collect()
@@ -143,7 +145,10 @@ def train_fold(frame, target, season, year, seeds, task_type, feature_module):
         outer_members.append(model.predict_proba(outer_valid_pool)[:, 1])
         iterations.append(iteration)
         seconds.append(float(time.perf_counter() - started))
-        print(f"year={year} seed={seed} fixed_iter={iteration} sec={seconds[-1]:.1f}", flush=True)
+        print(
+            f"year={year} seed={seed} selected_iter={selected_iteration} "
+            f"fixed_iter={iteration} sec={seconds[-1]:.1f}", flush=True,
+        )
         del model
         gc.collect()
     inner_prediction = np.mean(inner_members, axis=0)
@@ -156,7 +161,7 @@ def train_fold(frame, target, season, year, seeds, task_type, feature_module):
 
 
 def main(train_path: Path, component_dir: Path, output: Path,
-         task_type: str, seeds):
+         task_type: str, seeds, minimum_iterations: int):
     frame = pd.read_csv(train_path, encoding="utf-8-sig", low_memory=False)
     target = frame["control_success"].astype(int).to_numpy()
     season = frame["season"].astype(int).to_numpy()
@@ -164,7 +169,7 @@ def main(train_path: Path, component_dir: Path, output: Path,
     folds = []
     for year in YEARS:
         prediction, calibration_shift, iterations, seconds = train_fold(
-            frame, target, season, year, seeds, task_type, module
+            frame, target, season, year, seeds, task_type, module, minimum_iterations
         )
         valid_rows = frame.loc[season == year].reset_index(drop=True)
         component = load_component(component_dir, year)
@@ -233,6 +238,7 @@ def main(train_path: Path, component_dir: Path, output: Path,
         "test_aggregate_used": False,
         "target_year_early_stopping_used": False,
         "seeds": list(seeds),
+        "minimum_iterations": minimum_iterations,
         "folds": folds,
         "summaries": summaries,
         "selected": passed[0] if passed else None,
@@ -252,7 +258,8 @@ if __name__ == "__main__":
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--task-type", choices=("CPU", "GPU"), default="GPU")
     parser.add_argument("--seeds", default="42,7,2024")
+    parser.add_argument("--minimum-iterations", type=int, default=1)
     args = parser.parse_args()
     selected_seeds = tuple(int(value) for value in args.seeds.split(",") if value.strip())
     main(args.train.resolve(), args.component_dir.resolve(), args.output.resolve(),
-         args.task_type, selected_seeds)
+         args.task_type, selected_seeds, args.minimum_iterations)
