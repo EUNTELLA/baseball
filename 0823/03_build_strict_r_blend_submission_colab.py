@@ -1,4 +1,4 @@
-"""두 독립 추론 패키지를 실행해 R행만 혼합하거나 제한적으로 외삽한다."""
+"""두 독립 추론 패키지를 실행해 선택한 R/F 영역만 혼합한다."""
 from __future__ import annotations
 
 import argparse
@@ -25,6 +25,7 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parent
 BLEND = __BLEND__
+ACTIVE_REGION = "__ACTIVE_REGION__"
 
 
 def run_member(name):
@@ -74,7 +75,7 @@ def main():
     base = current[current_column].to_numpy(float)
     other = alternate[alternate_column].to_numpy(float)
     result = base.copy()
-    active = test["game_type"].astype(str).eq("R").to_numpy()
+    active = test["game_type"].astype(str).eq(ACTIVE_REGION).to_numpy()
     result[active] = (1.0 - BLEND) * base[active] + BLEND * other[active]
     result = np.clip(result, 1e-6, 1 - 1e-6)
     destination = ROOT / "output"
@@ -84,7 +85,8 @@ def main():
     )
     print(
         f"Saved ./output/submission.csv rows={len(result)} "
-        f"R={int(active.sum())} F={int((~active).sum())} blend={BLEND:.3f} mean={result.mean():.6f}",
+        f"active={ACTIVE_REGION} active_rows={int(active.sum())} "
+        f"other_rows={int((~active).sum())} blend={BLEND:.3f} mean={result.mean():.6f}",
         flush=True,
     )
 
@@ -165,7 +167,8 @@ def verify(package, test_path, sample_path):
     }
 
 
-def main(current_zip, alternate_zip, test_path, sample_path, output_zip, report, blend):
+def main(current_zip, alternate_zip, test_path, sample_path, output_zip, report,
+         blend, active_region):
     with tempfile.TemporaryDirectory(prefix="strict_r_blend_") as temporary:
         root = Path(temporary)
         package = root / "package"
@@ -177,7 +180,9 @@ def main(current_zip, alternate_zip, test_path, sample_path, output_zip, report,
         extract(current_zip, current)
         extract(alternate_zip, alternate)
         (package / "script.py").write_text(
-            WRAPPER.replace("__BLEND__", repr(blend)), encoding="utf-8"
+            WRAPPER.replace("__BLEND__", repr(blend)).replace(
+                "__ACTIVE_REGION__", active_region
+            ), encoding="utf-8"
         )
         (package / "requirements.txt").write_text(requirements(current, alternate), encoding="utf-8")
         verification = verify(package, test_path, sample_path)
@@ -192,11 +197,12 @@ def main(current_zip, alternate_zip, test_path, sample_path, output_zip, report,
         error = archive.testzip()
         members = archive.namelist()
     payload = {
-        "experiment": "strict model-only R-only runtime blend",
+        "experiment": "region-specific runtime blend",
         "official_train_only": True, "test_aggregate_used": False,
         "current_zip": str(current_zip), "current_sha256": sha256(current_zip),
         "alternate_zip": str(alternate_zip), "alternate_sha256": sha256(alternate_zip),
-        "blend": blend, "active_region": "R", "f_rows_unchanged": True,
+        "blend": blend, "active_region": active_region,
+        "inactive_region_unchanged": True,
         "output_zip": str(output_zip), "output_sha256": sha256(output_zip),
         "members": len(members), "zip_test_error": error,
         "sample_verification": verification,
@@ -216,8 +222,10 @@ if __name__ == "__main__":
     parser.add_argument("--output-zip", type=Path, required=True)
     parser.add_argument("--report", type=Path, required=True)
     parser.add_argument("--blend", type=float, default=0.05)
+    parser.add_argument("--active-region", choices=("R", "F"), default="R")
     args = parser.parse_args()
     if not 0 < args.blend <= 2:
         parser.error("--blend는 0보다 크고 2 이하여야 합니다")
     main(args.current_zip.resolve(), args.alternate_zip.resolve(), args.test.resolve(),
-         args.sample.resolve(), args.output_zip.resolve(), args.report.resolve(), args.blend)
+         args.sample.resolve(), args.output_zip.resolve(), args.report.resolve(),
+         args.blend, args.active_region)

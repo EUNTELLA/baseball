@@ -916,3 +916,4 @@
 - F160 리더보드 결과: R 0.075를 동일하게 유지한 `fgeneral160_r0075`는 `1062.0103016666`으로 128 iteration 최고 `1063.0784514723`보다 `-1.0681498057` 하락했다. 2024 로컬의 소폭 우위보다 2023의 열세와 추가 복잡도가 실제 평가에서 더 크게 작용했다. F general iteration은 128로 동결하고 96·160 후보를 모두 폐기한다.
 - strict F OOF student 방향: 완성 F 추론 runtime이 없으므로 OOF 확률을 제출에 직접 사용할 수는 없다. 대신 2022 teacher→2023, 2022~2023 teacher→2024의 순방향 soft-label 학습으로 행 독립 F 전용 student가 `p_f_stack`의 이득을 재현하는지 먼저 확인한다. 두 시즌 모두 shared 대비 양수이고 teacher 상관 0.90 이상·RMSE 0.04 이하일 때만 자체 runtime 학습으로 진행한다.
 - strict F OOF student 결과: teacher 자체가 2023 shared 대비 `-2321.14`였고 student도 `-2572.59`였다. 2024 student는 teacher 상관 `0.666`, RMSE `0.1924`, shared 대비 `-15836.12`로 크게 붕괴했다. OOF 확률만으로 F 전용 runtime을 증류하는 방식은 시즌 전이를 재현하지 못하므로 `passed=false`로 종료하고 현재 `fgeneral6_r0075`를 유지한다.
+- F-regime runtime 중간 혼합 계획: 현재 최고의 R0075는 고정하고 F행에서만 자체 general route를 기준으로 F-regime 경로를 0.25·0.50·0.75만큼 실제 혼합한다. 세 후보의 ZIP·검증 결과를 먼저 만들고 실제 제출 결과만 기록한다. 1.0 완전 교체는 중간 곡선의 방향을 확인한 뒤 비교한다.
