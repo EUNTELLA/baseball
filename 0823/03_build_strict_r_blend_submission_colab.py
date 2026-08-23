@@ -1,4 +1,4 @@
-"""두 독립 추론 패키지를 실행해 R행만 보수적으로 혼합한 제출 ZIP을 만든다."""
+"""두 독립 추론 패키지를 실행해 R행만 혼합하거나 제한적으로 외삽한다."""
 from __future__ import annotations
 
 import argparse
@@ -217,7 +217,7 @@ if __name__ == "__main__":
     parser.add_argument("--report", type=Path, required=True)
     parser.add_argument("--blend", type=float, default=0.05)
     args = parser.parse_args()
-    if not 0 < args.blend <= 1:
-        parser.error("--blend는 0보다 크고 1 이하여야 합니다")
+    if not 0 < args.blend <= 2:
+        parser.error("--blend는 0보다 크고 2 이하여야 합니다")
     main(args.current_zip.resolve(), args.alternate_zip.resolve(), args.test.resolve(),
          args.sample.resolve(), args.output_zip.resolve(), args.report.resolve(), args.blend)
