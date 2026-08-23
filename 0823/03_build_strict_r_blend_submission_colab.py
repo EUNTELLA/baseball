@@ -108,9 +108,15 @@ def extract(source, destination):
     with zipfile.ZipFile(source) as archive:
         archive.extractall(destination)
     scripts = list(destination.rglob("script.py"))
-    if len(scripts) != 1:
-        raise ValueError(f"{source}: script.py 개수={len(scripts)}")
-    package = scripts[0].parent
+    # 이미 두 추론 패키지를 감싼 제출물은 루트와 내부에 script.py가 함께 있다.
+    # 루트 실행기가 있으면 그것을 완성 패키지의 진입점으로 우선한다.
+    root_script = destination / "script.py"
+    if root_script.exists():
+        package = destination
+    elif len(scripts) == 1:
+        package = scripts[0].parent
+    else:
+        raise ValueError(f"{source}: 루트 script.py 없음, 전체 개수={len(scripts)}")
     if package != destination:
         temporary = destination.parent / f"{destination.name}_flat"
         shutil.move(str(package), temporary)
