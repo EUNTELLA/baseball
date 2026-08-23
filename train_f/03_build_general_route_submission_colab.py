@@ -21,7 +21,7 @@ from catboost import CatBoostClassifier, Pool
 ROOT = Path(__file__).resolve().parents[1]
 FEATURE_PATH = ROOT / "common" / "model_features.py"
 SEEDS = (42, 7, 2024, 99, 1, 123)
-ITERATIONS = 128
+DEFAULT_ITERATIONS = 128
 EXPECTED_SOURCE_SHA = "1a83c9f0903dbdee9daeab4d4c76402c1402da5150d9a037da4803753aa6288b"
 ID, TARGET = "row_id", "control_success"
 
@@ -65,9 +65,9 @@ def optimal_shift(prediction, target):
     return float((low + high) / 2)
 
 
-def params(seed, task_type):
+def params(seed, task_type, iterations):
     result = {
-        "iterations": ITERATIONS, "depth": 6, "learning_rate": 0.05,
+        "iterations": iterations, "depth": 6, "learning_rate": 0.05,
         "l2_leaf_reg": 1.0, "loss_function": "Logloss", "eval_metric": "Logloss",
         "random_seed": seed, "grow_policy": "SymmetricTree",
         "allow_writing_files": False, "verbose": False,
@@ -141,7 +141,8 @@ def run_package(package, test, sample, tag):
     return pd.read_csv(run_dir / "output" / "submission.csv"), completed.stdout.strip()
 
 
-def main(source_zip, train_path, test_path, sample_path, output_zip, report_path, task_type):
+def main(source_zip, train_path, test_path, sample_path, output_zip, report_path,
+         task_type, iterations):
     source_sha = digest(source_zip)
     if source_sha != EXPECTED_SOURCE_SHA:
         raise ValueError(f"원본 챔피언 SHA 불일치: {source_sha}")
@@ -175,23 +176,23 @@ def main(source_zip, train_path, test_path, sample_path, output_zip, report_path
         calibration_members, training = [], []
         for seed in SEEDS:
             started = time.perf_counter()
-            calibration_model = CatBoostClassifier(**params(seed, task_type))
+            calibration_model = CatBoostClassifier(**params(seed, task_type, iterations))
             calibration_model.fit(calibration_train_pool)
             calibration_members.append(
                 calibration_model.predict_proba(calibration_valid_pool)[:, 1]
             )
             del calibration_model
-            final_model = CatBoostClassifier(**params(seed, task_type))
+            final_model = CatBoostClassifier(**params(seed, task_type, iterations))
             final_model.fit(final_pool)
             final_model.save_model(candidate_dir / "model" / f"general_route_{seed}.cbm")
             seconds = float(time.perf_counter() - started)
-            training.append({"seed": seed, "iterations": ITERATIONS, "seconds": seconds})
+            training.append({"seed": seed, "iterations": iterations, "seconds": seconds})
             print(f"general route seed={seed} sec={seconds:.1f}", flush=True)
             del final_model
         calibration_prediction = np.mean(calibration_members, axis=0)
         calibration_shift = optimal_shift(calibration_prediction, target[holdout])
         metadata = {
-            "seeds": list(SEEDS), "iterations": ITERATIONS,
+            "seeds": list(SEEDS), "iterations": iterations,
             "global_mean": float(target.mean()), "calibration_shift": calibration_shift,
             "calibration_season": 2024, "feature_cols": list(final_features.columns),
             "cat_cols": list(module.CAT_COLS), "active_region": "F",
@@ -275,6 +276,10 @@ if __name__ == "__main__":
     parser.add_argument("--output-zip", type=Path, required=True)
     parser.add_argument("--report", type=Path, required=True)
     parser.add_argument("--task-type", choices=("CPU", "GPU"), default="GPU")
+    parser.add_argument("--iterations", type=int, default=DEFAULT_ITERATIONS)
     args = parser.parse_args()
+    if args.iterations < 1:
+        parser.error("--iterations는 1 이상이어야 합니다")
     main(args.source_zip.resolve(), args.train.resolve(), args.test.resolve(),
-         args.sample.resolve(), args.output_zip.resolve(), args.report.resolve(), args.task_type)
+         args.sample.resolve(), args.output_zip.resolve(), args.report.resolve(),
+         args.task_type, args.iterations)
