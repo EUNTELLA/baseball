@@ -113,6 +113,7 @@ def injection_block(axis: str):
     # Frozen R segment residual correction from official Train OOF.
     import json as _rseg_json
     import numpy as _rseg_np
+    import pandas as _rseg_pd
 
     def _rseg_first_existing(_frame, _names):
         for _name in _names:
@@ -128,12 +129,16 @@ def injection_block(axis: str):
         _pitcher_hand = _rseg_first_existing(_test, ("pitcher_hand", "pitcher_side", "p_throws"))
         _batter_hand = _rseg_first_existing(_test, ("batter_hand", "stand", "batter_side"))
         if _pitcher_hand and _batter_hand:
-            _hand = _test[_pitcher_hand].astype(str).to_numpy() + "_" + _test[_batter_hand].astype(str).to_numpy()
+            _hand = _test[_pitcher_hand].astype(str) + "_" + _test[_batter_hand].astype(str)
         elif _batter_hand:
-            _hand = _test[_batter_hand].astype(str).to_numpy()
+            _hand = _test[_batter_hand].astype(str)
         else:
-            _hand = _rseg_np.repeat("missing", len(_test))
-        return _rseg_np.char.add(_rseg_np.char.add(_p_band, "|"), _hand)
+            _hand = _rseg_pd.Series(["missing"] * len(_test), index=_test.index, dtype="string")
+        return (
+            _rseg_pd.Series(_p_band, index=_test.index, dtype="string")
+            + "|"
+            + _hand.astype("string")
+        ).astype(str).to_numpy()
 
     with open("model/r_segment_correction.json", "r", encoding="utf-8") as _rseg_stream:
         _rseg_meta = _rseg_json.load(_rseg_stream)
