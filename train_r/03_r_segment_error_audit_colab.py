@@ -31,7 +31,7 @@ def bss(target, prediction):
 
 def load_oof(oof_dir: Path, year: int):
     path = oof_dir / f"own_champion_oof_{year}.npz"
-    with np.load(path, allow_pickle=False) as data:
+    with np.load(path, allow_pickle=True) as data:
         return pd.DataFrame({
             ID: data[ID].astype(str),
             "target": data["target"].astype(float),
