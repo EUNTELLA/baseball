@@ -31,6 +31,11 @@ def bss(target, prediction):
 
 def load_oof(oof_dir: Path, year: int):
     path = oof_dir / f"own_champion_oof_{year}.npz"
+    if not path.exists():
+        available = sorted(item.name for item in oof_dir.glob("*.npz"))
+        raise FileNotFoundError(
+            f"Missing {path}. Available npz files in {oof_dir}: {available}"
+        )
     with np.load(path, allow_pickle=True) as data:
         return pd.DataFrame({
             ID: data[ID].astype(str),
