@@ -58,7 +58,10 @@ def make_frame(train_path: Path, oof_dir: Path, audit):
         rows = raw.loc[raw["season"].astype(int).eq(year)].copy().reset_index(drop=True)
         if not np.array_equal(rows[ID].astype(str).to_numpy(), oof[ID].astype(str).to_numpy()):
             raise ValueError(f"{year} row_id alignment failed")
-        merged = pd.concat([rows.reset_index(drop=True), oof.drop(columns=[ID, "game_type"])], axis=1)
+        merged = pd.concat(
+            [rows.reset_index(drop=True), oof.drop(columns=[ID, "game_type", "pitcher_id"])],
+            axis=1,
+        )
         merged["season"] = year
         pieces.append(merged)
     frame = audit.add_axes(pd.concat(pieces, ignore_index=True))
