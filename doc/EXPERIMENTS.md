@@ -80,8 +80,8 @@
 
 - **제출일:** 2026-08-05
 - **모델:** 운영진 제공 RandomForest 베이스라인
-- **학습 코드:** `baseline/[Baseline_Train]_RandomForest를 활용한 모델 학습 및 피쳐엔지니어링 (학습).ipynb`
-- **추론 코드:** `baseline/[Baseline_Inference]_RandomForest를 활용한 모델 학습 및 피쳐엔지니어링 (추론).ipynb`
+- **학습 코드:** `experiments/baseline/[Baseline_Train]_RandomForest를 활용한 모델 학습 및 피쳐엔지니어링 (학습).ipynb`
+- **추론 코드:** `experiments/baseline/[Baseline_Inference]_RandomForest를 활용한 모델 학습 및 피쳐엔지니어링 (추론).ipynb`
 - **Public Score:** `549.5119345223`
 - **수료 기준:** `549.51`
 - **기준 대비:** `+0.0019345223`
@@ -228,7 +228,7 @@
 - **2024 affine 검증:** RF 단독 `598.21` → 혼합 `603.06`
 - **보정 공식:** `p' = -0.0888594827 + 1.1518727060 × p`
 - **행 독립성 검사:** 일괄·단독 예측 최대 차이 `1.11e-16`
-- **제출 파일:** `0816/results/submit_rf85_lgb15_affine.zip`
+- **제출 파일:** `experiments/0816/results/submit_rf85_lgb15_affine.zip`
 - **비고:** LightGBM 단독은 2024 검증에서 탈락. 두 기준을 모두 개선한 15% 혼합 하나만 제출 후보로 채택
 
 ### catboost-fe10-012
@@ -295,7 +295,7 @@
 - **행 독립성:** shift와 보조모델 평균값은 학습 시 meta에 저장하며 test 전체 평균을 계산하지 않음
 - **Public Score:** `998.0030076995`
 - **이전 제출 대비:** shift 50% `985.0941819452` 대비 `+12.9088257543`
-- **제출 파일:** `0816/assets/submit012.zip`
+- **제출 파일:** `experiments/0816/assets/submit012.zip`
 - **비고:** 현재 전체 최고 점수 및 최종 제출 후보
 
 ### catboost-league-baseline-019
@@ -322,7 +322,7 @@
 - **고정 logit shift:** `-0.03842671927234861`
 - **규정 확인:** 외부 데이터 미사용, test 전체 통계 미사용, 행별 독립 추론 유지
 - **샘플 검증:** 5행 추론 성공, 결측 0, 예측 범위 `0.3999830781~0.4954598518`
-- **제출 파일:** `0816/results/submit_catboost_train_trend_shift.zip`
+- **제출 파일:** `experiments/0816/results/submit_catboost_train_trend_shift.zip`
 - **Public Score:** `997.3951851847`
 - **기존 고정 shift 제출 대비:** `998.0030076995` 대비 `-0.6078225148`
 - **League-rate baseline 대비:** `976.8482053318` 대비 `+20.5469798529`
@@ -338,7 +338,7 @@
 - **선별 절차:** 전체 후보 1시드 → 기존 기준과 최상위 도전자 1개를 3시드 확인, 총 33회 학습
 - **채택 기준:** 같은 평균 점수 평균 `+3` 초과, 최악 시즌 `-2` 이상, 원본 점수 평균 `-10` 이상
 - **사용 데이터:** 공식 `train.csv`만 사용
-- **실행 코드:** `0817/01_catboost_multiseason_tuning_colab.py`
+- **실행 코드:** `experiments/0817/01_catboost_multiseason_tuning_colab.py`
 - **결과:** `d6_lr03_l2_3` 채택. 같은 평균 평균 `+4.4015316253`, 최악 시즌 `+2.4662248756`, 원본 평균 `+4.9291059810`
 - **판정:** `continue_to_7_seed_build`
 - **비고:** depth는 6을 유지하고 learning rate `0.05→0.03`, L2 `1→3`으로 변경
@@ -348,7 +348,7 @@
 - **실험일:** 2026-08-17
 - **모델:** CatBoost d6·lr0.03·L2=3·7시드 + MR/wayoff 재적합 offset + 공식 train 추세 shift
 - **규정 설계:** 공식 train과 train-derived 2024 OOF 예측만 사용, 외부 데이터 및 TEST 집계 미사용
-- **실행 코드:** `0817/02_catboost_tuned_build_colab.py`
+- **실행 코드:** `experiments/0817/02_catboost_tuned_build_colab.py`
 - **7시드 최적 반복:** `480, 396, 403, 461, 461, 393, 579`
 - **2024 성공모델 검증:** `774.7029707551`
 - **offset 검증:** `774.3807967633 → 800.1366761409`
@@ -372,7 +372,7 @@
 - **검증:** 2022·2023·2024 중첩 walk-forward, 직전 시즌에서 반복 수·offset·shift 확정
 - **통제 변수:** FE, 시드, 보조모델 구조, offset/shift 산출 절차 동일
 - **채택 기준:** 최종 평균 `+5`, 2/3 시즌 개선, 최악 `-3`, 2024 개선, 평균 보정 오차 비악화
-- **실행 코드:** `0817/03_catboost_full_pipeline_walkforward_colab.py`
+- **실행 코드:** `experiments/0817/03_catboost_full_pipeline_walkforward_colab.py`
 - **2022 최종 점수:** 기준 `2025.83` → 후보 `2044.50` (약 `+18.67`)
 - **2023 최종 점수:** 기준 `-1288.41` → 후보 `-1276.59` (약 `+11.82`)
 - **2024 최종 점수:** 기준 `-31.52` → 후보 `-31.80` (`-0.2776087754`)
@@ -392,7 +392,7 @@
 - **확인 시즌:** 2024 (혼합 비율 선택에 미사용)
 - **혼합 후보:** 회귀 비중 `0.0~1.0`, 간격 `0.1`
 - **채택 기준:** 개발 raw 평균 `+3`, 최악 `-2`, 같은 평균 개선, 2024 raw `+3` 및 같은 평균 개선
-- **실행 코드:** `0817/04_catboost_brier_regression_screen_colab.py`
+- **실행 코드:** `experiments/0817/04_catboost_brier_regression_screen_colab.py`
 - **선택된 회귀 비중:** `0.0`
 - **개발 시즌 raw 평균 차이:** `0.0`
 - **개발 시즌 최악 차이:** `0.0`
@@ -410,7 +410,7 @@
 - **확인 시즌:** 2024
 - **후보:** 직접 성공확률, 실패 여집합, 단순합 정규화, 정규화/여집합 비중 `0.1~0.5` 혼합
 - **채택 기준:** 개발 raw 평균 `+5`, 최악 `-2`, 같은 평균 개선, 2024 raw `+5` 및 같은 평균 개선
-- **실행 코드:** `0817/05_catboost_failure_simplex_screen_colab.py`
+- **실행 코드:** `experiments/0817/05_catboost_failure_simplex_screen_colab.py`
 - **선택 후보:** `blend_complement_10` = `0.9×p_success + 0.1×clip(1-p_mr-p_wayoff)`
 - **개발 raw 평균/최악:** `+5.6300613755` / `+3.9737430360`
 - **개발 같은 평균 평균/최악:** `+5.2462639400` / `+3.3906022238`
@@ -425,7 +425,7 @@
 - **후보:** 실패 여집합 10%가 기존 offset을 대체하거나, 혼합 후 offset을 재적합하는 두 방식
 - **검증:** 2022·2023 선택, 2024 확인의 중첩 walk-forward
 - **채택 기준:** 개발 평균 `+5`, 최악 `-2`, 평균 보정 오차 비악화, 2024 `+5` 및 보정 오차 비악화
-- **실행 코드:** `0817/06_failure_simplex_full_pipeline_colab.py`
+- **실행 코드:** `experiments/0817/06_failure_simplex_full_pipeline_colab.py`
 - **선택 방식:** `simplex_replace_offset` (실패 여집합 10% 혼합이 기존 offset을 대체)
 - **개발 평균/최악 최종 점수 차이:** `+207.8028072784` / `+163.2569616239`
 - **개발 평균 절대 보정 오차 차이:** `-0.0025842519` (후보 개선)
@@ -443,7 +443,7 @@
 - **후보:** 실패 여집합 10% 혼합, offset 제거
 - **공통 shift:** 실제 배포 `-0.0384267193`, 주변 `±0.01` 및 넓은 민감도 격자
 - **채택 기준:** 배포 shift 개발 평균 `+5`, 최악 `-2`, 2024 `+5`, 주변 shift 2024 양수, 평균 오차 악화 `0.001` 이하
-- **실행 코드:** `0817/07_failure_simplex_shared_shift_validation_colab.py`
+- **실행 코드:** `experiments/0817/07_failure_simplex_shared_shift_validation_colab.py`
 - **배포 shift 개발 평균/최악 차이:** `+180.2663419552` / `+171.1283993775`
 - **개발 평균 절대 보정 오차 차이:** `+0.0033512297` (후보 악화)
 - **2024 배포 shift 차이:** `+2.4134365010`
@@ -462,7 +462,7 @@
 - **확인 시즌:** 2024
 - **전문가 비중:** `0, 0.25, 0.5, 0.75, 1.0`
 - **채택 기준:** 개발 평균 `+5`, 최악 `-2`, 유형별 최악 `-5`, 2024 raw `+10`, 같은 평균 개선, 유형별 최악 `-5`
-- **실행 코드:** `0818/01_game_type_mixture_of_experts_colab.py`
+- **실행 코드:** `experiments/0818/01_game_type_mixture_of_experts_colab.py`
 - **선택된 전문가 비중:** `0.0`
 - **개발 raw 평균/최악 차이:** `0.0` / `0.0`
 - **개발 같은 평균 차이 및 유형별 최악 차이:** `0.0` / `0.0`
@@ -481,7 +481,7 @@
 - **선별 기준 모델:** CatBoost d6·lr0.05·L2=1 성공모델 3시드
 - **평가:** 공식 Brier Skill Score
 - **채택 기준:** 2023·2024 BSS 증분 모두 양수, 2024 `+5` 이상
-- **실행 코드:** `0819/01_catboost_residual_differential_screen_colab.py`
+- **실행 코드:** `experiments/0819/01_catboost_residual_differential_screen_colab.py`
 - **후속:** 통과할 때만 MR/wayoff offset과 공식 train 추세 shift를 결합한 전체 997 파이프라인 검증
 - **2023 BSS 증분:** `+31.7693760408`
 - **2024 BSS 증분:** `+36.2943178506`
@@ -495,7 +495,7 @@
 - **기준:** CatBoost d6·lr0.05·L2=1 + MR/wayoff offset + 공식 train 추세 shift
 - **후보:** 기준 성공확률에 손·2스트라이크·주자유무 잔차 차등을 더한 뒤 동일 offset·shift 적용
 - **시간 규칙:** 2023은 2021·2022, 2024는 2022·2023을 학습하지 않은 예측 오차표 사용
-- **실행 코드:** `0819/02_residual_differential_full_pipeline_colab.py`
+- **실행 코드:** `experiments/0819/02_residual_differential_full_pipeline_colab.py`
 - **채택 기준:** 2023·2024 BSS 모두 양수, 2024 BSS `+5` 이상, 2024 평균 오차 악화 `0.001` 이하
 - **2023 BSS 증분:** `+8.6274251576`
 - **2024 BSS 증분:** `+57.3686996122`
@@ -509,9 +509,9 @@
 - **목적:** 기존 997 ZIP을 보존하면서 잔차 차등 3축을 추가한 별도 제출 후보 생성
 - **표 원천:** 각 시즌 직전 연도까지만 학습한 7시드 CatBoost의 2023·2024 예측 오차
 - **추론:** test 현재 행의 투수·손·스트라이크·주자 값만 조회하고 성공확률에 보정 후 기존 offset·shift 적용
-- **기준 ZIP:** `0816/results/submit_catboost_train_trend_shift.zip`
-- **출력 ZIP:** `0819/results/submit_catboost_residual_differential.zip`
-- **실행 코드:** `0819/03_build_residual_differential_submission_colab.py`
+- **기준 ZIP:** `experiments/0816/results/submit_catboost_train_trend_shift.zip`
+- **출력 ZIP:** `experiments/0819/results/submit_catboost_residual_differential.zip`
+- **실행 코드:** `experiments/0819/03_build_residual_differential_submission_colab.py`
 - **표 규모:** 같은 손 499명, 2스트라이크 508명, 주자 존재 499명
 - **중앙 보정 차이 절댓값:** `0.0042121` / `0.0027521` / `0.0016151`
 - **ZIP 검사:** 손상 없음 (`zip_test_error=null`)
@@ -530,7 +530,7 @@
 - **조합:** 3개 단독, 3개 두 종류 조합, 3개 전체
 - **적용 강도:** `0.5`, `0.75`, `1.0`, `1.25`
 - **선택 규칙:** 2023·2024 모두 BSS 개선 후보 중 최악 시즌 증분 최대, 2024 `+5` 이상
-- **실행 코드:** `0819/04_error_adjustment_weight_screen_colab.py`
+- **실행 코드:** `experiments/0819/04_error_adjustment_weight_screen_colab.py`
 - **선택 구성:** 같은 손 조합 + 2스트라이크, 적용 강도 `1.25`
 - **2023 BSS 증분:** `+32.0811739386`
 - **2024 BSS 증분:** `+33.1534297417`
@@ -543,7 +543,7 @@
 - **현재 기준:** Public `1029.0832235020`의 보정 3종, 적용 강도 `1.0`
 - **후보:** 같은 손 조합·2스트라이크 보정만 적용, 강도 `1.25`
 - **목적:** 선별 결과가 MR/wayoff offset과 공식 train 추세 shift 이후에도 유지되는지 확인
-- **실행 코드:** `0819/02_residual_differential_full_pipeline_colab.py --axes hand,two_strikes --weight 1.25`
+- **실행 코드:** `experiments/0819/02_residual_differential_full_pipeline_colab.py --axes hand,two_strikes --weight 1.25`
 - **후보 2023 / 2024 BSS 증분:** `+4.5534013565` / `+59.9253084763`
 - **현재 3종 구성 2023 / 2024 BSS 증분:** `+8.6274251576` / `+57.3686996122`
 - **현재 구성 대비 변화:** 2023 `-4.0740238011`, 2024 `+2.5566088641`
@@ -560,7 +560,7 @@
 - **적용 강도:** `0.25`, `0.5`, `0.75`, `1.0`, `1.25`
 - **제외 사항:** F 전용 모델 재학습 없음, test 행 집계 없음
 - **선택 규칙:** 현재 3종 보정 대비 2023·2024 모두 BSS 개선, 2024 `+3` 이상
-- **실행 코드:** `0819/05_f_row_adjustment_screen_colab.py`
+- **실행 코드:** `experiments/0819/05_f_row_adjustment_screen_colab.py`
 - **선택된 강도:** 없음 (`selected=null`)
 - **판정:** `keep_1029_champion`
 - **결론:** 시험한 모든 강도에서 2023·2024 동시 개선 조건을 충족하지 못해 F 행 단독 보정을 종료
@@ -573,7 +573,7 @@
 - **공식:** `적용 비율 = asof_pitcher_n / (asof_pitcher_n + k)`
 - **완화 상수:** `0`, `50`, `100`, `300`, `500`, `1000`; `0`은 현재 구성
 - **선택 규칙:** 현재 구성 대비 2023·2024 모두 BSS 개선, 2024 `+3` 이상
-- **실행 코드:** `0819/06_history_amount_adjustment_screen_colab.py`
+- **실행 코드:** `experiments/0819/06_history_amount_adjustment_screen_colab.py`
 - **선택된 완화 상수:** 없음 (`selected=null`)
 - **판정:** `keep_1029_champion`
 - **결론:** 누적 투구 수에 따라 보정을 줄이는 모든 후보가 두 시즌 동시 개선에 실패해 현재 적용량 유지
@@ -588,7 +588,7 @@
 - **검증:** 각 연도 이전 Train만 학습하는 2023·2024 순방향 검증
 - **선택 규칙:** 같은 신호·계수가 두 연도 모두 BSS 개선, 2024 `+3` 이상, 평균 오차 악화 `0.001` 이하
 - **규정:** 보조 신호 중심값은 직전 시즌 Train 보정 과정에서만 계산하며 test 행 집계 없음
-- **실행 코드:** `0819/07_f_failure_signal_screen_colab.py`
+- **실행 코드:** `experiments/0819/07_f_failure_signal_screen_colab.py`
 - **선택 결과:** 없음 (`selected=null`)
 - **판정:** `keep_1029_champion`
 - **결론:** MR과 큰 이탈 모두 동일한 추가 계수로 2023·2024를 함께 개선하지 못해 결합 검증 및 ZIP 생성 중단
@@ -602,8 +602,8 @@
 - **평균 / 최악 변화:** `+0.5648907390` / `-0.1054431872`
 - **2024 절대 평균 오차 변화:** `-0.0000662057`
 - **성격:** 정식 로컬 게이트 미통과, 잔여 제출 기회를 이용한 탐색 후보
-- **실행 코드:** `0819/08_build_f_large_miss_probe_colab.py`
-- **출력:** `0819/results/submit_catboost_f_large_miss_0025.zip`
+- **실행 코드:** `experiments/0819/08_build_f_large_miss_probe_colab.py`
+- **출력:** `experiments/0819/results/submit_catboost_f_large_miss_0025.zip`
 - **제출 시각:** 2026-08-19 23:15:44
 - **Public Score:** `1028.8717014405`
 - **현재 최고 대비:** `-0.2115220615`
@@ -619,7 +619,7 @@
 - **제어기:** CatBoostRegressor depth 4, 250 iterations, lr `0.025`, L2 `100`
 - **적용 강도:** `0.05`, `0.10`, `0.15`, `0.20`, `0.30`
 - **검증:** 2021·2022 → 2023, 2022·2023 → 2024
-- **실행 코드:** `0820/01_f_residual_controller_screen_colab.py`
+- **실행 코드:** `experiments/0820/01_f_residual_controller_screen_colab.py`
 - **선택 결과:** 없음 (`selected=null`)
 - **판정:** `keep_1029_champion`
 - **결론:** 시험한 모든 적용 강도에서 2023·2024 동시 개선 조건을 충족하지 못해 전체 학습 및 ZIP 제작 중단
@@ -632,7 +632,7 @@
 - **고정 요소:** 성공모델, 과거 예측 오차 보정 3종, 피처와 모델 파라미터
 - **추가 시드:** `99`, `1`, `123`
 - **검증:** 2023·2024 순방향 전체 과정
-- **실행 코드:** `0820/02_auxiliary_six_seed_calibration_screen_colab.py`
+- **실행 코드:** `experiments/0820/02_auxiliary_six_seed_calibration_screen_colab.py`
 - **6시드 + 기존 shift 2023 / 2024:** `+5.2875262661` / `-1.7550180043`
 - **6시드 + Train 재계산 shift 2023 / 2024:** `+5.3644104229` / `-1.7509770853`
 - **2024 절대 평균 오차 변화:** 각각 `-0.0000625401` / `-0.0000628166`
@@ -646,8 +646,8 @@
 - **후보:** MR·큰 이탈 6시드 평균 + 공식 Train 기반 2025 shift 재계산
 - **근거 JSON:** `0820_auxiliary_six_seed_calibration.json`
 - **성격:** 정식 로컬 게이트 미통과, 사용자 요청 탐색 제출
-- **실행 코드:** `0820/03_build_auxiliary_six_seed_probe_colab.py`
-- **출력:** `0820/results/submit_catboost_aux6_recomputed_shift_probe.zip`
+- **실행 코드:** `experiments/0820/03_build_auxiliary_six_seed_probe_colab.py`
+- **출력:** `experiments/0820/results/submit_catboost_aux6_recomputed_shift_probe.zip`
 - **production logit shift:** `-0.0689738607`
 - **Public Score:** `1009.4332838027`
 - **현재 최고 대비:** `-19.6499396993`
@@ -663,7 +663,7 @@
 - **후보:** CatBoostRegressor가 `control_success - dynamic_pitcher_base` 학습
 - **비교:** 동일 피처의 직접 CatBoostClassifier
 - **검증:** 2022·2023·2024 개별 BSS, pooled BSS, 오차 상관
-- **실행 코드:** `0820/04_dynamic_pitcher_baseline_residual_screen_colab.py`
+- **실행 코드:** `experiments/0820/04_dynamic_pitcher_baseline_residual_screen_colab.py`
 - **2022 / 2023 / 2024 BSS 변화:** `-44.5785953401` / `-1436.8537977632` / `-51.9202351969`
 - **pooled BSS 변화:** `-504.9753070532`
 - **오차 상관:** `0.999456` / `0.990779` / `0.999274`
@@ -678,7 +678,7 @@
 - **후보:** 세 단독 채널 및 동일가중 평균
 - **검증:** 2022·2023·2024 개별 BSS, pooled BSS, 직접 분류기와 오차 상관
 - **시드:** 구조 선별 단계 단일시드; 통과 채널만 3→6시드 확대
-- **실행 코드:** `0820/05_multichannel_residual_architecture_screen_colab.py`
+- **실행 코드:** `experiments/0820/05_multichannel_residual_architecture_screen_colab.py`
 - **compact 2022 / 2023 / 2024:** `-102.3655` / `-1488.9070` / `-94.7010`
 - **expanded slow:** `-60.9727` / `-1381.2311` / `-47.4203`
 - **expanded recent:** `-89.7824` / `-1454.2702` / `-64.3323`
@@ -808,7 +808,7 @@
 - 제출 규정 재확인: 최종 빌더는 5행 일괄 예측과 각 행의 단독 예측을 비교하며 최대 차이 `1e-12` 이하를 요구한다. 저장된 Train 자산과 현재 행만 사용하는지 이 검사로 최종 확인한다.
 - F 전환 제출 빌드: R행 기준 ZIP 대비 최대 차이와 단독·일괄 차이가 모두 `0.0`이었다. F 스모크 행은 `-0.00086356`만큼 실제 변경됐고 ZIP 무결성·결측·범위 검사를 통과해 `submit_catboost_r0050_f_transition0050.zip`을 제출 가능 후보로 확정한다.
 - F 전환 리더보드 결과: `1030.6410723404`로 R 0.05 챔피언보다 `-2.3715595375` 하락했다. 전체 anchor 로컬 `+4.3528`이 서버에서 반대로 전이됐으므로 F 이전 유형 전환 축을 폐기하고 R 0.05를 유지한다.
-- 전이 강건성 평가: 로컬 양수만으로는 제출하지 않도록 시즌별 최소 `+1`, 개선 크기 비율 `0.25`, 투수 묶음 재표본화 개선 확률 `0.80`, 평균 수준을 제외한 행별 형태 기여 양수를 동시에 요구한다. `0821/08_transfer_robustness_audit_colab.py`로 기존 F 전환 후보를 재평가하며 ZIP은 생성하지 않는다.
+- 전이 강건성 평가: 로컬 양수만으로는 제출하지 않도록 시즌별 최소 `+1`, 개선 크기 비율 `0.25`, 투수 묶음 재표본화 개선 확률 `0.80`, 평균 수준을 제외한 행별 형태 기여 양수를 동시에 요구한다. `experiments/0821/08_transfer_robustness_audit_colab.py`로 기존 F 전환 후보를 재평가하며 ZIP은 생성하지 않는다.
 - 전이 강건성 결과: 원본 0.05 보정은 2023 `+38.03`, 2024 `+4.50`, 투수 묶음 개선 확률 최소 `0.906`이었지만 시즌 개선 크기 비율이 `0.118`에 불과했다. 학습 시즌 F 평균을 제거하면 2023 `-19.04`, 2024 `-1.57`로 반전됐다. `selected=null`로 F 전환을 최종 폐기하고 R 0.05·Public `1033.0126318779`를 유지한다.
 - 다음 독립 축: 이닝 구간·공수·아웃·주자·점수 상황·레버리지의 행별 경기 상태 조합을 원천 시즌 리그 유형 평균 잔차로 중심화해 선별한다. 강화된 전이 게이트를 처음부터 적용하며 기존 2022~2024 anchor를 재사용한다.
 - 경기 상태 형태 결과: 최상위 이닝 구간×공수×아웃도 2023 `+0.269`, 2024 `+0.615`, 투수 묶음 개선 확률 최소 `0.582`였다. 모든 후보가 시즌별 `+1`과 bootstrap `0.80` 게이트를 통과하지 못해 `selected=null`로 폐기한다.
@@ -848,17 +848,17 @@
 - 혼합비는 R/F를 분리한다. 2023 적용값은 2022만, 2024 적용값은 2022~2023만 사용해 선택한다.
 - 선택 목적함수는 `연도별 평균 BSS 개선 + 0.35 × 최악 연도 개선`이며 2024 정답으로 2024 가중치를 고르지 않는다.
 - 승격 게이트: 2023·2024 strict delta 모두 양수, 2024 투수 묶음 bootstrap 개선 확률 0.80 이상, 전체 OOF 동결 가중치 중 하나 이상 양수다.
-- 실행기: `0823/01_strict_anchor_comparison_colab.py`. 결과 OOF ZIP 또는 폴더와 기존 `components_2022~2024.npz`를 직접 받아 행·타깃 정렬을 검증한다.
+- 실행기: `experiments/0823/01_strict_anchor_comparison_colab.py`. 결과 OOF ZIP 또는 폴더와 기존 `components_2022~2024.npz`를 직접 받아 행·타깃 정렬을 검증한다.
 - 1차 결과: 이전 연도만으로 선택한 R 혼합 0.20·F 혼합 0.0이 2023 전체 `+63.40`, 2024 `+309.66`이었다. 2024 투수 묶음 bootstrap 개선 확률은 `1.0`, Brier 개선 95% 구간은 `0.000580~0.000990`으로 1차 게이트를 통과했다.
 - 해석 제한: 이 비교의 현재 기준은 저장된 기본 anchor이며 서버 최고에 포함된 검증 shift·R 0.075·R 실패여집합 0.20의 완전한 parity 예측은 아니다. 전체 OOF 동결 추천에서 F 0.025가 나오더라도 2022 F가 음수이고 strict 2024 선택값은 F 0.0이므로 F는 변경하지 않는다.
 - 최종 확인: 현재 챔피언 parity를 재구성한 뒤 strict 전체 보정 전 예측을 R행에만 0.025~0.20 혼합한다. 두 시즌 최소 `+1`, 크기 비율 0.25, 투수 bootstrap 0.80을 다시 통과할 때만 제출 ZIP을 만든다.
 - 챔피언 parity 결과: R 혼합 0.025~0.20이 모두 2023·2024 양수이고 투수 bootstrap은 전부 `1.0`이었다. 0.05는 `+15.46/+72.20`, 0.20은 `+57.29/+260.88`이지만 연도 크기 비율이 `0.213~0.220`으로 자동 게이트 0.25에 근소하게 미달했다.
 - 제출 탐침: 부호·bootstrap·강도 반응이 모두 안정적이므로 자동 승격은 보류하되 R 0.05만 보수적 단일 탐침으로 생성한다. F행은 현재 챔피언과 동일하게 유지한다.
-- 빌드 방식: 현재 챔피언과 strict 최종 추론 패키지를 각각 행 독립적으로 실행하고 R행에서만 `0.95×현재 + 0.05×strict`를 적용한다. `0823/03_build_strict_r_blend_submission_colab.py`가 두 패키지를 중첩하고 샘플 추론·ZIP 무결성을 검사한다.
+- 빌드 방식: 현재 챔피언과 strict 최종 추론 패키지를 각각 행 독립적으로 실행하고 R행에서만 `0.95×현재 + 0.05×strict`를 적용한다. `experiments/0823/03_build_strict_r_blend_submission_colab.py`가 두 패키지를 중첩하고 샘플 추론·ZIP 무결성을 검사한다.
 - R 0.05 제출 빌드: `submit_catboost_champion_strict_r005.zip`, SHA-256 `bf5a6ea9...b563`으로 생성했다. 134개 멤버의 ZIP 검사 오류와 샘플 결측은 없었고, 5개 R 스모크 행에서 두 내부 추론을 완료한 뒤 최종 평균 `0.450499`를 기록했다. 서버 결과 전까지 현재 `1035.4845` 챔피언은 유지한다.
 - 제출 보류: 두 완성 추론 패키지를 중첩한 ZIP은 구조 변화와 자산 사용 범위가 크므로 진단용으로만 보관한다. 제출 후보는 공식 Train으로 자체 재학습한 모델만 포함하도록 제한한다.
 - 자체 R 다중채널 재구성: 현재 full residual 외에 강규제 경기문맥 CatBoost와 선수이력 CatBoost를 각각 3시드로 학습한다. 두 보조채널 평균으로 기존 R correction의 0.10~1.0을 교체하며 F·검증 shift·실패여집합 0.20·전체 R 강도 0.075는 고정한다.
-- 자체 재구성 게이트: 2023·2024 최소 `+1`, 연도 개선 크기 비율 0.20, 투수 bootstrap 0.80을 요구한다. 실행기는 `0823/04_r_multichannel_reconstruction_screen_colab.py`이며 통과 전에는 모델이나 ZIP을 생성하지 않는다.
+- 자체 재구성 게이트: 2023·2024 최소 `+1`, 연도 개선 크기 비율 0.20, 투수 bootstrap 0.80을 요구한다. 실행기는 `experiments/0823/04_r_multichannel_reconstruction_screen_colab.py`이며 통과 전에는 모델이나 ZIP을 생성하지 않는다.
 - 자체 R 다중채널 결과: 최소 교체 0.10도 2023 `+0.51`, 2024 `-0.60`, bootstrap 최소 `0.094`였고 교체 강도가 커질수록 2024 하락이 `-7.52`까지 확대됐다. 문맥·선수이력 채널이 기존 full residual보다 안정적이지 않아 `selected=null`로 폐기한다.
 - 다음 자체 축: 새 모델 계열 추가를 중단하고 서버에서 이미 양수 전이가 확인된 R 실패여집합 채널의 현재 0.20 이후 강도만 검증한다. 0.20을 기준으로 0.25·0.30·0.40의 챔피언 parity 곡선을 먼저 확인하고, 두 시즌 안정성이 유지될 때만 단일 후보를 만든다.
 - 별도 진단: strict model-only R 혼합도 기존 0.20에서 탐색 경계에 도달했으므로 0.25·0.30·0.40을 챔피언 parity OOF에서 추가 확인한다. 이 축은 자체 실패여집합 강도와 혼동하지 않고 별도 결과로 기록하며, 완성 추론 자산의 사용 범위 판단 전에는 제출 승격하지 않는다.
@@ -875,7 +875,7 @@
 - Futures 하드 라우팅 감사: 현재 챔피언 parity의 R행은 완전히 고정하고 `game_type=F` 행만 별도 strict F 전용 또는 전체 보정 예측으로 교체한다. 2023·2024 전체/F delta와 F 투수 bootstrap을 비교하며 R행 최대 변화가 정확히 0인지 검사한다. 통과하더라도 완성 자산을 직접 제출하지 않고 동일 Futures 구조의 자체 재학습 근거로만 사용한다.
 - Futures 하드 라우팅 결과: `F 전용 경로` 교체는 전체 기준 2023 `+310.05`, 2024 `+64.89`, F 내부 `+2972.40/+551.39`, F 투수 bootstrap 최소 `1.0`으로 통과했다. 전체 보정 경로 교체는 평균 개선은 양수였지만 bootstrap 최소 `0.779`로 탈락했다. 자체 재구성 범위는 F 전문가 경로까지만으로 제한하고 후단 surface·transition은 제외한다.
 - Futures 빌드업 1단계: strict OOF의 `공통 경로 → F 전용 경로` 증분과 F checkpoint의 저장 채널·상관·평균 이동을 연도별로 분해한다. 세 연도 모두 공통 경로 대비 양수인 채널 구조만 공식 Train 기반 자체 재학습 대상으로 넘긴다.
-- 관리 경로 분리: 이후 실행 파일은 생성일 기준 `08xx/` 날짜 폴더 아래에서 관리한다. F 전문가 재구성 흐름은 `0822/06~09`, `0823/11~15`, `0829/01~02`에 나눠 보관한다.
+- 관리 경로 분리: 이후 실행 파일은 생성일 기준 `08xx/` 날짜 폴더 아래에서 관리한다. F 전문가 재구성 흐름은 `experiments/0822/06~09`, `experiments/0823/11~15`, `experiments/0829/01~02`에 나눠 보관한다.
 - F 전용 경로 구성요소 감사 결과: 공통 경로 대비 delta는 2022 `+137.25`, 2023 `-2321.14`, 2024 `+58.64`로 2023에서 크게 반전됐다. 저장 채널은 세 잔차 확률·실패위험 및 보조 경로였다. F 전용 경로 자체 재구성은 중단하고, 현재 R 챔피언의 F행을 strict 공통 경로로 교체하는 하드 라우팅을 추가 감사한다.
 - Futures 경로 최종 감사: 현재 R 챔피언을 고정한 공통 경로 F 교체는 전체 2023 `+552.17`, 2024 `+57.99`, F 내부 `+5293.54/+492.74`, bootstrap `1.0`으로 통과했다. F 전용 경로도 전체 `+310.05/+64.89`, bootstrap `1.0`이지만 공통 경로 대비 2023 붕괴와 더 높은 복잡도를 고려해 자체 재구성 1순위는 공통 경로로 정한다. 전체 보정 경로는 bootstrap `0.779`로 제외한다.
 - 공통 경로 자체 재구성: 전체 R/F 과거 행으로 직접 성공확률 CatBoost를 학습하되 목표 연도 정답으로 early stopping하지 않는다. 직전 시즌을 내부 holdout으로 seed별 iteration과 logit shift를 정하고 목표 시즌 직전까지 재학습한다. 3시드 raw·이전연도 calibration을 비교해 2023·2024 전체 `+5`, F 양수, F bootstrap `0.80`을 통과할 때만 6시드로 확대한다.
@@ -929,20 +929,20 @@
 - R 시간가중 결과: 최선인 decay 0.30·raw·강도 0.01도 2023 전체/R `-0.19/-0.21`, 2024 `+11.73/+13.30`, 최소 bootstrap `0.164`로 탈락했다. 이후 근사 anchor 재조합을 중단하고 현재 자체 챔피언의 R/F 경로를 그대로 재학습한 행별 strict OOF를 저장한 뒤 모든 residual 실험의 단일 기준으로 사용한다.
 - 자체 챔피언 OOF 결과: 2023 전체/R/F BSS는 `-1109.59/569.91/-15857.36`, 2024는 `191.35/118.23/411.28`이었다. 2023 F 시즌 전이가 핵심 병목이므로 2022 F general6 OOF를 추가하고, 정확한 `target-p_champion`을 목표로 한 F residual을 2022→2023 및 2022~2023→2024에서 검증한다.
 - F residual 1차 결과: 가장 약한 depth 2·L2 100·scale 0.005도 2023 전체/F `-2.03/-19.44`, 2024 `+1.21/+10.31`로 부호가 반전됐다. 정적 residual 추가는 폐기하고 F general6의 과거 OOF를 2021까지 확장해 시즌별 평균 수준(level)과 행별 순위 신호(shape)를 분리한다.
-- F 장기 OOF 진단: `0823/21_oof_build_f_history_oof_colab.py`가 2021·2022 general6 예측을 동일한 6시드·직전 시즌 iteration 선택·최소 128 iteration·이전 시즌 calibration 방식으로 생성한다. `0823/22_oof_f_level_shape_transfer_audit_colab.py`는 2021~2024 F행의 평균 오차, 최적 logit level shift, level 보정 이득과 target-prediction 상관을 기록한다. 2022~2024 level shift 부호가 안정적일 때만 이전 시즌 calibration을 검증하고, 반전되면 정적 보정 없이 season-state 경로 선택으로 전환한다.
+- F 장기 OOF 진단: `experiments/0823/21_oof_build_f_history_oof_colab.py`가 2021·2022 general6 예측을 동일한 6시드·직전 시즌 iteration 선택·최소 128 iteration·이전 시즌 calibration 방식으로 생성한다. `experiments/0823/22_oof_f_level_shape_transfer_audit_colab.py`는 2021~2024 F행의 평균 오차, 최적 logit level shift, level 보정 이득과 target-prediction 상관을 기록한다. 2022~2024 level shift 부호가 안정적일 때만 이전 시즌 calibration을 검증하고, 반전되면 정적 보정 없이 season-state 경로 선택으로 전환한다.
 - F level-shape 결과: F 정답 평균은 2021/2022 `0.704/0.709`에서 2023/2024 `0.473/0.459`로 구조적으로 하락했다. 2023·2024 shape 상관은 `0.0677/0.0702`로 낮지만 같은 방향이었고, 최적 level shift는 2022 `+0.013`, 2023 탐색 하한 `-0.20`, 2024 `-0.0515`로 고정 보정의 부호 안정성이 없었다.
 - F 이전연도 level gate: 직전 시즌 최적 shift의 절댓값이 dead-zone 이상일 때만 `0.025/0.05/0.075`로 cap해 적용한다. 2023은 2022의 작은 shift를 차단하고, 2024는 2023의 큰 음수 shift를 제한 적용한다. 모든 상수는 공식 Train OOF에서 미리 정하며 평가행 전체 통계는 사용하지 않는다.
 - F 이전연도 level gate 결과: dead-zone `0.02`, cap `0.05`가 2023 완전 무변경, 2024 전체/F `+7.77/+65.99`, F 투수 bootstrap `0.956`으로 통과했다. 2024 OOF에서 얻은 배포 source shift `-0.0515`를 cap한 `-0.05`를 자체 단일 패키지의 F행에만 적용한다. 빌더는 R행 불변, 전체/단일행 예측 일치, 단일 `script.py`, 중첩 ZIP 부재를 검사한다.
 - F 이전연도 level gate 제출 결과: `rchampion_fgeneral6_flevelm005`는 `1031.6856843251`로 자체 재학습 기준 최고 `fgeneral6_r0075`보다 `-31.3927671472`, 전체 기준 최고 `1086.0400475105`보다 `-54.3543631854` 하락했다. 구조 검사는 통과했지만 level 보정이 실제 평가 분포로 전이되지 않았으므로 폐기하고, F행은 `fgeneral6` 강도 1.0을 유지한다.
-- R 구간 안정성 감사: F행 실험은 동결하고, 자체 챔피언 OOF의 R행에서 `예측구간×count/base/hand/out/inning/score`별 residual 부호가 2023·2024에 반복되는지 먼저 찾는다. 실행기는 `0828/01_train_r_segment_error_audit_colab.py`이며, 검증 정답으로 구간을 찾는 진단용 screen이라 결과를 직접 제출 패키지에 넣지 않는다. 통과 구간이 있으면 다음 단계에서 이전 시즌만으로 구간 보정값을 동결하는 strict R route로 재작성한다.
-- R 구간 strict 전이 검증: 진단에서 가장 강했던 `예측구간×손 조합` 축을 포함해 2023 R residual만으로 segment 보정값을 만들고 2024 R행에 적용한다. 실행기는 `0828/02_train_r_segment_transfer_screen_colab.py`이며, 2024 delta `+1`과 투수 bootstrap `0.80`을 넘을 때만 2024 전체 Train residual segment를 frozen asset으로 만드는 제출 경로로 진행한다.
-- R 구간 strict 전이 결과: `axis_p_hand`, alpha `50`, scale `0.15`가 2024 R행에서 BSS `+17.81`, 변경 행 `206,965`, 평균 예측 변화 `+0.000785`, 투수 bootstrap `1.0`으로 통과했다. 제출 빌더 `0828/03_build_train_r_segment_submission_colab.py`는 2024 자체 OOF에서 segment residual table을 고정 asset으로 저장하고, 추론 때는 각 test 행의 예측구간과 손 조합만 사용해 R행에만 correction을 적용한다.
+- R 구간 안정성 감사: F행 실험은 동결하고, 자체 챔피언 OOF의 R행에서 `예측구간×count/base/hand/out/inning/score`별 residual 부호가 2023·2024에 반복되는지 먼저 찾는다. 실행기는 `experiments/0828/01_train_r_segment_error_audit_colab.py`이며, 검증 정답으로 구간을 찾는 진단용 screen이라 결과를 직접 제출 패키지에 넣지 않는다. 통과 구간이 있으면 다음 단계에서 이전 시즌만으로 구간 보정값을 동결하는 strict R route로 재작성한다.
+- R 구간 strict 전이 검증: 진단에서 가장 강했던 `예측구간×손 조합` 축을 포함해 2023 R residual만으로 segment 보정값을 만들고 2024 R행에 적용한다. 실행기는 `experiments/0828/02_train_r_segment_transfer_screen_colab.py`이며, 2024 delta `+1`과 투수 bootstrap `0.80`을 넘을 때만 2024 전체 Train residual segment를 frozen asset으로 만드는 제출 경로로 진행한다.
+- R 구간 strict 전이 결과: `axis_p_hand`, alpha `50`, scale `0.15`가 2024 R행에서 BSS `+17.81`, 변경 행 `206,965`, 평균 예측 변화 `+0.000785`, 투수 bootstrap `1.0`으로 통과했다. 제출 빌더 `experiments/0828/03_build_train_r_segment_submission_colab.py`는 2024 자체 OOF에서 segment residual table을 고정 asset으로 저장하고, 추론 때는 각 test 행의 예측구간과 손 조합만 사용해 R행에만 correction을 적용한다.
 - R 구간 보정 제출 메모: `submit_catboost_rchampion_fgeneral6_rseg015.zip`는 `rchampion_fgeneral6`을 기준으로 F행을 유지하고 R행에만 `axis_p_hand` frozen segment correction을 추가한 후보이다. alpha `50`, scale `0.15`, segment `8`개를 사용하며 ZIP 무결성 오류 없음, `script.py` 1개, 중첩 ZIP 0개, 결측 0, 행 독립성 최대 차이 `0.0`을 확인했다. 샘플 R행 평균 변화는 `+0.00320068`, 최대 절대 변화는 `0.00800178`로 성능상 과보정 가능성은 남지만 규칙 점검은 통과했다.
 - R 구간 보정 제출 결과: 최초 ZIP은 문자열 key dtype 오류로 실행 실패했고, `submit_catboost_rchampion_fgeneral6_rseg015_fix.zip`로 재생성한 뒤 제출했다. 서버 점수는 `1040.2470580574`로 기준 `rchampion_fgeneral6`의 `1050.1729660849`보다 `-9.9259080275` 하락했다. 2023→2024 strict OOF 전이와 투수 bootstrap은 강했지만 실제 평가에서는 R segment level 보정이 과하게 작용했으므로 이 축은 폐기한다.
-- R strict response 후보: 서버에서 양수였던 R strict 혼합 축으로 돌아가 `0.05→0.075` 사이와 바깥의 `0.0625/0.0875/0.10` 유효 강도 후보를 같은 패키징 방식으로 만든다. 실행기는 `0829/03_repack_train_r_strict_response_colab.py`이며, F행은 유지하고 R행만 기존 기준과 strict 후보 사이를 선형 혼합한다. 이 실험은 새 모델을 추가하지 않고 서버 반응곡선의 국소 정점을 찾는 용도다.
+- R strict response 후보: 서버에서 양수였던 R strict 혼합 축으로 돌아가 `0.05→0.075` 사이와 바깥의 `0.0625/0.0875/0.10` 유효 강도 후보를 같은 패키징 방식으로 만든다. 실행기는 `experiments/0829/03_repack_train_r_strict_response_colab.py`이며, F행은 유지하고 R행만 기존 기준과 strict 후보 사이를 선형 혼합한다. 이 실험은 새 모델을 추가하지 않고 서버 반응곡선의 국소 정점을 찾는 용도다.
 - R strict 0.0875 제출 결과: `submit_catboost_fgeneral6_rstrict0875.zip`가 `1065.0894351120`을 기록해 기존 자체 재학습 기준 최고 `fgeneral6_r0075`의 `1063.0784514723`보다 `+2.0109836397` 개선됐다. R strict response 축은 아직 상승 구간으로 판단하며, 다음 단일 후보는 `0.09375`, 그 다음 후보는 `0.10`으로 제한한다.
-- F post-regime profile screen: R strict response 탐색은 일단 중단하고, 현재 기준의 F행에서 2023 residual profile을 만들어 2024 F행에 전이되는지 확인한다. 실행기는 `0829/01_train_f_postregime_profile_screen_colab.py`이며 `pitcher_id×batter_hand`, `batter_team_id`, `pitcher_team_id×count`, `batter_id×pitcher_hand` 축을 shrinkage·scale·cap으로 제한해 검사한다. 2024 F delta `+5`, 투수 bootstrap `0.80`, 평균 예측 변화 `0.003` 이내일 때만 제출 경로로 넘긴다.
-- F post-regime profile 선별 결과: `pitcher_team_id×count`, shrinkage `10000`, scale `0.10`, cap `0.01`이 2024 F행에서 `+25.52`, 변경 행 `17,688`, 평균 예측 변화 `-0.00150`, 투수 bootstrap `1.0`으로 통과했다. 빌더 `0829/02_build_train_f_postregime_profile_submission_colab.py`는 2024 자체 OOF residual profile을 frozen asset으로 저장하고, 추론 때는 각 F행의 팀·카운트 key만 사용해 보정한다.
-- R gap/pocket 선별 계획: 현재 자체 최고 OOF의 R행에서 투수·타자 asof 성공률 격차와 투수 최근폼 격차를 residual model 입력으로 쓰고, count·hand·base·예측구간·gap 구간으로 좁은 음수 pocket만 별도 downshift한다. 실행기는 `0829/04_train_r_gap_pocket_screen_colab.py`이며 2023 R행으로 학습한 뒤 2024 R행에 전이해 R BSS `+2`, 투수 bootstrap `0.80`, 평균 예측 변화 `0.003` 이내일 때만 제출 빌더로 넘긴다.
-- R residual rebuild 선별 계획: 미세 scale 탐색 대신 현재 자체 최고 OOF의 R행에서 `target-p_champion`을 직접 학습하는 CatBoost residual 경로를 새로 만든다. 실행기는 `0829/05_train_r_residual_rebuild_screen_colab.py`이며 anchor logit, 투수·타자 gap, 최근폼 gap, count/hand/base/team/context를 입력으로 쓰고 scale·표본수 reliability·cap을 함께 검사한다. 최신 fold에서 R BSS `+20`, 투수 bootstrap `0.90` 이상일 때만 큰 점수 후보로 승격한다.
-- R residual rebuild 선별 결과: 2023 R행으로 학습해 2024 R행에 전이한 결과 scale `0.30`, alpha `0`, cap `0.04`가 R BSS `+152.60`, 평균 예측 변화 `+0.00160`, 평균 절대 변화 `0.00633`, 투수 bootstrap `1.0`으로 통과했다. 제출 빌더 `0829/06_build_train_r_residual_rebuild_submission_colab.py`는 2024 자체 OOF residual로 4시드 모델을 재학습하고 R행에만 동일 보정을 적용한다.
+- F post-regime profile screen: R strict response 탐색은 일단 중단하고, 현재 기준의 F행에서 2023 residual profile을 만들어 2024 F행에 전이되는지 확인한다. 실행기는 `experiments/0829/01_train_f_postregime_profile_screen_colab.py`이며 `pitcher_id×batter_hand`, `batter_team_id`, `pitcher_team_id×count`, `batter_id×pitcher_hand` 축을 shrinkage·scale·cap으로 제한해 검사한다. 2024 F delta `+5`, 투수 bootstrap `0.80`, 평균 예측 변화 `0.003` 이내일 때만 제출 경로로 넘긴다.
+- F post-regime profile 선별 결과: `pitcher_team_id×count`, shrinkage `10000`, scale `0.10`, cap `0.01`이 2024 F행에서 `+25.52`, 변경 행 `17,688`, 평균 예측 변화 `-0.00150`, 투수 bootstrap `1.0`으로 통과했다. 빌더 `experiments/0829/02_build_train_f_postregime_profile_submission_colab.py`는 2024 자체 OOF residual profile을 frozen asset으로 저장하고, 추론 때는 각 F행의 팀·카운트 key만 사용해 보정한다.
+- R gap/pocket 선별 계획: 현재 자체 최고 OOF의 R행에서 투수·타자 asof 성공률 격차와 투수 최근폼 격차를 residual model 입력으로 쓰고, count·hand·base·예측구간·gap 구간으로 좁은 음수 pocket만 별도 downshift한다. 실행기는 `experiments/0829/04_train_r_gap_pocket_screen_colab.py`이며 2023 R행으로 학습한 뒤 2024 R행에 전이해 R BSS `+2`, 투수 bootstrap `0.80`, 평균 예측 변화 `0.003` 이내일 때만 제출 빌더로 넘긴다.
+- R residual rebuild 선별 계획: 미세 scale 탐색 대신 현재 자체 최고 OOF의 R행에서 `target-p_champion`을 직접 학습하는 CatBoost residual 경로를 새로 만든다. 실행기는 `experiments/0829/05_train_r_residual_rebuild_screen_colab.py`이며 anchor logit, 투수·타자 gap, 최근폼 gap, count/hand/base/team/context를 입력으로 쓰고 scale·표본수 reliability·cap을 함께 검사한다. 최신 fold에서 R BSS `+20`, 투수 bootstrap `0.90` 이상일 때만 큰 점수 후보로 승격한다.
+- R residual rebuild 선별 결과: 2023 R행으로 학습해 2024 R행에 전이한 결과 scale `0.30`, alpha `0`, cap `0.04`가 R BSS `+152.60`, 평균 예측 변화 `+0.00160`, 평균 절대 변화 `0.00633`, 투수 bootstrap `1.0`으로 통과했다. 제출 빌더 `experiments/0829/06_build_train_r_residual_rebuild_submission_colab.py`는 2024 자체 OOF residual로 4시드 모델을 재학습하고 R행에만 동일 보정을 적용한다.

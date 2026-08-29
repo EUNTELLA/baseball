@@ -32,7 +32,7 @@ Phase 2 결과와 코드 검증을 바탕으로 약 100명의 Phase 3 진출자�
 
 ```text
 .
-├── baseline/
+├── experiments/baseline/
 │   ├── [Baseline_Train]_RandomForest...ipynb
 │   └── [Baseline_Inference]_RandomForest...ipynb
 ├── open/
