@@ -91,3 +91,12 @@ python 0822/05_build_f_auxiliary_meta_core_submission_colab.py \
 ```
 
 서버에서 검증된 현재 최고 R failure-complement ZIP에 F core만 추가해 효과를 독립 측정한다. 실제 샘플의 R행 불변과 합성 F행 변경을 모두 검사하므로 새 최고 대비 F core의 서버 효과만 확인할 수 있다.
+
+## 추가 정리된 실행 파일
+
+2026-08-22에 만든 F 경로 재구성 실행 파일은 날짜 폴더로 합쳤다.
+
+- `06_train_f_component_audit_colab.py`: F 구성요소 checkpoint 감사
+- `07_train_f_general_route_reconstruction_colab.py`: F general route 재구성 검증
+- `08_build_train_f_general_route_submission_colab.py`: F general route 제출 ZIP 생성
+- `09_repack_train_f_general_route_strengths_colab.py`: F general route 강도 후보 재패키징
