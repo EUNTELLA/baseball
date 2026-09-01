@@ -3,7 +3,7 @@
 /open/data/train.csv
 /open/data/trackman_history.csv
 
-# Competition reference material
+# Competition documents
 *.pdf
 
 # Generated submissions and model artifacts

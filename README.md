@@ -32,30 +32,22 @@ Phase 2 결과와 코드 검증을 바탕으로 약 100명의 Phase 3 진출자�
 
 ```text
 .
-├── experiments/baseline/
-│   ├── [Baseline_Train]_RandomForest...ipynb
-│   └── [Baseline_Inference]_RandomForest...ipynb
-├── open/
-│   ├── data/
-│   │   ├── train.csv
-│   │   ├── test.csv
-│   │   ├── sample_submission.csv
-│   │   └── trackman_history.csv
-│   ├── data_description.md
-│   └── submit.zip
-├── open.zip
+├── common/          # 공통 라벨·피처 유틸
+├── doc/             # 실험 및 제출 기록
+├── experiments/     # 날짜별 실험 코드와 baseline
+├── main_colab/      # 대표 Colab 실행 노트북
+├── .gitignore
 └── README.md
 ```
 
-- `train.csv`: 학습 입력 및 정답 데이터, 1,475,092행 × 49열
-- `test.csv`: 컬럼 형식 확인용 샘플 5행 × 48열. 평가 시 실제 비공개 데이터로 교체
-- `sample_submission.csv`: 제출 형식 확인용 샘플 5행 × 2열
-- `trackman_history.csv`: 2019~2024년 Trackman 과거 로그, 1,793,078행 × 30열
-- `open/submit.zip`: 운영진 베이스라인 기반 제출 파일 예시
+- `experiments/baseline/`: baseline 노트북
+- `experiments/08xx/`: 날짜별 실험·검증·제출 빌드 코드
+- `common/`: 여러 실험에서 공유하는 파생변수와 라벨 유틸
+- `main_colab/`: 주요 실행 노트북
 
-전체 컬럼 정의는 [데이터 설명서](open/data_description.md), 현재 코드에서 사용하는 구조와 파생 정보는 [데이터 구조 문서](doc/DATA_STRUCTURE.md)를 참고하세요.
+로컬 데이터(`open/`, `open.zip`, 제출 ZIP, 생성 결과)는 `.gitignore`로 제외합니다.
 
-모델별 실험 내용과 리더보드 제출 결과는 [실험 및 제출 기록](EXPERIMENTS.md)에 누적합니다.
+모델별 실험 내용과 리더보드 제출 결과는 [실험 및 제출 기록](doc/EXPERIMENTS.md)에 누적합니다.
 
 ## 데이터 사용 원칙
 
