@@ -131,7 +131,7 @@ submit.zip
 ├── data/               # 읽기 전용 실제 평가 데이터
 └── output/             # 예측 결과 저장 경로
     └── submission.csv
-```
+``` 
 
 `script.py`는 반드시 `output/submission.csv`를 생성해야 합니다. 결과 파일은 평가 서버의 `test.csv`와 동일한 `row_id`를 포함하고, `control_success` 열에 0 이상 1 이하의 확률을 기록해야 합니다.
 
